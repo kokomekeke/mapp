@@ -19,7 +19,7 @@ namespace GMap.NET.WindowsForms.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources {
@@ -76,6 +76,16 @@ namespace GMap.NET.WindowsForms.Properties {
         internal static System.Drawing.Bitmap arrowshadow {
             get {
                 object obj = ResourceManager.GetObject("arrowshadow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Bíborkör {
+            get {
+                object obj = ResourceManager.GetObject("Bíborkör", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,6 +163,16 @@ namespace GMap.NET.WindowsForms.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Feketekör {
+            get {
+                object obj = ResourceManager.GetObject("Feketekör", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap gray_small {
             get {
                 object obj = ResourceManager.GetObject("gray_small", resourceCulture);
@@ -213,6 +233,16 @@ namespace GMap.NET.WindowsForms.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Kékkör {
+            get {
+                object obj = ResourceManager.GetObject("Kékkör", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap lightblue {
             get {
                 object obj = ResourceManager.GetObject("lightblue", resourceCulture);
@@ -236,6 +266,16 @@ namespace GMap.NET.WindowsForms.Properties {
         internal static System.Drawing.Bitmap lightblue_pushpin {
             get {
                 object obj = ResourceManager.GetObject("lightblue_pushpin", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Lilakör {
+            get {
+                object obj = ResourceManager.GetObject("Lilakör", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -306,6 +346,16 @@ namespace GMap.NET.WindowsForms.Properties {
         internal static System.Drawing.Bitmap pink_pushpin {
             get {
                 object obj = ResourceManager.GetObject("pink_pushpin", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Piroskör {
+            get {
+                object obj = ResourceManager.GetObject("Piroskör", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -413,9 +463,39 @@ namespace GMap.NET.WindowsForms.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Sárgakör {
+            get {
+                object obj = ResourceManager.GetObject("Sárgakör", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap shadow_small {
             get {
                 object obj = ResourceManager.GetObject("shadow_small", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Sötétvöröskör {
+            get {
+                object obj = ResourceManager.GetObject("Sötétvöröskör", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Világoskékkör {
+            get {
+                object obj = ResourceManager.GetObject("Világoskékkör", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -476,6 +556,16 @@ namespace GMap.NET.WindowsForms.Properties {
         internal static System.Drawing.Bitmap yellow_small {
             get {
                 object obj = ResourceManager.GetObject("yellow_small", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Zöldkör {
+            get {
+                object obj = ResourceManager.GetObject("Zöldkör", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

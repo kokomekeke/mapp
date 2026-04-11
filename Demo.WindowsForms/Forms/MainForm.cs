@@ -1048,6 +1048,17 @@ namespace Demo.WindowsForms
             }
         }
 
+
+        private void btn_addline_Click(object sender, EventArgs e)
+        {
+            var points = new List<PointLatLng>();
+            points.Add(new PointLatLng(_start.Lat, _start.Lng));
+            points.Add(new PointLatLng(_end.Lat, _end.Lng));
+            var polygon = new GMapPolygon(points, "Line");
+            Objects.Polygons.Add(polygon);
+        }
+
+
         // add marker on current position
         private void btnAddMarker_Click(object sender, EventArgs e)
         {
@@ -1463,6 +1474,7 @@ namespace Demo.WindowsForms
         }
 
 
+
         // export mobile gps log to gpx file
         /*
         private void buttonExportToGpx_Click(object sender, EventArgs e)
@@ -1513,7 +1525,6 @@ namespace Demo.WindowsForms
 
 
         #endregion
-
 
     }
 }

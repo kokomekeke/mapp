@@ -72,6 +72,8 @@ namespace Demo.WindowsForms
             this.comboBoxMode = new System.Windows.Forms.ComboBox();
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.btn_addline = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBoxProgress.SuspendLayout();
@@ -178,15 +180,15 @@ namespace Demo.WindowsForms
             this.panel2.Controls.Add(this.groupBox2);
             this.panel2.Controls.Add(this.groupBox1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(869, 0);
+            this.panel2.Location = new System.Drawing.Point(922, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(233, 718);
+            this.panel2.Size = new System.Drawing.Size(233, 760);
             this.panel2.TabIndex = 3;
             // 
             // groupBoxProgress
             // 
             this.groupBoxProgress.Controls.Add(this.progressBar1);
-            this.groupBoxProgress.Location = new System.Drawing.Point(14, 647);
+            this.groupBoxProgress.Location = new System.Drawing.Point(14, 686);
             this.groupBoxProgress.Name = "groupBoxProgress";
             this.groupBoxProgress.Size = new System.Drawing.Size(203, 59);
             this.groupBoxProgress.TabIndex = 5;
@@ -208,7 +210,7 @@ namespace Demo.WindowsForms
             this.groupBox6.Controls.Add(this.btnCacheClear);
             this.groupBox6.Controls.Add(this.btnImport);
             this.groupBox6.Controls.Add(this.btnExport);
-            this.groupBox6.Location = new System.Drawing.Point(14, 549);
+            this.groupBox6.Location = new System.Drawing.Point(14, 588);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(203, 92);
             this.groupBox6.TabIndex = 4;
@@ -284,7 +286,7 @@ namespace Demo.WindowsForms
             this.groupBox5.Controls.Add(this.radioButtonPerf);
             this.groupBox5.Controls.Add(this.radioButtonVehicle);
             this.groupBox5.Controls.Add(this.radioButtonNone);
-            this.groupBox5.Location = new System.Drawing.Point(14, 475);
+            this.groupBox5.Location = new System.Drawing.Point(14, 514);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.Size = new System.Drawing.Size(203, 68);
             this.groupBox5.TabIndex = 3;
@@ -328,12 +330,13 @@ namespace Demo.WindowsForms
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.btn_addline);
             this.groupBox4.Controls.Add(this.btnAddRoute);
             this.groupBox4.Controls.Add(this.btnSetEnd);
             this.groupBox4.Controls.Add(this.btnSetStart);
             this.groupBox4.Location = new System.Drawing.Point(14, 386);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(203, 83);
+            this.groupBox4.Size = new System.Drawing.Size(203, 122);
             this.groupBox4.TabIndex = 2;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Routes";
@@ -558,18 +561,37 @@ namespace Demo.WindowsForms
             this.MainMap.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.MainMap.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.MainMap.ShowTileGridLines = false;
-            this.MainMap.Size = new System.Drawing.Size(869, 718);
+            this.MainMap.Size = new System.Drawing.Size(922, 760);
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Location = new System.Drawing.Point(0, 760);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1155, 22);
+            this.statusStrip1.TabIndex = 5;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // btn_addline
+            // 
+            this.btn_addline.Location = new System.Drawing.Point(9, 75);
+            this.btn_addline.Name = "btn_addline";
+            this.btn_addline.Size = new System.Drawing.Size(164, 22);
+            this.btn_addline.TabIndex = 7;
+            this.btn_addline.Text = "Add Line";
+            this.btn_addline.UseVisualStyleBackColor = true;
+            this.btn_addline.Click += new System.EventHandler(this.btn_addline_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1102, 718);
+            this.ClientSize = new System.Drawing.Size(1155, 782);
             this.Controls.Add(this.MainMap);
             this.Controls.Add(this.panel2);
+            this.Controls.Add(this.statusStrip1);
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(554, 106);
             this.Name = "MainForm";
@@ -592,6 +614,7 @@ namespace Demo.WindowsForms
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
       }
 
@@ -640,6 +663,8 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.CheckBox checkBoxCanDrag;
         private System.Windows.Forms.CheckBox checkBoxCurrentMarker;
         private System.Windows.Forms.CheckBox checkBoxTileHost;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.Button btn_addline;
     }
 }
 
