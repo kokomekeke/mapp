@@ -38,7 +38,8 @@ namespace Demo.WindowsForms
         // etc
         readonly Random _rnd = new Random();
         readonly DescendingComparer _comparerIpStatus = new DescendingComparer();
-        GMapMarkerRect _curentRectMarker;
+        GMapMarkerRect _currentRectMarker;
+        GMarkerHFsystem _currentHFmarker;
         string _mobileGpsLog = string.Empty;
         bool _isMouseDown;
         PointLatLng _start;
@@ -687,12 +688,16 @@ namespace Demo.WindowsForms
         {
             if (item is GMapMarkerRect)
             {
-                _curentRectMarker = null;
+                _currentRectMarker = null;
 
                 var rc = item as GMapMarkerRect;
                 rc.Pen.Color = Color.Blue;
 
                 Debug.WriteLine("OnMarkerLeave: " + item.Position);
+            }
+            else if (item is GMarkerHFsystem)
+            {
+                _currentHFmarker = null;
             }
         }
 
@@ -703,7 +708,11 @@ namespace Demo.WindowsForms
                 var rc = item as GMapMarkerRect;
                 rc.Pen.Color = Color.Red;
 
-                _curentRectMarker = rc;
+                _currentRectMarker = rc;
+            }
+            else if (item is GMarkerHFsystem)
+            {
+                _currentHFmarker = item as GMarkerHFsystem;
             }
             Debug.WriteLine("OnMarkerEnter: " + item.Position);
         }
@@ -776,6 +785,18 @@ namespace Demo.WindowsForms
                     var tile = MainMap.MapProvider.Projection.FromPixelToTileXY(px);
 
                     Debug.WriteLine("MouseDown: geo: " + _currentMarker.Position + " | px: " + px + " | tile: " + tile);
+                    statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
+                }
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                if ((_currentHFmarker != null) && _currentHFmarker.IsMouseOver)
+                {
+                    MenuItem m1 = new MenuItem("Highlight");
+                    MenuItem m2 = new MenuItem("Delete");
+
+                    ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2 });
+                    m.Show(MainMap, new Point(e.X, e.Y));
                 }
             }
         }
@@ -785,18 +806,24 @@ namespace Demo.WindowsForms
         {
             if (e.Button == MouseButtons.Left && _isMouseDown)
             {
-                if (_curentRectMarker == null)
+                if (_currentRectMarker == null)
                 {
                     if (_currentMarker.IsVisible)
                     {
                         _currentMarker.Position = MainMap.FromLocalToLatLng(e.X, e.Y);
+                        statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
+                    }
+
+                    if (_currentHFmarker != null)
+                    {
+                        _currentHFmarker.Position = MainMap.FromLocalToLatLng(e.X, e.Y);
                     }
                 }
                 else // move rect marker
                 {
                     var pnew = MainMap.FromLocalToLatLng(e.X, e.Y);
 
-                    int? pIndex = (int?)_curentRectMarker.Tag;
+                    int? pIndex = (int?)_currentRectMarker.Tag;
                     if (pIndex.HasValue)
                     {
                         if (pIndex < _polygon.Points.Count)
@@ -810,11 +837,11 @@ namespace Demo.WindowsForms
                     {
                         _currentMarker.Position = pnew;
                     }
-                    _curentRectMarker.Position = pnew;
+                    _currentRectMarker.Position = pnew;
 
-                    if (_curentRectMarker.InnerMarker != null)
+                    if (_currentRectMarker.InnerMarker != null)
                     {
-                        _curentRectMarker.InnerMarker.Position = pnew;
+                        _currentRectMarker.InnerMarker.Position = pnew;
                     }
                 }
 
@@ -1055,7 +1082,8 @@ namespace Demo.WindowsForms
             points.Add(new PointLatLng(_start.Lat, _start.Lng));
             points.Add(new PointLatLng(_end.Lat, _end.Lng));
             var polygon = new GMapPolygon(points, "Line");
-            Objects.Polygons.Add(polygon);
+            polygon.Stroke = new Pen(Color.Blue, 2);
+            Polygons.Polygons.Add(polygon);
         }
 
 
@@ -1077,7 +1105,7 @@ namespace Demo.WindowsForms
             if (checkBoxPlacemarkInfo.Checked)
             {
                 GeoCoderStatusCode status;
-                var ret = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
+                var ret = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);      // get city, street, etc info for current marker position
                 if (status == GeoCoderStatusCode.OK && ret != null)
                 {
                     p = ret;
@@ -1099,13 +1127,28 @@ namespace Demo.WindowsForms
             RegeneratePolygon();
         }
 
-        // clear markers, routes and polygons
+        private void btnAddPushpin_Click(object sender, EventArgs e)
+        {
+            var m = new GMarkerHFsystem(_currentMarker.Position, GMarkerHFsystemType.Piroskör);
+            Objects.Markers.Add(m);
+        }
+
+
+        // clear markers
         private void btnClearAll_Click(object sender, EventArgs e)
         {
             Objects.Markers.Clear();
+            //Routes.Routes.Clear();
+            //Polygons.Polygons.Clear();
+        }
+
+        // clear routes and polygons
+        private void btn_clear_routes_Click(object sender, EventArgs e)
+        {
             Routes.Routes.Clear();
             Polygons.Polygons.Clear();
         }
+
 
         // show current marker
         private void checkBoxCurrentMarker_CheckedChanged(object sender, EventArgs e)
@@ -1237,15 +1280,22 @@ namespace Demo.WindowsForms
                     _currentRoute = null;
                 }
 
-                if (_curentRectMarker != null)
+                if (_currentHFmarker != null)
                 {
-                    Objects.Markers.Remove(_curentRectMarker);
+                    Objects.Markers.Remove(_currentHFmarker);
+                    _currentHFmarker = null;
+                }
 
-                    if (_curentRectMarker.InnerMarker != null)
+                if (_currentRectMarker != null)
+                {
+                    Objects.Markers.Remove(_currentRectMarker);
+
+                    if (_currentRectMarker.InnerMarker != null)
                     {
-                        Objects.Markers.Remove(_curentRectMarker.InnerMarker);
+                        Objects.Markers.Remove(_currentRectMarker.InnerMarker);
                     }
-                    _curentRectMarker = null;
+                    _currentRectMarker = null;
+
 
                     RegeneratePolygon();
                 }
@@ -1294,33 +1344,33 @@ namespace Demo.WindowsForms
             Routes.Routes.Clear();
 
             // start performance test
-            if (radioButtonPerf.Checked)
-            {
-                _timerPerf.Interval = 44;
-                _timerPerf.Start();
-            }
-            else
-            {
-                // stop performance test
-                _timerPerf.Stop();
-            }
+            //if (radioButtonPerf.Checked)
+            //{
+            //    _timerPerf.Interval = 44;
+            //    _timerPerf.Start();
+            //}
+            //else
+            //{
+            //    // stop performance test
+            //    _timerPerf.Stop();
+            //}
 
-            // vehicle demo
-            if (radioButtonVehicle.Checked)
-            {
-                if (!_transportWorker.IsBusy)
-                {
-                    _firstLoadTrasport = true;
-                    _transportWorker.RunWorkerAsync();
-                }
-            }
-            else
-            {
-                if (_transportWorker.IsBusy)
-                {
-                    _transportWorker.CancelAsync();
-                }
-            }
+            //// vehicle demo
+            //if (radioButtonVehicle.Checked)
+            //{
+            //    if (!_transportWorker.IsBusy)
+            //    {
+            //        _firstLoadTrasport = true;
+            //        _transportWorker.RunWorkerAsync();
+            //    }
+            //}
+            //else
+            //{
+            //    if (_transportWorker.IsBusy)
+            //    {
+            //        _transportWorker.CancelAsync();
+            //    }
+            //}
         }
 
         // http://leafletjs.com/
@@ -1526,5 +1576,38 @@ namespace Demo.WindowsForms
 
         #endregion
 
-    }
-}
+        private void checkBox_Markers_CheckedChanged(object sender, EventArgs e)
+        {
+            Objects.IsVisibile = checkBox_Markers.Checked;  
+        }
+
+        private void checkBox_Routes_CheckedChanged(object sender, EventArgs e)
+        {
+            Polygons.IsVisibile = checkBox_Routes.Checked;
+        }
+
+        private void checkBox1_Infobox_CheckedChanged(object sender, EventArgs e)
+        {
+            //.. TODO :  
+
+        }
+
+        private void button_centerMarker_Click(object sender, EventArgs e)
+        {
+            if (_currentMarker.IsVisible)
+            {
+                MainMap.Position = _currentMarker.Position;
+            }
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            if ((_currentHFmarker != null) &&_currentHFmarker.IsVisible)
+            {
+                Objects.Markers.Remove(_currentHFmarker);
+                _currentHFmarker = null;
+            }
+        }
+    } /* class MainForm */
+
+} /* namespace Demo.WindowsForms */

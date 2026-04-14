@@ -125,5 +125,20 @@ namespace GMap.NET
         {
             return string.Format(CultureInfo.CurrentCulture, "{{Lat={0}, Lng={1}}}", Lat, Lng);
         }
+
+        public string ToGeoString()
+        {
+            return DegreeToString(Lat) + ", " + DegreeToString(Lng);
+        }
+
+
+        public static string DegreeToString(double degree)
+        {
+            int d = (int)degree;
+            int m = (int)((degree - d) * 60);
+            int s = (int)(((degree - d) * 60 - m) * 60);
+            return string.Format(CultureInfo.CurrentCulture, "{0}°{1:D2}'{2:D2}\"", d, m, s);
+        }
+
     }
 }

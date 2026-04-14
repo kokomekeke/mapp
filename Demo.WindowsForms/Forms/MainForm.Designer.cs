@@ -39,6 +39,10 @@ namespace Demo.WindowsForms
             this.textBoxLng = new System.Windows.Forms.TextBox();
             this.textBoxLat = new System.Windows.Forms.TextBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.groupBox_Show = new System.Windows.Forms.GroupBox();
+            this.checkBox1_Infobox = new System.Windows.Forms.CheckBox();
+            this.checkBox_Routes = new System.Windows.Forms.CheckBox();
+            this.checkBox_Markers = new System.Windows.Forms.CheckBox();
             this.groupBoxProgress = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -48,20 +52,20 @@ namespace Demo.WindowsForms
             this.btnCacheClear = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.radioButtonPerf = new System.Windows.Forms.RadioButton();
-            this.radioButtonVehicle = new System.Windows.Forms.RadioButton();
-            this.radioButtonNone = new System.Windows.Forms.RadioButton();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btn_clear_routes = new System.Windows.Forms.Button();
+            this.btn_addline = new System.Windows.Forms.Button();
             this.btnAddRoute = new System.Windows.Forms.Button();
             this.btnSetEnd = new System.Windows.Forms.Button();
             this.btnSetStart = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnAddPushpin = new System.Windows.Forms.Button();
             this.checkBoxPlacemarkInfo = new System.Windows.Forms.CheckBox();
             this.btnClearAll = new System.Windows.Forms.Button();
             this.btnZoomCenter = new System.Windows.Forms.Button();
             this.btnAddMarker = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.button_centerMarker = new System.Windows.Forms.Button();
             this.checkBoxTileHost = new System.Windows.Forms.CheckBox();
             this.checkBoxCurrentMarker = new System.Windows.Forms.CheckBox();
             this.checkBoxCanDrag = new System.Windows.Forms.CheckBox();
@@ -71,17 +75,18 @@ namespace Demo.WindowsForms
             this.label4 = new System.Windows.Forms.Label();
             this.comboBoxMode = new System.Windows.Forms.ComboBox();
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
-            this.MainMap = new GMap.NET.WindowsForms.GMapControl();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.btn_addline = new System.Windows.Forms.Button();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.MainMap = new GMap.NET.WindowsForms.GMapControl();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.groupBox_Show.SuspendLayout();
             this.groupBoxProgress.SuspendLayout();
             this.groupBox6.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -172,9 +177,9 @@ namespace Demo.WindowsForms
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.groupBox_Show);
             this.panel2.Controls.Add(this.groupBoxProgress);
             this.panel2.Controls.Add(this.groupBox6);
-            this.panel2.Controls.Add(this.groupBox5);
             this.panel2.Controls.Add(this.groupBox4);
             this.panel2.Controls.Add(this.groupBox3);
             this.panel2.Controls.Add(this.groupBox2);
@@ -184,6 +189,55 @@ namespace Demo.WindowsForms
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(233, 760);
             this.panel2.TabIndex = 3;
+            // 
+            // groupBox_Show
+            // 
+            this.groupBox_Show.Controls.Add(this.checkBox1_Infobox);
+            this.groupBox_Show.Controls.Add(this.checkBox_Routes);
+            this.groupBox_Show.Controls.Add(this.checkBox_Markers);
+            this.groupBox_Show.Location = new System.Drawing.Point(14, 548);
+            this.groupBox_Show.Name = "groupBox_Show";
+            this.groupBox_Show.Size = new System.Drawing.Size(203, 39);
+            this.groupBox_Show.TabIndex = 6;
+            this.groupBox_Show.TabStop = false;
+            this.groupBox_Show.Text = "Show";
+            // 
+            // checkBox1_Infobox
+            // 
+            this.checkBox1_Infobox.AutoSize = true;
+            this.checkBox1_Infobox.Location = new System.Drawing.Point(133, 16);
+            this.checkBox1_Infobox.Name = "checkBox1_Infobox";
+            this.checkBox1_Infobox.Size = new System.Drawing.Size(61, 17);
+            this.checkBox1_Infobox.TabIndex = 2;
+            this.checkBox1_Infobox.Text = "Infobox";
+            this.checkBox1_Infobox.UseVisualStyleBackColor = true;
+            this.checkBox1_Infobox.CheckedChanged += new System.EventHandler(this.checkBox1_Infobox_CheckedChanged);
+            // 
+            // checkBox_Routes
+            // 
+            this.checkBox_Routes.AutoSize = true;
+            this.checkBox_Routes.Checked = true;
+            this.checkBox_Routes.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_Routes.Location = new System.Drawing.Point(75, 16);
+            this.checkBox_Routes.Name = "checkBox_Routes";
+            this.checkBox_Routes.Size = new System.Drawing.Size(60, 17);
+            this.checkBox_Routes.TabIndex = 1;
+            this.checkBox_Routes.Text = "Routes";
+            this.checkBox_Routes.UseVisualStyleBackColor = true;
+            this.checkBox_Routes.CheckedChanged += new System.EventHandler(this.checkBox_Routes_CheckedChanged);
+            // 
+            // checkBox_Markers
+            // 
+            this.checkBox_Markers.AutoSize = true;
+            this.checkBox_Markers.Checked = true;
+            this.checkBox_Markers.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBox_Markers.Location = new System.Drawing.Point(12, 16);
+            this.checkBox_Markers.Name = "checkBox_Markers";
+            this.checkBox_Markers.Size = new System.Drawing.Size(64, 17);
+            this.checkBox_Markers.TabIndex = 0;
+            this.checkBox_Markers.Text = "Markers";
+            this.checkBox_Markers.UseVisualStyleBackColor = true;
+            this.checkBox_Markers.CheckedChanged += new System.EventHandler(this.checkBox_Markers_CheckedChanged);
             // 
             // groupBoxProgress
             // 
@@ -281,65 +335,39 @@ namespace Demo.WindowsForms
             this.btnExport.UseVisualStyleBackColor = true;
             this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.radioButtonPerf);
-            this.groupBox5.Controls.Add(this.radioButtonVehicle);
-            this.groupBox5.Controls.Add(this.radioButtonNone);
-            this.groupBox5.Location = new System.Drawing.Point(14, 514);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(203, 68);
-            this.groupBox5.TabIndex = 3;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "RealTime";
-            // 
-            // radioButtonPerf
-            // 
-            this.radioButtonPerf.AutoSize = true;
-            this.radioButtonPerf.Location = new System.Drawing.Point(100, 21);
-            this.radioButtonPerf.Name = "radioButtonPerf";
-            this.radioButtonPerf.Size = new System.Drawing.Size(85, 17);
-            this.radioButtonPerf.TabIndex = 2;
-            this.radioButtonPerf.Text = "Performance";
-            this.radioButtonPerf.UseVisualStyleBackColor = true;
-            this.radioButtonPerf.CheckedChanged += new System.EventHandler(this.RealTimeChanged);
-            // 
-            // radioButtonVehicle
-            // 
-            this.radioButtonVehicle.AutoSize = true;
-            this.radioButtonVehicle.Location = new System.Drawing.Point(25, 44);
-            this.radioButtonVehicle.Name = "radioButtonVehicle";
-            this.radioButtonVehicle.Size = new System.Drawing.Size(70, 17);
-            this.radioButtonVehicle.TabIndex = 1;
-            this.radioButtonVehicle.Text = "Transport";
-            this.radioButtonVehicle.UseVisualStyleBackColor = true;
-            this.radioButtonVehicle.CheckedChanged += new System.EventHandler(this.RealTimeChanged);
-            // 
-            // radioButtonNone
-            // 
-            this.radioButtonNone.AutoSize = true;
-            this.radioButtonNone.Checked = true;
-            this.radioButtonNone.Location = new System.Drawing.Point(25, 21);
-            this.radioButtonNone.Name = "radioButtonNone";
-            this.radioButtonNone.Size = new System.Drawing.Size(51, 17);
-            this.radioButtonNone.TabIndex = 0;
-            this.radioButtonNone.TabStop = true;
-            this.radioButtonNone.Text = "None";
-            this.radioButtonNone.UseVisualStyleBackColor = true;
-            this.radioButtonNone.CheckedChanged += new System.EventHandler(this.RealTimeChanged);
-            // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.btn_clear_routes);
             this.groupBox4.Controls.Add(this.btn_addline);
             this.groupBox4.Controls.Add(this.btnAddRoute);
             this.groupBox4.Controls.Add(this.btnSetEnd);
             this.groupBox4.Controls.Add(this.btnSetStart);
-            this.groupBox4.Location = new System.Drawing.Point(14, 386);
+            this.groupBox4.Location = new System.Drawing.Point(14, 411);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(203, 122);
+            this.groupBox4.Size = new System.Drawing.Size(203, 130);
             this.groupBox4.TabIndex = 2;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Routes";
+            // 
+            // btn_clear_routes
+            // 
+            this.btn_clear_routes.Location = new System.Drawing.Point(94, 101);
+            this.btn_clear_routes.Name = "btn_clear_routes";
+            this.btn_clear_routes.Size = new System.Drawing.Size(96, 22);
+            this.btn_clear_routes.TabIndex = 8;
+            this.btn_clear_routes.Text = "Clear Routes";
+            this.btn_clear_routes.UseVisualStyleBackColor = true;
+            this.btn_clear_routes.Click += new System.EventHandler(this.btn_clear_routes_Click);
+            // 
+            // btn_addline
+            // 
+            this.btn_addline.Location = new System.Drawing.Point(9, 75);
+            this.btn_addline.Name = "btn_addline";
+            this.btn_addline.Size = new System.Drawing.Size(164, 22);
+            this.btn_addline.TabIndex = 7;
+            this.btn_addline.Text = "Add Line";
+            this.btn_addline.UseVisualStyleBackColor = true;
+            this.btn_addline.Click += new System.EventHandler(this.btn_addline_Click);
             // 
             // btnAddRoute
             // 
@@ -373,21 +401,32 @@ namespace Demo.WindowsForms
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnAddPushpin);
             this.groupBox3.Controls.Add(this.checkBoxPlacemarkInfo);
             this.groupBox3.Controls.Add(this.btnClearAll);
             this.groupBox3.Controls.Add(this.btnZoomCenter);
             this.groupBox3.Controls.Add(this.btnAddMarker);
             this.groupBox3.Location = new System.Drawing.Point(14, 301);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(203, 79);
+            this.groupBox3.Size = new System.Drawing.Size(203, 104);
             this.groupBox3.TabIndex = 2;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Markers";
             // 
+            // btnAddPushpin
+            // 
+            this.btnAddPushpin.Location = new System.Drawing.Point(94, 19);
+            this.btnAddPushpin.Name = "btnAddPushpin";
+            this.btnAddPushpin.Size = new System.Drawing.Size(79, 22);
+            this.btnAddPushpin.TabIndex = 4;
+            this.btnAddPushpin.Text = "Add Pushpin";
+            this.btnAddPushpin.UseVisualStyleBackColor = true;
+            this.btnAddPushpin.Click += new System.EventHandler(this.btnAddPushpin_Click);
+            // 
             // checkBoxPlacemarkInfo
             // 
             this.checkBoxPlacemarkInfo.AutoSize = true;
-            this.checkBoxPlacemarkInfo.Location = new System.Drawing.Point(99, 22);
+            this.checkBoxPlacemarkInfo.Location = new System.Drawing.Point(94, 51);
             this.checkBoxPlacemarkInfo.Name = "checkBoxPlacemarkInfo";
             this.checkBoxPlacemarkInfo.Size = new System.Drawing.Size(74, 17);
             this.checkBoxPlacemarkInfo.TabIndex = 3;
@@ -396,11 +435,11 @@ namespace Demo.WindowsForms
             // 
             // btnClearAll
             // 
-            this.btnClearAll.Location = new System.Drawing.Point(94, 46);
+            this.btnClearAll.Location = new System.Drawing.Point(94, 76);
             this.btnClearAll.Name = "btnClearAll";
-            this.btnClearAll.Size = new System.Drawing.Size(79, 22);
+            this.btnClearAll.Size = new System.Drawing.Size(91, 22);
             this.btnClearAll.TabIndex = 2;
-            this.btnClearAll.Text = "Clear All";
+            this.btnClearAll.Text = "Clear Markers";
             this.btnClearAll.UseVisualStyleBackColor = true;
             this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
             // 
@@ -426,6 +465,7 @@ namespace Demo.WindowsForms
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.button_centerMarker);
             this.groupBox2.Controls.Add(this.checkBoxTileHost);
             this.groupBox2.Controls.Add(this.checkBoxCurrentMarker);
             this.groupBox2.Controls.Add(this.checkBoxCanDrag);
@@ -441,6 +481,16 @@ namespace Demo.WindowsForms
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Gmap";
+            // 
+            // button_centerMarker
+            // 
+            this.button_centerMarker.Location = new System.Drawing.Point(94, 96);
+            this.button_centerMarker.Name = "button_centerMarker";
+            this.button_centerMarker.Size = new System.Drawing.Size(79, 22);
+            this.button_centerMarker.TabIndex = 8;
+            this.button_centerMarker.Text = "Center marker";
+            this.button_centerMarker.UseVisualStyleBackColor = true;
+            this.button_centerMarker.Click += new System.EventHandler(this.button_centerMarker_Click);
             // 
             // checkBoxTileHost
             // 
@@ -458,7 +508,7 @@ namespace Demo.WindowsForms
             this.checkBoxCurrentMarker.AutoSize = true;
             this.checkBoxCurrentMarker.Checked = true;
             this.checkBoxCurrentMarker.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(94, 77);
+            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(94, 76);
             this.checkBoxCurrentMarker.Name = "checkBoxCurrentMarker";
             this.checkBoxCurrentMarker.Size = new System.Drawing.Size(96, 17);
             this.checkBoxCurrentMarker.TabIndex = 6;
@@ -481,7 +531,7 @@ namespace Demo.WindowsForms
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(94, 109);
+            this.btnSave.Location = new System.Drawing.Point(94, 121);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(79, 22);
             this.btnSave.TabIndex = 4;
@@ -538,6 +588,22 @@ namespace Demo.WindowsForms
             this.comboBoxMapType.TabIndex = 0;
             this.comboBoxMapType.DropDownClosed += new System.EventHandler(this.comboBoxMapType_DropDownClosed);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 760);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1155, 22);
+            this.statusStrip1.TabIndex = 5;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
+            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            // 
             // MainMap
             // 
             this.MainMap.Bearing = 0F;
@@ -565,24 +631,6 @@ namespace Demo.WindowsForms
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Location = new System.Drawing.Point(0, 760);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1155, 22);
-            this.statusStrip1.TabIndex = 5;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // btn_addline
-            // 
-            this.btn_addline.Location = new System.Drawing.Point(9, 75);
-            this.btn_addline.Name = "btn_addline";
-            this.btn_addline.Size = new System.Drawing.Size(164, 22);
-            this.btn_addline.TabIndex = 7;
-            this.btn_addline.Text = "Add Line";
-            this.btn_addline.UseVisualStyleBackColor = true;
-            this.btn_addline.Click += new System.EventHandler(this.btn_addline_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -603,16 +651,18 @@ namespace Demo.WindowsForms
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.panel2.ResumeLayout(false);
+            this.groupBox_Show.ResumeLayout(false);
+            this.groupBox_Show.PerformLayout();
             this.groupBoxProgress.ResumeLayout(false);
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -644,10 +694,6 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.Button btnAddRoute;
         private System.Windows.Forms.Button btnSetEnd;
         private System.Windows.Forms.Button btnSetStart;
-        private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.RadioButton radioButtonPerf;
-        private System.Windows.Forms.RadioButton radioButtonVehicle;
-        private System.Windows.Forms.RadioButton radioButtonNone;
         private System.Windows.Forms.GroupBox groupBoxProgress;
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.GroupBox groupBox6;
@@ -665,6 +711,14 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.CheckBox checkBoxTileHost;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Button btn_addline;
+        private System.Windows.Forms.Button btn_clear_routes;
+        private System.Windows.Forms.Button btnAddPushpin;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.GroupBox groupBox_Show;
+        private System.Windows.Forms.CheckBox checkBox_Markers;
+        private System.Windows.Forms.CheckBox checkBox1_Infobox;
+        private System.Windows.Forms.CheckBox checkBox_Routes;
+        private System.Windows.Forms.Button button_centerMarker;
     }
 }
 

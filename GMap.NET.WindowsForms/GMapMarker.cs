@@ -244,6 +244,12 @@ namespace GMap.NET.WindowsForms
             //
         }
 
+        public string ToGeoString()
+        {
+            return _position.ToGeoString();
+        }
+
+
         #region ISerializable Members
 
         /// <summary>
@@ -338,4 +344,5 @@ namespace GMap.NET.WindowsForms
         Never,
         Always,
     }
+
 }

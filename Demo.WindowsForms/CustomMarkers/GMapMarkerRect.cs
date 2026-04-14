@@ -20,11 +20,11 @@ namespace Demo.WindowsForms.CustomMarkers
       public GMapMarkerRect(PointLatLng p)
          : base(p)
       {
-         Pen = new Pen(Brushes.Blue, 5);
+         Pen = new Pen(Brushes.Blue, 2);
 
          // do not forget set Size of the marker
          // if so, you shall have no event on it ;}
-         Size = new Size(111, 111);
+         Size = new Size(11, 11);
          Offset = new Point(-Size.Width / 2, -Size.Height / 2);
       }
 
