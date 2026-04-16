@@ -2513,6 +2513,27 @@ namespace GMap.NET.WindowsForms
             Core.ReloadMap();
         }
 
+
+        public PointLatLng GetPositionBySettlement(string keys)
+        {
+            var status = GeoCoderStatusCode.UNKNOWN_ERROR;
+            var gp = MapProvider as GeocodingProvider;
+
+            if (gp == null)
+                gp = GMapProviders.OpenStreetMap as GeocodingProvider;
+
+            if (gp != null)
+            {
+                var pt = gp.GetPoint(keys.Replace("#", "%23"), out status);
+
+                if (status == GeoCoderStatusCode.OK && pt.HasValue)
+                    return pt.Value;
+            }
+
+            return PointLatLng.Empty;
+        }
+
+
         /// <summary>
         ///     set current position using keywords
         /// </summary>

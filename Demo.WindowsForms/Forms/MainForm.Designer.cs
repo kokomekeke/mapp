@@ -77,7 +77,10 @@ namespace Demo.WindowsForms
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.btnMarker = new System.Windows.Forms.Button();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
+            this.btnCenterCursor = new System.Windows.Forms.Button();
+            this.btnCursor = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -91,7 +94,8 @@ namespace Demo.WindowsForms
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.btnReload);
+            this.groupBox1.Controls.Add(this.btnCursor);
+            this.groupBox1.Controls.Add(this.btnMarker);
             this.groupBox1.Controls.Add(this.btnGoTo);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
@@ -108,7 +112,7 @@ namespace Demo.WindowsForms
             // 
             // btnReload
             // 
-            this.btnReload.Location = new System.Drawing.Point(94, 97);
+            this.btnReload.Location = new System.Drawing.Point(94, 72);
             this.btnReload.Name = "btnReload";
             this.btnReload.Size = new System.Drawing.Size(79, 22);
             this.btnReload.TabIndex = 7;
@@ -120,7 +124,7 @@ namespace Demo.WindowsForms
             // 
             this.btnGoTo.Location = new System.Drawing.Point(9, 97);
             this.btnGoTo.Name = "btnGoTo";
-            this.btnGoTo.Size = new System.Drawing.Size(79, 22);
+            this.btnGoTo.Size = new System.Drawing.Size(48, 22);
             this.btnGoTo.TabIndex = 6;
             this.btnGoTo.Text = "Go To";
             this.btnGoTo.UseVisualStyleBackColor = true;
@@ -167,6 +171,7 @@ namespace Demo.WindowsForms
             this.textBoxLng.Name = "textBoxLng";
             this.textBoxLng.Size = new System.Drawing.Size(154, 20);
             this.textBoxLng.TabIndex = 1;
+            this.textBoxLng.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxLng_KeyPress);
             // 
             // textBoxLat
             // 
@@ -174,6 +179,7 @@ namespace Demo.WindowsForms
             this.textBoxLat.Name = "textBoxLat";
             this.textBoxLat.Size = new System.Drawing.Size(154, 20);
             this.textBoxLat.TabIndex = 0;
+            this.textBoxLat.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxLat_KeyPress);
             // 
             // panel2
             // 
@@ -194,10 +200,12 @@ namespace Demo.WindowsForms
             // 
             this.groupBox_Show.Controls.Add(this.checkBox1_Infobox);
             this.groupBox_Show.Controls.Add(this.checkBox_Routes);
+            this.groupBox_Show.Controls.Add(this.checkBoxCurrentMarker);
             this.groupBox_Show.Controls.Add(this.checkBox_Markers);
-            this.groupBox_Show.Location = new System.Drawing.Point(14, 548);
+            this.groupBox_Show.Controls.Add(this.checkBoxDebug);
+            this.groupBox_Show.Location = new System.Drawing.Point(14, 542);
             this.groupBox_Show.Name = "groupBox_Show";
-            this.groupBox_Show.Size = new System.Drawing.Size(203, 39);
+            this.groupBox_Show.Size = new System.Drawing.Size(203, 58);
             this.groupBox_Show.TabIndex = 6;
             this.groupBox_Show.TabStop = false;
             this.groupBox_Show.Text = "Show";
@@ -205,6 +213,8 @@ namespace Demo.WindowsForms
             // checkBox1_Infobox
             // 
             this.checkBox1_Infobox.AutoSize = true;
+            this.checkBox1_Infobox.Checked = true;
+            this.checkBox1_Infobox.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBox1_Infobox.Location = new System.Drawing.Point(133, 16);
             this.checkBox1_Infobox.Name = "checkBox1_Infobox";
             this.checkBox1_Infobox.Size = new System.Drawing.Size(61, 17);
@@ -242,16 +252,16 @@ namespace Demo.WindowsForms
             // groupBoxProgress
             // 
             this.groupBoxProgress.Controls.Add(this.progressBar1);
-            this.groupBoxProgress.Location = new System.Drawing.Point(14, 686);
+            this.groupBoxProgress.Location = new System.Drawing.Point(14, 704);
             this.groupBoxProgress.Name = "groupBoxProgress";
-            this.groupBoxProgress.Size = new System.Drawing.Size(203, 59);
+            this.groupBoxProgress.Size = new System.Drawing.Size(203, 53);
             this.groupBoxProgress.TabIndex = 5;
             this.groupBoxProgress.TabStop = false;
             this.groupBoxProgress.Text = "Progress";
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(6, 21);
+            this.progressBar1.Location = new System.Drawing.Point(10, 16);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(167, 23);
             this.progressBar1.TabIndex = 0;
@@ -264,7 +274,7 @@ namespace Demo.WindowsForms
             this.groupBox6.Controls.Add(this.btnCacheClear);
             this.groupBox6.Controls.Add(this.btnImport);
             this.groupBox6.Controls.Add(this.btnExport);
-            this.groupBox6.Location = new System.Drawing.Point(14, 588);
+            this.groupBox6.Location = new System.Drawing.Point(14, 604);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.Size = new System.Drawing.Size(203, 92);
             this.groupBox6.TabIndex = 4;
@@ -401,6 +411,7 @@ namespace Demo.WindowsForms
             // 
             // groupBox3
             // 
+            this.groupBox3.Controls.Add(this.btnCenterCursor);
             this.groupBox3.Controls.Add(this.btnAddPushpin);
             this.groupBox3.Controls.Add(this.checkBoxPlacemarkInfo);
             this.groupBox3.Controls.Add(this.btnClearAll);
@@ -465,12 +476,11 @@ namespace Demo.WindowsForms
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnReload);
             this.groupBox2.Controls.Add(this.button_centerMarker);
             this.groupBox2.Controls.Add(this.checkBoxTileHost);
-            this.groupBox2.Controls.Add(this.checkBoxCurrentMarker);
             this.groupBox2.Controls.Add(this.checkBoxCanDrag);
             this.groupBox2.Controls.Add(this.btnSave);
-            this.groupBox2.Controls.Add(this.checkBoxDebug);
             this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.comboBoxMode);
@@ -508,11 +518,11 @@ namespace Demo.WindowsForms
             this.checkBoxCurrentMarker.AutoSize = true;
             this.checkBoxCurrentMarker.Checked = true;
             this.checkBoxCurrentMarker.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(94, 76);
+            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(78, 38);
             this.checkBoxCurrentMarker.Name = "checkBoxCurrentMarker";
-            this.checkBoxCurrentMarker.Size = new System.Drawing.Size(96, 17);
+            this.checkBoxCurrentMarker.Size = new System.Drawing.Size(56, 17);
             this.checkBoxCurrentMarker.TabIndex = 6;
-            this.checkBoxCurrentMarker.Text = "Current Marker";
+            this.checkBoxCurrentMarker.Text = "Cursor";
             this.checkBoxCurrentMarker.UseVisualStyleBackColor = true;
             this.checkBoxCurrentMarker.CheckedChanged += new System.EventHandler(this.checkBoxCurrentMarker_CheckedChanged);
             // 
@@ -542,9 +552,7 @@ namespace Demo.WindowsForms
             // checkBoxDebug
             // 
             this.checkBoxDebug.AutoSize = true;
-            this.checkBoxDebug.Checked = true;
-            this.checkBoxDebug.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxDebug.Location = new System.Drawing.Point(9, 77);
+            this.checkBoxDebug.Location = new System.Drawing.Point(12, 39);
             this.checkBoxDebug.Name = "checkBoxDebug";
             this.checkBoxDebug.Size = new System.Drawing.Size(45, 17);
             this.checkBoxDebug.TabIndex = 4;
@@ -601,8 +609,17 @@ namespace Demo.WindowsForms
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
+            // 
+            // btnMarker
+            // 
+            this.btnMarker.Location = new System.Drawing.Point(63, 97);
+            this.btnMarker.Name = "btnMarker";
+            this.btnMarker.Size = new System.Drawing.Size(52, 22);
+            this.btnMarker.TabIndex = 7;
+            this.btnMarker.Text = "Marker";
+            this.btnMarker.UseVisualStyleBackColor = true;
+            this.btnMarker.Click += new System.EventHandler(this.btnMarker_Click);
             // 
             // MainMap
             // 
@@ -630,6 +647,26 @@ namespace Demo.WindowsForms
             this.MainMap.Size = new System.Drawing.Size(922, 760);
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
+            // 
+            // btnCenterCursor
+            // 
+            this.btnCenterCursor.Location = new System.Drawing.Point(12, 75);
+            this.btnCenterCursor.Name = "btnCenterCursor";
+            this.btnCenterCursor.Size = new System.Drawing.Size(79, 22);
+            this.btnCenterCursor.TabIndex = 5;
+            this.btnCenterCursor.Text = "Center Cursor";
+            this.btnCenterCursor.UseVisualStyleBackColor = true;
+            this.btnCenterCursor.Click += new System.EventHandler(this.btnCenterCursor_Click);
+            // 
+            // btnCursor
+            // 
+            this.btnCursor.Location = new System.Drawing.Point(121, 97);
+            this.btnCursor.Name = "btnCursor";
+            this.btnCursor.Size = new System.Drawing.Size(52, 22);
+            this.btnCursor.TabIndex = 8;
+            this.btnCursor.Text = "Cursor";
+            this.btnCursor.UseVisualStyleBackColor = true;
+            this.btnCursor.Click += new System.EventHandler(this.btnCursor_Click);
             // 
             // MainForm
             // 
@@ -719,6 +756,9 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.CheckBox checkBox1_Infobox;
         private System.Windows.Forms.CheckBox checkBox_Routes;
         private System.Windows.Forms.Button button_centerMarker;
+        private System.Windows.Forms.Button btnMarker;
+        private System.Windows.Forms.Button btnCenterCursor;
+        private System.Windows.Forms.Button btnCursor;
     }
 }
 

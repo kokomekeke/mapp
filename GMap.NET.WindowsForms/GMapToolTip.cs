@@ -178,7 +178,14 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-        private void WriteString(Graphics g, string text, RectangleF rectText)
+        public void DrawRectangle(Graphics g, Pen pen, float h, float v, float width, float height)
+        {
+            g.FillRectangle(Fill, h, v, width, height);
+            g.DrawRectangle(pen, h, v, width, height);
+        }
+
+
+        protected virtual void WriteString(Graphics g, string text, RectangleF rectText)
         {
             string[] vec1 = text.Split('\n');
             for (int i = 0; i < vec1.Length; i++)

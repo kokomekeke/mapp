@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
@@ -17,7 +18,7 @@ using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using GMap.NET.WindowsForms.ToolTips;
-using System.Reflection;
+using static GMap.NET.Entity.OpenStreetMapRouteEntity;
 
 namespace Demo.WindowsForms
 {
@@ -71,6 +72,9 @@ namespace Demo.WindowsForms
                     //MessageBox.Show("No internet connection available, going to CacheOnly mode.", "GMap.NET - Demo.WindowsForms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     MessageBox.Show("No internet connection available", "GMap.NET - Demo.WindowsForms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
+
+                Text += " - HFsystem version - " + " Build=" + AssemblyCreationDate().ToString("yyyy.MM.dd HH:mm"); 
+
 
                 //----------------------------------------
                 // Config Map at Startup
@@ -187,7 +191,7 @@ namespace Demo.WindowsForms
 
 #if DEBUG
                 checkBoxDebug.Checked = true;
-                MainMap.ShowTileGridLines = checkBoxDebug.Checked;
+                MainMap.ShowTileGridLines = false;
 #endif
 
                 // set current marker
@@ -261,6 +265,13 @@ namespace Demo.WindowsForms
             Activate();
             TopMost = true;
             TopMost = false;
+        }
+
+        public static DateTime AssemblyCreationDate()
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var fi = new FileInfo(asm.Location);
+            return fi.LastWriteTime; //itt eredetileg itt .CreationTime volt, de ez igy jobban követi a lokal re-buldeket is B
         }
 
 
@@ -762,6 +773,11 @@ namespace Demo.WindowsForms
             {
                 _isMouseDown = false;
             }
+
+            if (e.Button == MouseButtons.Right)
+            {
+                _isMouseDown = false;
+            }
         }
 
         // add demo circle
@@ -787,18 +803,83 @@ namespace Demo.WindowsForms
                     Debug.WriteLine("MouseDown: geo: " + _currentMarker.Position + " | px: " + px + " | tile: " + tile);
                     statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
                 }
+
+                foreach (var m in Objects.Markers)
+                {
+                    m.IsSelected = false;
+                }
             }
             else if (e.Button == MouseButtons.Right)
             {
                 if ((_currentHFmarker != null) && _currentHFmarker.IsMouseOver)
                 {
-                    MenuItem m1 = new MenuItem("Highlight");
-                    MenuItem m2 = new MenuItem("Delete");
+                    _isMouseDown = false;
 
-                    ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2 });
+                    MenuItem m1 = new MenuItem("Center");
+                    MenuItem m2 = new MenuItem("Infobox");
+                    MenuItem m3 = new MenuItem("Highlight");
+                    MenuItem m4 = new MenuItem("Delete");
+
+                    m1.Click += M1_Click;
+                    m2.Click += M2_Click;
+                    m2.Checked = _currentHFmarker.BallonState == GeoBallonState.geoDisplayBalloon;
+                    m3.Click += M3_Click;    
+                    m3.Checked = _currentHFmarker.Highlight;
+                    m4.Click += M4_Click;
+
+                    ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3, m4 });
                     m.Show(MainMap, new Point(e.X, e.Y));
+                    _isMouseDown = false;
                 }
             }
+        }
+
+        private void M3_Click(object sender, EventArgs e)
+        {
+            if (_currentHFmarker != null)
+            {
+                foreach (var m in Objects.Markers)
+                {
+                    if (m is GMarkerHFsystem)
+                    {
+                        var hf = m as GMarkerHFsystem;
+                        if (hf != _currentHFmarker)
+                            hf.Highlight = false;
+                    }
+                }
+                
+                _currentHFmarker.Highlight = !_currentHFmarker.Highlight;
+                _isMouseDown = false;
+            }
+        }
+
+        private void M4_Click(object sender, EventArgs e)
+        {
+            if ((_currentHFmarker != null) && _currentHFmarker.IsVisible)
+            {
+                Objects.Markers.Remove(_currentHFmarker);
+                _currentHFmarker = null;
+            }
+            _isMouseDown = false;
+        }
+
+
+        private void M2_Click(object sender, EventArgs e)
+        {
+            if (_currentHFmarker != null)
+            {
+                if (_currentHFmarker.BallonState == GeoBallonState.geoDisplayBalloon)
+                _currentHFmarker.BallonState = GeoBallonState.geoDisplayNone;
+                else _currentHFmarker.BallonState = GeoBallonState.geoDisplayBalloon;
+            }
+            _isMouseDown = false;
+        }
+
+        private void M1_Click(object sender, EventArgs e)
+        {
+            if (_currentHFmarker != null)
+                MainMap.Position = _currentHFmarker.Position;   
+            _isMouseDown = false;
         }
 
         // move current marker with left holding
@@ -817,6 +898,9 @@ namespace Demo.WindowsForms
                     if (_currentHFmarker != null)
                     {
                         _currentHFmarker.Position = MainMap.FromLocalToLatLng(e.X, e.Y);
+
+                        if (_currentHFmarker != null)
+                            _currentHFmarker.UpdateDefaultInfo();
                     }
                 }
                 else // move rect marker
@@ -876,6 +960,13 @@ namespace Demo.WindowsForms
                 }
                 else
                 {
+                    foreach (var m in Objects.Markers)
+                    {
+                        m.IsSelected = false;
+                    }
+
+                    item.IsSelected = true;
+
                     if (item.Tag != null)
                     {
                         if (_currentTransport != null)
@@ -999,16 +1090,36 @@ namespace Demo.WindowsForms
                     MessageBox.Show("Geocoder can't find: '" + textBoxGeo.Text + "', reason: " + status.ToString(), "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 }
             }
+            else
+            {
+                textBoxLat.Text = MainMap.Position.Lat.ToString(CultureInfo.InvariantCulture);
+                textBoxLng.Text = MainMap.Position.Lng.ToString(CultureInfo.InvariantCulture);
+            }
         }
 
         // go to
         private void btnGoTo_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(textBoxGeo.Text))
+            {
+                if (double.TryParse(textBoxLat.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double lat) &&
+                    double.TryParse(textBoxLng.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double lng))
+                {
+                    MainMap.Position = new PointLatLng(lat, lng);
+                }
+                return;
+            }
+
             var status = MainMap.SetPositionByKeywords(textBoxGeo.Text);
 
             if (status != GeoCoderStatusCode.OK)
             {
                 MessageBox.Show("Geocoder can't find: '" + textBoxGeo.Text + "', reason: " + status.ToString(), "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else
+            {
+                textBoxLat.Text = MainMap.Position.Lat.ToString(CultureInfo.InvariantCulture);
+                textBoxLng.Text = MainMap.Position.Lng.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -1098,7 +1209,7 @@ namespace Demo.WindowsForms
                 {
                     mBorders.Tag = _polygon.Points.Count;
                 }
-                mBorders.ToolTipMode = MarkerTooltipMode.Always;
+                mBorders.ToolTipMode = checkBox1_Infobox.Checked?  MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             }
 
             Placemark? p = null;
@@ -1129,7 +1240,9 @@ namespace Demo.WindowsForms
 
         private void btnAddPushpin_Click(object sender, EventArgs e)
         {
-            var m = new GMarkerHFsystem(_currentMarker.Position, GMarkerHFsystemType.Piroskör);
+            var m = new GMarkerHFsystem(_currentMarker.Position, GMarkerHFsystemType.Piroskör, 1);
+            m.SetDefaultInfo();
+            m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             Objects.Markers.Add(m);
         }
 
@@ -1588,8 +1701,11 @@ namespace Demo.WindowsForms
 
         private void checkBox1_Infobox_CheckedChanged(object sender, EventArgs e)
         {
-            //.. TODO :  
-
+            foreach (var m in Objects.Markers)
+            {
+                m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+            }
+            MainMap.Refresh();
         }
 
         private void button_centerMarker_Click(object sender, EventArgs e)
@@ -1607,6 +1723,80 @@ namespace Demo.WindowsForms
                 Objects.Markers.Remove(_currentHFmarker);
                 _currentHFmarker = null;
             }
+        }
+
+        private void textBoxLat_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            textBoxGeo.Text = string.Empty;
+        }
+
+        private void textBoxLng_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            textBoxGeo.Text = string.Empty;
+        }
+
+        private void btnMarker_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(textBoxGeo.Text))
+            {
+                if (double.TryParse(textBoxLat.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double lat) &&
+                    double.TryParse(textBoxLng.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double lng))
+                {
+                    var p = new PointLatLng(lat, lng);
+                    var m = new GMarkerHFsystem(p, GMarkerHFsystemType.Piroskör, 1);
+                    m.SetDefaultInfo();
+                    m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                    Objects.Markers.Add(m);
+                }
+                return;
+            }
+            else
+            {
+                var pos = MainMap.GetPositionBySettlement(textBoxGeo.Text);
+                if (!pos.IsEmpty)
+                {
+                    var m = new GMarkerHFsystem(pos, GMarkerHFsystemType.Piroskör, 1);
+                    m.SetDefaultInfo();
+                    m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                    Objects.Markers.Add(m);
+                }
+            }
+
+        }
+
+        private void btnCenterCursor_Click(object sender, EventArgs e)
+        {
+            if (_currentMarker != null)
+            {
+                MainMap.Position = _currentMarker.Position;
+            }
+        }
+
+        private void btnCursor_Click(object sender, EventArgs e)
+        {
+            if ((_currentMarker == null) || !_currentMarker.IsVisible)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(textBoxGeo.Text))
+            {
+                if (double.TryParse(textBoxLat.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double lat) &&
+                    double.TryParse(textBoxLng.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double lng))
+                {
+                    _currentMarker.Position = new PointLatLng(lat, lng);
+                }
+                return;
+            }
+            else
+            {
+                var pos = MainMap.GetPositionBySettlement(textBoxGeo.Text);
+                if (!pos.IsEmpty)
+                {
+                    _currentMarker.Position = pos;
+                }
+            }
+
         }
     } /* class MainForm */
 

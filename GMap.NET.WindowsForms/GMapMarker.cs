@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.Serialization;
+using System.Security.Policy;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.ToolTips;
 
@@ -87,13 +88,15 @@ namespace GMap.NET.WindowsForms
         {
             get
             {
-                return _area.Location;
+                return _area.Location + new Size(_area.Size.Width / 2, _area.Size.Height / 2);
             }
             set
             {
-                if (_area.Location != value)
+                var p = value - new Size(_area.Size.Width / 2, _area.Size.Height / 2);
+
+                if (_area.Location != p)
                 {
-                    _area.Location = value;
+                    _area.Location = p;
                     {
                         if (Overlay != null && Overlay.Control != null)
                         {
@@ -114,7 +117,7 @@ namespace GMap.NET.WindowsForms
         {
             get
             {
-                var ret = _area.Location;
+                var ret = _area.Location + new Size(_area.Size.Width / 2, _area.Size.Height / 2);
                 ret.Offset(-Offset.X, -Offset.Y);
                 return ret;
             }
@@ -146,7 +149,7 @@ namespace GMap.NET.WindowsForms
 
         string _toolTipText;
 
-        public string ToolTipText
+        public virtual string ToolTipText
         {
             get
             {
@@ -231,6 +234,26 @@ namespace GMap.NET.WindowsForms
             internal set
             {
                 _isMouseOver = value;
+            }
+        }
+
+        protected bool _isselected;
+        public bool IsSelected
+        {
+            get { return _isselected; }
+            set
+            {
+                if (_isselected != value)
+                {
+                    _isselected = value;
+                    if (Overlay != null && Overlay.Control != null)
+                    {
+                        if (!Overlay.Control.HoldInvalidation)
+                        {
+                            Overlay.Control.Invalidate();
+                        }
+                    }
+                }
             }
         }
 

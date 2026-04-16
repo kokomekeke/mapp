@@ -69,6 +69,7 @@ namespace GMap.NET.WindowsForms.ToolTips
                 g.DrawPath(Stroke, objGp);
             }
 
+            rect.Y -= (int) Radius ;
             g.DrawString(Marker.ToolTipText, Font, Foreground, rect, Format);
         }
 
