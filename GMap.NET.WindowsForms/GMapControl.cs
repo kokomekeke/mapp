@@ -373,7 +373,7 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     if true, selects area just by holding mouse and moving
         /// </summary>
-        public bool DisableAltForSelection = false;
+        public bool DisableAltForSelection = true;
 
         /// <summary>
         ///     retry count to get tile
@@ -411,7 +411,8 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     map dragg button
         /// </summary>
-        [Category("GMap.NET")] public MouseButtons DragButton = MouseButtons.Right;
+        [Category("GMap.NET")] public MouseButtons DragButton = MouseButtons.Left;
+        [Category("GMap.NET")] public MouseButtons SelectioButton = MouseButtons.Right;
 
         private bool _showTileGridLines;
 
@@ -1900,7 +1901,7 @@ namespace GMap.NET.WindowsForms
                     Core.MouseDown = ApplyRotationInversion(e.X, e.Y);
                     Invalidate();
                 }
-                else if (!_isSelected)
+                else if (!_isSelected && e.Button == SelectioButton)
                 {
                     _isSelected = true;
                     SelectedArea = RectLatLng.Empty;
@@ -1953,6 +1954,7 @@ namespace GMap.NET.WindowsForms
                     if (!SelectedArea.IsEmpty && ModifierKeys == Keys.Shift)
                     {
                         zoomtofit = SetZoomToFitRect(SelectedArea);
+                        ClearSelection();
                     }
 
                     OnSelectionChange?.Invoke(SelectedArea, zoomtofit);
@@ -2045,7 +2047,7 @@ namespace GMap.NET.WindowsForms
 
                 if (!overlayObjet && Core.MouseDown != GPoint.Empty)
                     OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
-            }                       
+            }
         }
 
         protected override void OnMouseDoubleClick(MouseEventArgs e)
@@ -2129,8 +2131,47 @@ namespace GMap.NET.WindowsForms
 
                 if (!overlayObjet && Core.MouseDown != GPoint.Empty)
                     OnMapDoubleClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
+
             }
         }
+
+        /// <summary>
+        /// Clears the selection rectangle.
+        /// </summary>
+        public void ClearSelection()
+        {
+            if (!SelectedArea.IsEmpty)
+            {
+                SelectedArea = RectLatLng.Empty;
+                _selectionEnd = PointLatLng.Empty;
+                _selectionStart = PointLatLng.Empty;
+                Invalidate();
+            }
+        }
+
+        public bool IsSelected()
+        {
+            return !SelectedArea.IsEmpty;
+        }
+
+        public bool InSelectedArea(PointLatLng pos)
+        {
+             return IsSelected() && SelectedArea.Contains(pos);
+        }
+
+
+        public void CheckSelection(PointLatLng pos)
+        {
+            if (IsSelected() && SelectedArea.Contains(pos))
+            {
+                bool zoomtofit = SetZoomToFitRect(SelectedArea);
+
+                OnSelectionChange?.Invoke(SelectedArea, zoomtofit);
+            }
+
+            ClearSelection();
+        }
+
 
         /// <summary>
         ///     apply transformation if in rotation mode

@@ -32,6 +32,9 @@ namespace Demo.WindowsForms
 
         // marker
         GMapMarker _currentMarker;
+        GMapMarkerRect _currentRectMarker;
+        GMarkerHFsystem _currentHFmarker;
+        GMarkerHFsystem _tempHFmarker;
 
         // polygons
         GMapPolygon _polygon;
@@ -39,8 +42,6 @@ namespace Demo.WindowsForms
         // etc
         readonly Random _rnd = new Random();
         readonly DescendingComparer _comparerIpStatus = new DescendingComparer();
-        GMapMarkerRect _currentRectMarker;
-        GMarkerHFsystem _currentHFmarker;
         string _mobileGpsLog = string.Empty;
         bool _isMouseDown;
         PointLatLng _start;
@@ -808,6 +809,9 @@ namespace Demo.WindowsForms
                 {
                     m.IsSelected = false;
                 }
+
+                MainMap.CheckSelection(MainMap.FromLocalToLatLng(e.X, e.Y));
+
             }
             else if (e.Button == MouseButtons.Right)
             {
@@ -827,38 +831,41 @@ namespace Demo.WindowsForms
                     m3.Checked = _currentHFmarker.Highlight;
                     m4.Click += M4_Click;
 
+                    _tempHFmarker = _currentHFmarker;
+
                     ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3, m4 });
                     m.Show(MainMap, new Point(e.X, e.Y));
                     _isMouseDown = false;
+                    _currentHFmarker = null;
                 }
             }
         }
 
         private void M3_Click(object sender, EventArgs e)
         {
-            if (_currentHFmarker != null)
+            if (_tempHFmarker != null)
             {
                 foreach (var m in Objects.Markers)
                 {
                     if (m is GMarkerHFsystem)
                     {
                         var hf = m as GMarkerHFsystem;
-                        if (hf != _currentHFmarker)
+                        if (hf != _tempHFmarker)
                             hf.Highlight = false;
                     }
                 }
                 
-                _currentHFmarker.Highlight = !_currentHFmarker.Highlight;
+                _tempHFmarker.Highlight = !_tempHFmarker.Highlight;
                 _isMouseDown = false;
             }
         }
 
         private void M4_Click(object sender, EventArgs e)
         {
-            if ((_currentHFmarker != null) && _currentHFmarker.IsVisible)
+            if ((_tempHFmarker != null) && _tempHFmarker.IsVisible)
             {
-                Objects.Markers.Remove(_currentHFmarker);
-                _currentHFmarker = null;
+                Objects.Markers.Remove(_tempHFmarker);
+                _tempHFmarker = null;
             }
             _isMouseDown = false;
         }
@@ -866,19 +873,19 @@ namespace Demo.WindowsForms
 
         private void M2_Click(object sender, EventArgs e)
         {
-            if (_currentHFmarker != null)
+            if (_tempHFmarker != null)
             {
-                if (_currentHFmarker.BallonState == GeoBallonState.geoDisplayBalloon)
-                _currentHFmarker.BallonState = GeoBallonState.geoDisplayNone;
-                else _currentHFmarker.BallonState = GeoBallonState.geoDisplayBalloon;
+                if (_tempHFmarker.BallonState == GeoBallonState.geoDisplayBalloon)
+                _tempHFmarker.BallonState = GeoBallonState.geoDisplayNone;
+                else _tempHFmarker.BallonState = GeoBallonState.geoDisplayBalloon;
             }
             _isMouseDown = false;
         }
 
         private void M1_Click(object sender, EventArgs e)
         {
-            if (_currentHFmarker != null)
-                MainMap.Position = _currentHFmarker.Position;   
+            if (_tempHFmarker != null)
+                MainMap.Position = _tempHFmarker.Position;   
             _isMouseDown = false;
         }
 
