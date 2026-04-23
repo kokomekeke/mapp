@@ -191,7 +191,7 @@ namespace Demo.WindowsForms
                 //trackBarZoom.TickFrequency = 100;
 
 #if DEBUG
-                checkBoxDebug.Checked = true;
+                checkBoxDebug.Checked = false;
                 MainMap.ShowTileGridLines = false;
 #endif
 
@@ -231,7 +231,7 @@ namespace Demo.WindowsForms
                     MainMap.ZoomAndCenterMarkers(null);
                 }
 
-                RegeneratePolygon();
+                //RegeneratePolygon();
 
                 try
                 {
@@ -493,7 +493,9 @@ namespace Demo.WindowsForms
 
 
         #region -- some functions --
-
+        /// <summary>
+        /// generates polygon from rect markers, using marker.Tag to keep point index in polygon
+        /// </summary>
         void RegeneratePolygon()
         {
             var polygonPoints = new List<PointLatLng>();

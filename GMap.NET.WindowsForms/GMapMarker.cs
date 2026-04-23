@@ -13,6 +13,14 @@ namespace GMap.NET.WindowsForms
     [Serializable]
     public abstract class GMapMarker : ISerializable, IDisposable
     {
+        Object _parent = null;
+        public Object Parent
+        {
+            get { return _parent; }
+            protected set { _parent = value; }
+        }
+
+
         GMapOverlay _overlay;
 
         public GMapOverlay Overlay
@@ -255,6 +263,10 @@ namespace GMap.NET.WindowsForms
                     }
                 }
             }
+        }
+
+        public GMapMarker()
+        {
         }
 
         public GMapMarker(PointLatLng pos)

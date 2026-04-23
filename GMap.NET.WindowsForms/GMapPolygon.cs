@@ -59,7 +59,7 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     can receive input
         /// </summary>
-        public bool IsHitTestVisible = false;
+        public bool IsHitTestVisible = true;
 
         private bool _isMouseOver;
 
@@ -79,6 +79,47 @@ namespace GMap.NET.WindowsForms
         }
 
         public GMapOverlay Overlay { get; set; }
+
+        protected bool _isselected = false;
+
+        public bool IsSelected 
+        { 
+            get { return _isselected; }
+            set 
+            {                 
+                if (value != _isselected)
+                {
+                    _isselected = value;
+
+                    if (_isselected)
+                    {
+                        for (int i = 0; i < Points.Count; i++)
+                        {
+                            var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Points[i]);
+                            Overlay?.Markers.Add(m);
+                        }
+                    }
+                    else
+                    {
+                        for (int i = Overlay.Markers.Count - 1; i >= 0; i--)
+                        {
+                            if (Overlay.Markers[i].Parent == this)
+                            {
+                                Overlay.Markers.RemoveAt(i);
+                            }
+                        }
+                    }
+
+                    if (Overlay != null && Overlay.Control != null)
+                    {
+                        if (!Overlay.Control.HoldInvalidation)
+                        {
+                            Overlay.Control.Invalidate();
+                        }
+                    }
+                }
+            }
+        }    
 
         /// <summary>
         ///     Indicates whether the specified point is contained within this System.Drawing.Drawing2D.GraphicsPath
@@ -131,13 +172,11 @@ namespace GMap.NET.WindowsForms
         {
             if (IsVisible)
             {
-                if (IsVisible)
+                if (_graphicsPath != null)
                 {
-                    if (_graphicsPath != null)
-                    {
-                        g.FillPath(Fill, _graphicsPath);
-                        g.DrawPath(Stroke, _graphicsPath);
-                    }
+                    g.FillPath(Fill, _graphicsPath);
+                    g.DrawPath(Stroke, _graphicsPath);
+
                 }
             }
         }
@@ -158,12 +197,15 @@ namespace GMap.NET.WindowsForms
         [NonSerialized] public Pen Stroke = DefaultStroke;
 
         public static readonly Brush DefaultFill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
-
+        
         /// <summary>
         ///     background color
         /// </summary>
         [NonSerialized] public Brush Fill = DefaultFill;
 
+        /// <summary>
+        /// List of points in map  (x,y)
+        /// </summary>
         public readonly List<GPoint> LocalPoints = new List<GPoint>();
 
         static GMapPolygon()
@@ -188,10 +230,35 @@ namespace GMap.NET.WindowsForms
         {
             int count = Points.Count;
 
-            if (count < 3)
+            if (count == 2)
             {
+                var p1 = Points[0];
+                var p2 = Points[1];
+
+                if (Math.Abs(p2.Lat - p1.Lat) > Math.Abs(p2.Lng - p1.Lng))
+                {
+                    if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
+                    {
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {   if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
+                    {
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
                 return false;
             }
+            else if (count < 3)
+                return false;
 
             bool result = false;
 
@@ -200,13 +267,35 @@ namespace GMap.NET.WindowsForms
                 var p1 = Points[i];
                 var p2 = Points[j];
 
-                if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
+                if (Math.Abs(p2.Lat - p1.Lat) > Math.Abs(p2.Lng - p1.Lng))
                 {
-                    if (p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) < p.Lng)
+                    if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
                     {
-                        result = !result;
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        {
+                            result = !result;
+                        }
                     }
                 }
+                else
+                {
+                    if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
+                    {
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        {
+                            result = !result;
+                        }
+                    }
+                }
+
+
+                //if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
+                //{
+                //    if (p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) < p.Lng)
+                //    {
+                //        result = !result;
+                //    }
+                //}
 
                 j = i;
             }
@@ -284,6 +373,18 @@ namespace GMap.NET.WindowsForms
                 _disposed = true;
 
                 LocalPoints.Clear();
+
+                if (Overlay != null)
+                {
+                    for (int i = Overlay.Markers.Count - 1; i >= 0; i--)
+                    {
+                        if (Overlay.Markers[i].Parent == this)
+                        {
+                            Overlay.Markers.RemoveAt(i);
+                        }
+                    }
+                }
+
 
                 if (_graphicsPath != null)
                 {

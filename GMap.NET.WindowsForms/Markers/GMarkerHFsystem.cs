@@ -141,6 +141,12 @@ namespace GMap.NET.WindowsForms.Markers
         }
 
 
+        /// <summary>
+        ///     marker using manual bitmap, NonSerialized
+        /// </summary>
+        /// <param name="p">position in geo coordinates</param>
+        /// <param name="type">type of bitmap of marker</param>
+        /// <param name="magnification">magnification of bitmap</param>
         public GMarkerHFsystem(PointLatLng p, GMarkerHFsystemType type, int magnification = 1)
             : base(p)
         {
@@ -163,8 +169,9 @@ namespace GMap.NET.WindowsForms.Markers
         /// <summary>
         ///     marker using manual bitmap, NonSerialized
         /// </summary>
-        /// <param name="p"></param>
-        /// <param name="bitmap"></param>
+        /// <param name="p">position in geo coordinates</param>
+        /// <param name="bitmap">bitmap of marker</param>
+        /// <param name="magnification">magnification of bitmap</param>
         public GMarkerHFsystem(PointLatLng p, Bitmap bitmap, int magnification = 1)
             : base(p)
         {

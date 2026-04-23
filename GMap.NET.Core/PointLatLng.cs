@@ -4,7 +4,7 @@ using System.Globalization;
 namespace GMap.NET
 {
     /// <summary>
-    ///     the point of coordinates
+    ///     the point of geo coordinates
     /// </summary>
     [Serializable]
     public struct PointLatLng

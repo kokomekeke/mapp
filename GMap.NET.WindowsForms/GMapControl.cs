@@ -1104,7 +1104,7 @@ namespace GMap.NET.WindowsForms
         public bool IsPointInBoundary(List<PointLatLng> points, string lat, string lng)
         {
             var polyOverlay = new GMapOverlay();
-            var polygon = new GMapPolygon(points, "routePloygon");
+            var polygon = new GMapPolygon(points, "routePolygon");
             polygon.Fill = new SolidBrush(Color.FromArgb(50, Color.Red));
             polygon.Stroke = new Pen(Color.Red, 1);
             polyOverlay.Polygons.Add(polygon);
@@ -2028,15 +2028,17 @@ namespace GMap.NET.WindowsForms
 
                         foreach (var m in o.Polygons)
                         {
+                            m.IsSelected = false;
+
                             if (m.IsVisible && m.IsHitTestVisible)
                             {
                                 #region -- check --
 
                                 if (m.IsInside(FromLocalToLatLng(e.X, e.Y)))
                                 {
+                                    m.IsSelected = true;
                                     OnPolygonClick?.Invoke(m, e);
                                     overlayObjet = true;
-                                    break;
                                 }
 
                                 #endregion

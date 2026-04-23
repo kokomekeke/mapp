@@ -13,7 +13,7 @@ namespace GMap.NET
     public class MapRoute : ISerializable, IDeserializationCallback
     {
         /// <summary>
-        ///     points of route
+        ///     points of route in geo coordinates
         /// </summary>
         public readonly List<PointLatLng> Points = new List<PointLatLng>();
 
