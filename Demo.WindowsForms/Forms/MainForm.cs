@@ -46,6 +46,9 @@ namespace Demo.WindowsForms
         bool _isMouseDown;
         PointLatLng _start;
         PointLatLng _end;
+        int _lineindex = 0;
+        GMarkerCross _startMarker;
+        GMarkerCross _endMarker;
 
         public MainForm()
         {
@@ -1192,18 +1195,30 @@ namespace Demo.WindowsForms
                 MainMap.ZoomAndCenterRoute(r);
 
                 //MainMap.Position = _start;
+                ClearStartEnd();
             }
         }
 
 
         private void btn_addline_Click(object sender, EventArgs e)
         {
+            if (_start.IsEmpty)
+            {
+                MessageBox.Show("Set start point first");
+                return;
+            }
             var points = new List<PointLatLng>();
             points.Add(new PointLatLng(_start.Lat, _start.Lng));
+
+            if (_end.IsEmpty)
+                _end = _currentMarker.Position;
+
             points.Add(new PointLatLng(_end.Lat, _end.Lng));
-            var polygon = new GMapPolygon(points, "Line");
+            var polygon = new GMapPolygon(points, $"Line-{++_lineindex}");
             polygon.Stroke = new Pen(Color.Blue, 2);
             Polygons.Polygons.Add(polygon);
+
+            ClearStartEnd();
         }
 
 
@@ -1259,6 +1274,7 @@ namespace Demo.WindowsForms
         // clear markers
         private void btnClearAll_Click(object sender, EventArgs e)
         {
+            ClearStartEnd();
             Objects.Markers.Clear();
             //Routes.Routes.Clear();
             //Polygons.Polygons.Clear();
@@ -1269,8 +1285,21 @@ namespace Demo.WindowsForms
         {
             Routes.Routes.Clear();
             Polygons.Polygons.Clear();
+            ClearStartEnd();
         }
 
+
+        private void ClearStartEnd()
+        {
+            if (_startMarker != null)
+                Objects.Markers.Remove(_startMarker);
+            if (_endMarker != null)
+                Objects.Markers.Remove(_endMarker);
+            _start = PointLatLng.Empty;
+            _end = PointLatLng.Empty;
+            _startMarker = null;
+            _endMarker = null;
+        }
 
         // show current marker
         private void checkBoxCurrentMarker_CheckedChanged(object sender, EventArgs e)
@@ -1288,12 +1317,16 @@ namespace Demo.WindowsForms
         private void btnSetStart_Click(object sender, EventArgs e)
         {
             _start = _currentMarker.Position;
+            _startMarker = new GMarkerCross(_start);
+            Objects.Markers.Add(_startMarker);
         }
 
         // set route end
         private void btnSetEnd_Click(object sender, EventArgs e)
         {
             _end = _currentMarker.Position;
+            _endMarker = new GMarkerCross(_end);
+            Objects.Markers.Add(_endMarker);
         }
 
         // zoom to max for markers

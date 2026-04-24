@@ -25,15 +25,15 @@ namespace GMap.NET.WindowsForms.Markers
             // do not forget set Size of the marker
             // if so, you shall have no event on it ;}
             Size = new Size(8, 8);
-            Offset = new Point(-Size.Width / 2, -Size.Height / 2);
+            //Offset = new Point(Size.Width / 2, Size.Height / 2);
         }
 
 
         public override void OnRender(Graphics g)
         {
-            g.DrawRectangle(Pen, new Rectangle(LocalPosition.X, LocalPosition.Y, Size.Width/2, Size.Height/2));
+            g.DrawRectangle(Pen, new Rectangle(LocalPosition.X - Size.Width/4, LocalPosition.Y - Size.Height/4, Size.Width/2, Size.Height/2));
             if (IsMouseOver)
-                g.DrawRectangle(Pens.Red, new Rectangle(LocalPosition.X - Size.Width/4, LocalPosition.Y - Size.Height/4, Size.Width, Size.Height));
+                g.DrawRectangle(Pens.Red, LocalArea);
         }
 
         public override void Dispose()
