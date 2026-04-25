@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
+using static GMap.NET.Entity.OpenStreetMapGraphHopperGeocodeEntity;
 
 namespace GMap.NET.WindowsForms
 {
@@ -11,12 +13,12 @@ namespace GMap.NET.WindowsForms
     ///     GMap.NET polygon
     /// </summary>
     [Serializable]
-    public class GMapPolygon : MapRoute, ISerializable, IDeserializationCallback, IDisposable
+    public class GMapPolyLine : MapRoute, ISerializable, IDeserializationCallback, IDisposable
     {
         private bool _visible = true;
 
         /// <summary>
-        ///     is polygon visible
+        ///     is polyline visible
         /// </summary>
         public bool IsVisible
         {
@@ -119,7 +121,40 @@ namespace GMap.NET.WindowsForms
                     }
                 }
             }
-        }    
+        }
+
+        bool _isclosed = false;
+        public bool IsClosed
+        {
+            get { return _isclosed; } 
+            set
+            {
+                if (value != _isclosed)
+                {
+                    _isclosed = value;
+                    if (_graphicsPath != null)
+                    {
+                        if (_isclosed)
+                        {
+                            Points.Add(Points[0]);
+                        }
+                        else
+                        {
+                            Points.RemoveAt(Points.Count - 1);
+                        }
+                    }
+
+                    if (Overlay != null && Overlay.Control != null)
+                    {
+                        Overlay.Control.UpdatePolygonLocalPosition(this);
+                        if (!Overlay.Control.HoldInvalidation)
+                        {
+                            Overlay.Control.Invalidate();
+                        }
+                    }
+                }
+            }
+        }
 
         /// <summary>
         ///     Indicates whether the specified point is contained within this System.Drawing.Drawing2D.GraphicsPath
@@ -150,21 +185,17 @@ namespace GMap.NET.WindowsForms
             }
 
             {
-                var pnts = new Point[LocalPoints.Count];
+                var pnts = new System.Drawing.Point[LocalPoints.Count];
                 for (int i = 0; i < LocalPoints.Count; i++)
                 {
-                    var p2 = new Point((int)LocalPoints[i].X, (int)LocalPoints[i].Y);
+                    var p2 = new System.Drawing.Point((int)LocalPoints[i].X, (int)LocalPoints[i].Y);
                     pnts[pnts.Length - 1 - i] = p2;
                 }
 
                 if (pnts.Length > 2)
-                {
-                    _graphicsPath.AddPolygon(pnts);
-                }
-                else if (pnts.Length == 2)
-                {
                     _graphicsPath.AddLines(pnts);
-                }
+                else if (pnts.Length == 2)
+                    _graphicsPath.AddLine(pnts[0], pnts[1]);
             }
         }
 
@@ -174,8 +205,10 @@ namespace GMap.NET.WindowsForms
             {
                 if (_graphicsPath != null)
                 {
-                    g.FillPath(Fill, _graphicsPath);
-                    g.DrawPath(Stroke, _graphicsPath);
+                    //g.FillPath(Fill, _graphicsPath);
+                    if (Points.Count > 2)
+                         g.DrawPath(Stroke, _graphicsPath);
+                    else g.DrawLine(Stroke, LocalPoints[0].X, LocalPoints[0].Y, LocalPoints[1].X, LocalPoints[1].Y);
 
                 }
             }
@@ -208,16 +241,50 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         public readonly List<GPoint> LocalPoints = new List<GPoint>();
 
-        static GMapPolygon()
+        static GMapPolyLine()
         {
             DefaultStroke.LineJoin = LineJoin.Round;
             DefaultStroke.Width = 5;
         }
 
-        public GMapPolygon(List<PointLatLng> points, string name)
+        public GMapPolyLine(List<PointLatLng> points, string name)
             : base(points, name)
         {
             LocalPoints.Capacity = Points.Count;
+            Stroke.EndCap = LineCap.ArrowAnchor;
+        }
+
+        public GMapPolyLine(List<PointLatLng> points, Color color, string name)
+            : base(points, name)
+        {
+            LocalPoints.Capacity = Points.Count;
+            Stroke = new Pen(color, DefaultStroke.Width)
+            {
+                LineJoin = DefaultStroke.LineJoin
+            };
+            Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
+        }
+
+
+        public Color LineColor
+        {
+            get { return Stroke.Color; }
+            set
+            {
+                if (Stroke.Color.ToArgb() != value.ToArgb())
+                {
+                    Stroke.Color = value;
+
+                    if (Overlay != null && Overlay.Control != null)
+                    {
+                        Overlay.Control.UpdatePolygonLocalPosition(this);
+                        if (!Overlay.Control.HoldInvalidation)
+                        {
+                            Overlay.Control.Invalidate();
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -288,20 +355,229 @@ namespace GMap.NET.WindowsForms
                     }
                 }
 
-
-                //if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
-                //{
-                //    if (p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) < p.Lng)
-                //    {
-                //        result = !result;
-                //    }
-                //}
-
                 j = i;
             }
 
             return result;
         }
+
+
+        /// <summary>
+        /// Get index of line in lines
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns>index of end point of line or 0 or -1</returns>
+        public int IndexOfPoint(PointLatLng p)
+        {
+            int count = Points.Count;
+            if (count == 0)
+                return -1;
+
+            int pos = Points.IndexOf(p);
+            if (pos >= 0 && pos < LocalPoints.Count)
+                return pos;
+
+            var p1 = Points[0];
+            var p2 = Points[1];
+
+            if (count == 2)
+            {
+                if (Math.Abs(p2.Lat - p1.Lat) > Math.Abs(p2.Lng - p1.Lng))
+                {
+                    if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
+                    {
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        {
+                            return 1;
+                        }
+                    }
+                }
+                else
+                {
+                    if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
+                    {
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        {
+                            return 1;
+                        }
+                    }
+                }
+
+                return -1;
+            }
+            else if (count < 3)
+                return -1;
+
+
+            for (int i = 1; i < count; i++)
+            {
+                p2 = Points[i];
+
+                if (Math.Abs(p2.Lat - p1.Lat) > Math.Abs(p2.Lng - p1.Lng))
+                {
+                    if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
+                    {
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        {
+                            return i;
+                        }
+                    }
+                }
+                else
+                {
+                    if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
+                    {
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        {
+                            return i;
+                        }
+                    }
+                }
+
+                p1 = p2;
+            }
+            return -1;
+        }
+
+
+        public void Append(PointLatLng point)
+        {
+            Points.Add(point);
+            LocalPoints.Capacity = Points.Count;
+
+            if (IsSelected)
+            {
+                var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, point);
+                Overlay?.Markers.Add(m);
+            }
+
+            if (Overlay != null && Overlay.Control != null)
+            {
+                Overlay.Control.UpdatePolygonLocalPosition(this);
+                if (!Overlay.Control.HoldInvalidation)
+                {
+                    Overlay.Control.Invalidate();
+                }
+            }
+        }
+
+
+        public void Insert(int index, PointLatLng point)
+        {
+            Points.Insert(index, point);
+            LocalPoints.Capacity = Points.Count;
+            if (IsSelected)
+            {
+                var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, point);
+                Overlay?.Markers.Add(m);
+            }
+            if (Overlay != null && Overlay.Control != null)
+            {
+                Overlay.Control.UpdatePolygonLocalPosition(this);
+                if (!Overlay.Control.HoldInvalidation)
+                {
+                    Overlay.Control.Invalidate();
+                }
+            }
+        }
+
+
+        public void MovePoint(int index, PointLatLng point)
+        {
+            if (index >= 0 && index < Points.Count)
+            {
+                Points[index] = point;
+                if (IsSelected)
+                {
+                    for (int i = Overlay.Markers.Count - 1; i >= 0; i--)
+                    {
+                        if (Overlay.Markers[i].Parent == this && ((GMap.NET.WindowsForms.Markers.GMarkerLinePoint)Overlay.Markers[i]).Position == point)
+                        {
+                            ((GMap.NET.WindowsForms.Markers.GMarkerLinePoint)Overlay.Markers[i]).Position = point;
+                        }
+                    }
+                }
+                if (Overlay != null && Overlay.Control != null)
+                {
+                    Overlay.Control.UpdatePolygonLocalPosition(this);
+                    if (!Overlay.Control.HoldInvalidation)
+                    {
+                        Overlay.Control.Invalidate();
+                    }
+                }
+            }
+        }
+
+        public void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            int index = Points.IndexOf(oldpoint);
+            if (index != -1)
+            {
+                Points[index] = newpoint;
+
+                if (Overlay != null && Overlay.Control != null)
+                {
+                    Overlay.Control.UpdatePolygonLocalPosition(this);
+                    if (!Overlay.Control.HoldInvalidation)
+                    {
+                        Overlay.Control.Invalidate();
+                    }
+                }
+            }
+        }
+
+
+        public void ClearPoints()
+        {
+            Points.Clear();
+            LocalPoints.Clear();
+            if (IsSelected)
+            {
+                for (int i = Overlay.Markers.Count - 1; i >= 0; i--)
+                {
+                    if (Overlay.Markers[i].Parent == this)
+                    {
+                        Overlay.Markers.RemoveAt(i);
+                    }
+                }
+            }
+            if (Overlay != null && Overlay.Control != null)
+            {
+                if (!Overlay.Control.HoldInvalidation)
+                {
+                    Overlay.Control.Invalidate();
+                }
+            }
+        }
+
+        public void RemovePoint(PointLatLng point)
+        {
+            int index = Points.IndexOf(point);
+            if (index != -1)
+            {
+                Points.RemoveAt(index);
+                LocalPoints.RemoveAt(index);
+                if (IsSelected)
+                {
+                    for (int i = Overlay.Markers.Count - 1; i >= 0; i--)
+                    {
+                        if (Overlay.Markers[i].Parent == this && ((GMap.NET.WindowsForms.Markers.GMarkerLinePoint)Overlay.Markers[i]).Position == point)
+                        {
+                            Overlay.Markers.RemoveAt(i);
+                        }
+                    }
+                }
+                if (Overlay != null && Overlay.Control != null)
+                {
+                    Overlay.Control.UpdatePolygonLocalPosition(this);
+                    if (!Overlay.Control.HoldInvalidation)
+                    {
+                        Overlay.Control.Invalidate();
+                    }
+                }
+            }
+        }
+
 
         #region ISerializable Members
 
@@ -333,7 +609,7 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         /// <param name="info">The info.</param>
         /// <param name="context">The context.</param>
-        protected GMapPolygon(SerializationInfo info, StreamingContext context)
+        protected GMapPolyLine(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             deserializedLocalPoints = Extensions.GetValue<GPoint[]>(info, "LocalPoints");
@@ -399,11 +675,11 @@ namespace GMap.NET.WindowsForms
         #endregion
     }
 
-    public delegate void PolygonClick(GMapPolygon item, MouseEventArgs e);
+    public delegate void PolygonClick(GMapPolyLine item, MouseEventArgs e);
 
-    public delegate void PolygonDoubleClick(GMapPolygon item, MouseEventArgs e);
+    public delegate void PolygonDoubleClick(GMapPolyLine item, MouseEventArgs e);
 
-    public delegate void PolygonEnter(GMapPolygon item);
+    public delegate void PolygonEnter(GMapPolyLine item);
 
-    public delegate void PolygonLeave(GMapPolygon item);
+    public delegate void PolygonLeave(GMapPolyLine item);
 }

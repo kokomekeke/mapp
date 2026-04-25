@@ -110,8 +110,8 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     list of polygons, should be thread safe
         /// </summary>
-        public readonly ObservableCollectionThreadSafe<GMapPolygon> Polygons =
-            new ObservableCollectionThreadSafe<GMapPolygon>();
+        public readonly ObservableCollectionThreadSafe<GMapPolyLine> Polygons =
+            new ObservableCollectionThreadSafe<GMapPolyLine>();
 
         GMapControl _control;
 
@@ -163,7 +163,7 @@ namespace GMap.NET.WindowsForms
         {
             if (e.NewItems != null)
             {
-                foreach (GMapPolygon obj in e.NewItems)
+                foreach (GMapPolyLine obj in e.NewItems)
                 {
                     if (obj != null)
                     {
@@ -395,14 +395,14 @@ namespace GMap.NET.WindowsForms
             Routes.CopyTo(routeArray, 0);
             info.AddValue("Routes", routeArray);
 
-            var polygonArray = new GMapPolygon[Polygons.Count];
+            var polygonArray = new GMapPolyLine[Polygons.Count];
             Polygons.CopyTo(polygonArray, 0);
             info.AddValue("Polygons", polygonArray);
         }
 
         private GMapMarker[] deserializedMarkerArray;
         private GMapRoute[] deserializedRouteArray;
-        private GMapPolygon[] deserializedPolygonArray;
+        private GMapPolyLine[] deserializedPolygonArray;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="GMapOverlay" /> class.
@@ -416,7 +416,7 @@ namespace GMap.NET.WindowsForms
 
             deserializedMarkerArray = Extensions.GetValue(info, "Markers", new GMapMarker[0]);
             deserializedRouteArray = Extensions.GetValue(info, "Routes", new GMapRoute[0]);
-            deserializedPolygonArray = Extensions.GetValue(info, "Polygons", new GMapPolygon[0]);
+            deserializedPolygonArray = Extensions.GetValue(info, "Polygons", new GMapPolyLine[0]);
 
             CreateEvents();
         }

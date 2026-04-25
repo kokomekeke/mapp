@@ -35,9 +35,12 @@ namespace Demo.WindowsForms
         GMapMarkerRect _currentRectMarker;
         GMarkerHFsystem _currentHFmarker;
         GMarkerHFsystem _tempHFmarker;
+        GMarkerLinePoint _currentLinePoint;
+        GMapPolyLine _currentPolyline;
+        PointLatLng _currentLatLong;
 
         // polygons
-        GMapPolygon _polygon;
+        GMapPolyLine _polygon;
 
         // etc
         readonly Random _rnd = new Random();
@@ -294,12 +297,12 @@ namespace Demo.WindowsForms
            
         }
 
-        private void MainMap_OnPolygonDoubleClick(GMapPolygon item, MouseEventArgs e)
+        private void MainMap_OnPolygonDoubleClick(GMapPolyLine item, MouseEventArgs e)
         {
             
         }
 
-        private void MainMap_OnPolygonClick(GMapPolygon item, MouseEventArgs e)
+        private void MainMap_OnPolygonClick(GMapPolyLine item, MouseEventArgs e)
         {
             
         }
@@ -514,7 +517,7 @@ namespace Demo.WindowsForms
 
             if (_polygon == null)
             {
-                _polygon = new GMapPolygon(polygonPoints, "polygon test");
+                _polygon = new GMapPolyLine(polygonPoints, "polygon test");
                 _polygon.IsHitTestVisible = true;
                 Polygons.Polygons.Add(_polygon);
             }
@@ -716,6 +719,10 @@ namespace Demo.WindowsForms
             {
                 _currentHFmarker = null;
             }
+            else if (item is GMarkerLinePoint)
+            {
+                _currentLinePoint = null;
+            }
         }
 
         void MainMap_OnMarkerEnter(GMapMarker item)
@@ -731,20 +738,27 @@ namespace Demo.WindowsForms
             {
                 _currentHFmarker = item as GMarkerHFsystem;
             }
+            else if (item is GMarkerLinePoint)
+            {
+                _currentLinePoint = item as GMarkerLinePoint;
+                if (_currentLinePoint.Parent is GMapPolyLine polygon)
+                {
+                    _currentPolyline = polygon;
+                }
+            }
             Debug.WriteLine("OnMarkerEnter: " + item.Position);
         }
 
-        GMapPolygon _currentPolygon;
-        void MainMap_OnPolygonLeave(GMapPolygon item)
+        void MainMap_OnPolygonLeave(GMapPolyLine item)
         {
-            _currentPolygon = null;
+            _currentPolyline = null;
             item.Stroke.Color = Color.MidnightBlue;
             Debug.WriteLine("OnPolygonLeave: " + item.Name);
         }
 
-        void MainMap_OnPolygonEnter(GMapPolygon item)
+        void MainMap_OnPolygonEnter(GMapPolyLine item)
         {
-            _currentPolygon = item;
+            _currentPolyline = item;
             item.Stroke.Color = Color.Red;
             Debug.WriteLine("OnPolygonEnter: " + item.Name);
         }
@@ -823,6 +837,7 @@ namespace Demo.WindowsForms
                 if ((_currentHFmarker != null) && _currentHFmarker.IsMouseOver)
                 {
                     _isMouseDown = false;
+                    MainMap.ClearSelection();
 
                     MenuItem m1 = new MenuItem("Center");
                     MenuItem m2 = new MenuItem("Infobox");
@@ -832,7 +847,7 @@ namespace Demo.WindowsForms
                     m1.Click += M1_Click;
                     m2.Click += M2_Click;
                     m2.Checked = _currentHFmarker.BallonState == GeoBallonState.geoDisplayBalloon;
-                    m3.Click += M3_Click;    
+                    m3.Click += M3_Click;
                     m3.Checked = _currentHFmarker.Highlight;
                     m4.Click += M4_Click;
 
@@ -843,8 +858,51 @@ namespace Demo.WindowsForms
                     _isMouseDown = false;
                     _currentHFmarker = null;
                 }
+                else
+                {
+                    _currentLatLong = MainMap.FromLocalToLatLng(e.X, e.Y);
+
+                    if (_currentPolyline == null)
+                    {
+                        foreach (var p in Polygons.Polygons)
+                        {
+                            if (p.IsInside(_currentLatLong))
+                            {
+                                _currentPolyline = p;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (_currentPolyline != null)
+                    {
+                        if (_currentPolyline.IsInside(_currentLatLong))
+                        {
+                            MainMap.ClearSelection();
+                            _currentPolyline.IsSelected = true;
+
+                            MenuItem m1 = new MenuItem("Add point");
+                            MenuItem m2 = new MenuItem("Close curve");
+                            MenuItem m3 = new MenuItem("Change color");
+
+                            m1.Click += M1P_Click;
+                            m2.Click += M2P_Click;
+                            m3.Click += M3P_Click;
+
+                            _tempHFmarker = _currentHFmarker;
+
+                            ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3});
+                            m.Show(MainMap, new Point(e.X, e.Y));
+                            _isMouseDown = false;
+                            MainMap.ClearSelection();
+                            MainMap.IsMouseOverPolygon = true;
+                        }
+                        else MainMap.IsMouseOverPolygon = false;
+                    }
+                }
             }
-        }
+
+        } /* MainMap_MouseDown */
 
         private void M3_Click(object sender, EventArgs e)
         {
@@ -862,6 +920,7 @@ namespace Demo.WindowsForms
                 
                 _tempHFmarker.Highlight = !_tempHFmarker.Highlight;
                 _isMouseDown = false;
+                MainMap.ClearSelection();
             }
         }
 
@@ -873,6 +932,7 @@ namespace Demo.WindowsForms
                 _tempHFmarker = null;
             }
             _isMouseDown = false;
+            MainMap.ClearSelection();
         }
 
 
@@ -885,6 +945,7 @@ namespace Demo.WindowsForms
                 else _tempHFmarker.BallonState = GeoBallonState.geoDisplayBalloon;
             }
             _isMouseDown = false;
+            MainMap.ClearSelection();
         }
 
         private void M1_Click(object sender, EventArgs e)
@@ -892,6 +953,47 @@ namespace Demo.WindowsForms
             if (_tempHFmarker != null)
                 MainMap.Position = _tempHFmarker.Position;   
             _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+
+
+        private void M1P_Click(object sender, EventArgs e)
+        {
+            if (_currentLatLong != null && _currentPolyline != null)
+            {
+                int index = _currentPolyline.IndexOfPoint(_currentLatLong);
+                if (index >= 0)
+                {
+                    _currentPolyline.Insert(index, _currentLatLong);
+                    MainMap.UpdatePolygonLocalPosition(_currentPolyline);
+                }
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+        private void M2P_Click(object sender, EventArgs e)
+        {
+            if (_currentPolyline != null)
+            {
+                _currentPolyline.IsClosed = true;
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+        private void M3P_Click(object sender, EventArgs e)
+        {
+            //.. change color
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+
+            var cd = new ColorDialog();
+            if (cd.ShowDialog() == DialogResult.OK)
+            {
+                _currentPolyline.LineColor = cd.Color;
+            }
         }
 
         // move current marker with left holding
@@ -901,18 +1003,25 @@ namespace Demo.WindowsForms
             {
                 if (_currentRectMarker == null)
                 {
+                    var pos = MainMap.FromLocalToLatLng(e.X, e.Y);
+
                     if (_currentMarker.IsVisible)
                     {
-                        _currentMarker.Position = MainMap.FromLocalToLatLng(e.X, e.Y);
+                        _currentMarker.Position = pos;
                         statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
                     }
 
                     if (_currentHFmarker != null)
                     {
-                        _currentHFmarker.Position = MainMap.FromLocalToLatLng(e.X, e.Y);
+                        _currentHFmarker.Position = pos;
 
                         if (_currentHFmarker != null)
                             _currentHFmarker.UpdateDefaultInfo();
+                    }
+
+                    if (_currentLinePoint != null)
+                    {
+                        _currentLinePoint.Position = pos;
                     }
                 }
                 else // move rect marker
@@ -1202,23 +1311,57 @@ namespace Demo.WindowsForms
 
         private void btn_addline_Click(object sender, EventArgs e)
         {
+            GMapPolyLine polygon = null;
+
             if (_start.IsEmpty)
             {
-                MessageBox.Show("Set start point first");
-                return;
+                switch (Polygons.Polygons.Count)
+                {
+                    case 0: return;
+                    case 1:
+                        polygon = Polygons.Polygons[0];
+                        break;
+                    default:
+                        foreach (var p in Polygons.Polygons)
+                        {
+                            if (p.IsSelected)
+                            {
+                                polygon = p;
+                                break;
+                            }
+                        }
+                        break;
+                }
             }
-            var points = new List<PointLatLng>();
-            points.Add(new PointLatLng(_start.Lat, _start.Lng));
 
-            if (_end.IsEmpty)
-                _end = _currentMarker.Position;
+            if (polygon == null)
+            {
+                if (_start.IsEmpty)
+                {
+                    MessageBox.Show("Set start point first");
+                    return;
+                }
+                var points = new List<PointLatLng>();
+                points.Add(new PointLatLng(_start.Lat, _start.Lng));
 
-            points.Add(new PointLatLng(_end.Lat, _end.Lng));
-            var polygon = new GMapPolygon(points, $"Line-{++_lineindex}");
-            polygon.Stroke = new Pen(Color.Blue, 2);
-            Polygons.Polygons.Add(polygon);
+                if (_end.IsEmpty)
+                    _end = _currentMarker.Position;
 
-            ClearStartEnd();
+                points.Add(new PointLatLng(_end.Lat, _end.Lng));
+                polygon = new GMapPolyLine(points, $"Line-{++_lineindex}");
+                polygon.Stroke = new Pen(Color.Blue, 2);
+                polygon.Stroke.EndCap = LineCap.ArrowAnchor;
+                Polygons.Polygons.Add(polygon);
+
+                ClearStartEnd();
+            }
+            else
+            {
+                if ((_currentMarker != null) &&  _currentMarker.IsVisible)
+                {
+                    polygon.Append(new PointLatLng(_currentMarker.Position.Lat, _currentMarker.Position.Lng));
+                }
+            }
         }
 
 
@@ -1423,10 +1566,10 @@ namespace Demo.WindowsForms
             }
             else if (e.KeyCode == Keys.Delete)
             {
-                if (_currentPolygon != null)
+                if (_currentPolyline != null)
                 {
-                    Polygons.Polygons.Remove(_currentPolygon);
-                    _currentPolygon = null;
+                    Polygons.Polygons.Remove(_currentPolyline);
+                    _currentPolyline = null;
                 }
 
                 if (_currentRoute != null)

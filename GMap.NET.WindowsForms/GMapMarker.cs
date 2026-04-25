@@ -47,6 +47,7 @@ namespace GMap.NET.WindowsForms
             {
                 if (_position != value)
                 {
+                    var oldPosition = _position;
                     _position = value;
 
                     if (IsVisible)
@@ -54,6 +55,22 @@ namespace GMap.NET.WindowsForms
                         if (Overlay != null && Overlay.Control != null)
                         {
                             Overlay.Control.UpdateMarkerLocalPosition(this);
+                        }
+
+                        if (Parent != null)
+                        {
+                            if (Parent is GMapPolyLine)
+                            {
+                                ((GMapPolyLine)Parent).MovePoint(oldPosition, _position);
+                            }
+
+                            if (Overlay != null && Overlay.Control != null)
+                            {
+                                if (!Overlay.Control.HoldInvalidation)
+                                {
+                                    Overlay.Control.Invalidate();
+                                }
+                            }
                         }
                     }
                 }

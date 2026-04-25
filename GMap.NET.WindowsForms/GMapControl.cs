@@ -715,7 +715,7 @@ namespace GMap.NET.WindowsForms
         ///     updates polygons local position
         /// </summary>
         /// <param name="polygon"></param>
-        public void UpdatePolygonLocalPosition(GMapPolygon polygon)
+        public void UpdatePolygonLocalPosition(GMapPolyLine polygon)
         {
             polygon.LocalPoints.Clear();
 
@@ -1104,7 +1104,7 @@ namespace GMap.NET.WindowsForms
         public bool IsPointInBoundary(List<PointLatLng> points, string lat, string lng)
         {
             var polyOverlay = new GMapOverlay();
-            var polygon = new GMapPolygon(points, "routePolygon");
+            var polygon = new GMapPolyLine(points, "routePolygon");
             polygon.Fill = new SolidBrush(Color.FromArgb(50, Color.Red));
             polygon.Stroke = new Pen(Color.Red, 1);
             polyOverlay.Polygons.Add(polygon);
@@ -1894,7 +1894,7 @@ namespace GMap.NET.WindowsForms
         {
             base.OnMouseDown(e);
 
-            if (!IsMouseOverMarker)
+            if (!IsMouseOverMarker && !IsMouseOverPolygon)
             {
                 if (e.Button == DragButton && CanDragMap)
                 {
@@ -1909,6 +1909,8 @@ namespace GMap.NET.WindowsForms
                     _selectionStart = FromLocalToLatLng(e.X, e.Y);
                 }
             }
+            else if (IsMouseOverPolygon)
+                IsMouseOverPolygon = false;
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
@@ -2379,10 +2381,10 @@ namespace GMap.NET.WindowsForms
 
                                     var rp = new GPoint(e.X, e.Y);
 
-                                    if (!MobileMode)
-                                    {
-                                        rp.OffsetNegative(Core.RenderOffset);
-                                    }
+                                    //if (!MobileMode)
+                                    //{
+                                    //    rp.OffsetNegative(Core.RenderOffset);
+                                    //}
 
                                     if (m.IsInsideLocal((int)rp.X, (int)rp.Y))
                                     {
@@ -2998,7 +3000,7 @@ namespace GMap.NET.WindowsForms
             {
                 return _isMouseOverPolygon;
             }
-            internal set
+            set
             {
                 _isMouseOverPolygon = value;
                 OverObjectCount += value ? 1 : -1;
