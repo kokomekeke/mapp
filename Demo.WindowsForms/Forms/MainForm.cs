@@ -53,6 +53,10 @@ namespace Demo.WindowsForms
         GMarkerCross _startMarker;
         GMarkerCross _endMarker;
 
+        // macro
+        string _filename = string.Empty;
+
+
         public MainForm()
         {
             InitializeComponent();
@@ -73,20 +77,21 @@ namespace Demo.WindowsForms
                 //                          
 
                 // set cache mode only if no internet available
-                if (!Stuff.PingNetwork("google.com"))
+                if (!Stuff.PingNetwork(Program.pingaddress))
                 {
                     //MainMap.Manager.Mode = AccessMode.CacheOnly;
                     //MessageBox.Show("No internet connection available, going to CacheOnly mode.", "GMap.NET - Demo.WindowsForms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     MessageBox.Show("No internet connection available", "GMap.NET - Demo.WindowsForms", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
 
-                Text += " - HFsystem version - " + " Build=" + AssemblyCreationDate().ToString("yyyy.MM.dd HH:mm"); 
+                Text += " - HFsystem version - " + " Build=" + AssemblyCreationDate().ToString("yyyy.MM.dd HH:mm");
 
 
                 //----------------------------------------
                 // Config Map at Startup
                 //----------------------------------------
-                MainMap.MapProvider = GMapProviders.GoogleMap;
+                MainMap.MapProvider = Program.mapProvider;  //GMapProviders.GoogleMap;
+                MainMap.Manager.Mode = Program.accesmode;
 
                 OpenStreetMapGraphHopperProvider.Instance.ApiKey = Stuff.OpenStreetMapsGraphHopperApiKey;
                 GoogleMapProvider.Instance.ApiKey = Stuff.GoogleMapsApiKey;
@@ -99,14 +104,15 @@ namespace Demo.WindowsForms
                 //----------------------------------------
                 // Initial Position
                 //----------------------------------------
-                MainMap.Position = new PointLatLng(54.6961334816182, 25.2985095977783); // Lithuania, Vilnius
+                //MainMap.Position = new PointLatLng(54.6961334816182, 25.2985095977783); // Lithuania, Vilnius
+                MainMap.Position = new PointLatLng(Program.initialLatitude, Program.initialLongitude);
                 MainMap.MinZoom = 0;
                 MainMap.MaxZoom = 24;
-                MainMap.Zoom = 9;
+                MainMap.Zoom = Program.initialZoom;
 
                 textBoxLat.Text = MainMap.Position.Lat.ToString(CultureInfo.InvariantCulture);
                 textBoxLng.Text = MainMap.Position.Lng.ToString(CultureInfo.InvariantCulture);
-                textBoxGeo.Text = "Lithuania, Vilnius";
+                textBoxGeo.Text = Program.settlement;   //  "Lithuania, Vilnius";
               
 
                 MainMap.ScaleMode = ScaleModes.Fractional;
@@ -185,6 +191,7 @@ namespace Demo.WindowsForms
                 comboBoxMapType.SelectedItem = MainMap.MapProvider;
 #endif
                 // acccess mode
+                MainMap.Manager.Mode = Program.accesmode;
                 comboBoxMode.DataSource = Enum.GetValues(typeof(AccessMode));
                 comboBoxMode.SelectedItem = MainMap.Manager.Mode;
 
@@ -209,33 +216,33 @@ namespace Demo.WindowsForms
 
                 // add my city location for demo
                 // [jokubokla]: The stuff down below doesn't work anymore either, but I leave it in case someone wants to fix it
-                GeoCoderStatusCode status;
-                var pos = MainMap.GeocodingProvider.GetPoint("Lithuania, Vilnius", out status);
+                //GeoCoderStatusCode status;
+                //var pos = MainMap.GeocodingProvider.GetPoint("Lithuania, Vilnius", out status);
 
-                if (pos != null && status == GeoCoderStatusCode.OK)
-                {
-                    _currentMarker.Position = pos.Value;
+                //if (pos != null && status == GeoCoderStatusCode.OK)
+                //{
+                //    _currentMarker.Position = pos.Value;
 
-                    GMapMarker myCity = new GMarkerGoogle(pos.Value, GMarkerGoogleType.green_small);
-                    myCity.ToolTipMode = MarkerTooltipMode.Always;
-                    myCity.ToolTipText = "Welcome to Lithuania! ;}";
-                    Objects.Markers.Add(myCity);
+                //    GMapMarker myCity = new GMarkerGoogle(pos.Value, GMarkerGoogleType.green_small);
+                //    myCity.ToolTipMode = MarkerTooltipMode.Always;
+                //    myCity.ToolTipText = "Welcome to Lithuania! ;}";
+                //    Objects.Markers.Add(myCity);
 
-                    // add some more points in lithuania
-                    AddLocationLithuania("Kaunas");
-                    AddLocationLithuania("Klaipėda");
-                    AddLocationLithuania("Šiauliai");
-                    AddLocationLithuania("Panevėžys");
-                }
-                else
-                {
-                    Debug.WriteLine("GeoCoderStatusCode = " + status.ToString()); // REQUEST_DENIED I assume
-                }
-
-                if (Objects.Markers.Count > 0)
-                {
-                    MainMap.ZoomAndCenterMarkers(null);
-                }
+                //    // add some more points in lithuania
+                //    AddLocationLithuania("Kaunas");
+                //    AddLocationLithuania("Klaipėda");
+                //    AddLocationLithuania("Šiauliai");
+                //    AddLocationLithuania("Panevėžys");
+                //}
+                //else
+                //{
+                //    Debug.WriteLine("GeoCoderStatusCode = " + status.ToString()); // REQUEST_DENIED I assume
+                //}
+                //
+                //if (Objects.Markers.Count > 0)
+                //{
+                //    MainMap.ZoomAndCenterMarkers(null);
+                //}
 
                 //RegeneratePolygon();
 
@@ -1983,6 +1990,59 @@ namespace Demo.WindowsForms
             }
 
         }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Program.settlement = textBoxGeo.Text;
+            Program.initialLatitude = MainMap.Position.Lat;
+            Program.initialLongitude = MainMap.Position.Lng;
+            Program.initialZoom = MainMap.Zoom;
+            Program.mapProvider = MainMap.MapProvider;
+            Program.accesmode = MainMap.Manager.Mode;
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearStartEnd();
+            Objects.Markers.Clear();
+            Routes.Routes.Clear();
+            Polygons.Polygons.Clear();
+
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
+        }
+
+        private void copyPageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainMap.Copy();
+        }
+
+        private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            using (FileDialog dlg = new SaveFileDialog())
+            {
+                dlg.CheckPathExists = true;
+                dlg.CheckFileExists = false;
+                dlg.AddExtension = true;
+                dlg.DefaultExt = "jpeg";
+                dlg.ValidateNames = true;
+                dlg.FileName = "";
+                dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                dlg.Filter = "Jpeg file (*.jpeg)|*.jpeg";
+                dlg.FilterIndex = 1;
+                dlg.RestoreDirectory = true;
+
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    MainMap.Save(dlg.FileName);
+                }
+            }
+
+        } /* saveToolStripMenuItem1_Click */
+
     } /* class MainForm */
 
 } /* namespace Demo.WindowsForms */

@@ -2791,6 +2791,30 @@ namespace GMap.NET.WindowsForms
             return false;
         }
 
+        /// <summary>
+        /// save map in jpeg file
+        /// </summary>
+        /// <param name="filename"></param>
+        public void Save(string filename)
+        {
+            var img = ToImage();
+
+            if (img != null)
+                img.Save(filename, ImageFormat.Jpeg);
+        }
+
+        /// <summary>
+        /// Copy map into clipboard
+        /// </summary>
+        public void Copy()
+        {
+            var img = ToImage();
+
+            if (img != null)
+                Clipboard.SetImage(img);
+        }
+
+
         [Category("GMap.NET")]
         [Description("map scale type")]
         public ScaleModes ScaleMode { get; set; } = ScaleModes.Integer;
@@ -3350,7 +3374,7 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-        #endregion
+        #endregion IGControl event Members
 
         #region Serialization
 
@@ -3399,8 +3423,8 @@ namespace GMap.NET.WindowsForms
         //    ForceUpdateOverlays();
         //}
 
-        #endregion
-    }
+        #endregion Serialization
+    } /* class GMapControl */
 
     public enum ScaleModes
     {
@@ -3434,4 +3458,5 @@ namespace GMap.NET.WindowsForms
     public delegate void MapClick(PointLatLng pointClick, MouseEventArgs e);
 
     public delegate void MapDoubleClick(PointLatLng pointClick, MouseEventArgs e);
-}
+
+} /* namespace GMap.NET.WindowsForms */

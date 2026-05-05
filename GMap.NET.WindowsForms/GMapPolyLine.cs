@@ -205,7 +205,8 @@ namespace GMap.NET.WindowsForms
             {
                 if (_graphicsPath != null)
                 {
-                    //g.FillPath(Fill, _graphicsPath);
+                    if (Points.Count < 2) return;
+
                     if (Points.Count > 2)
                          g.DrawPath(Stroke, _graphicsPath);
                     else g.DrawLine(Stroke, LocalPoints[0].X, LocalPoints[0].Y, LocalPoints[1].X, LocalPoints[1].Y);

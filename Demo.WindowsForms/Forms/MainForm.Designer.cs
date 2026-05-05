@@ -30,7 +30,8 @@ namespace Demo.WindowsForms
       private void InitializeComponent()
       {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.btnReload = new System.Windows.Forms.Button();
+            this.btnCursor = new System.Windows.Forms.Button();
+            this.btnMarker = new System.Windows.Forms.Button();
             this.btnGoTo = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -38,11 +39,14 @@ namespace Demo.WindowsForms
             this.textBoxGeo = new System.Windows.Forms.TextBox();
             this.textBoxLng = new System.Windows.Forms.TextBox();
             this.textBoxLat = new System.Windows.Forms.TextBox();
+            this.btnReload = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox_Show = new System.Windows.Forms.GroupBox();
             this.checkBox1_Infobox = new System.Windows.Forms.CheckBox();
             this.checkBox_Routes = new System.Windows.Forms.CheckBox();
+            this.checkBoxCurrentMarker = new System.Windows.Forms.CheckBox();
             this.checkBox_Markers = new System.Windows.Forms.CheckBox();
+            this.checkBoxDebug = new System.Windows.Forms.CheckBox();
             this.groupBoxProgress = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
@@ -59,6 +63,7 @@ namespace Demo.WindowsForms
             this.btnSetEnd = new System.Windows.Forms.Button();
             this.btnSetStart = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.btnCenterCursor = new System.Windows.Forms.Button();
             this.btnAddPushpin = new System.Windows.Forms.Button();
             this.checkBoxPlacemarkInfo = new System.Windows.Forms.CheckBox();
             this.btnClearAll = new System.Windows.Forms.Button();
@@ -67,20 +72,28 @@ namespace Demo.WindowsForms
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.button_centerMarker = new System.Windows.Forms.Button();
             this.checkBoxTileHost = new System.Windows.Forms.CheckBox();
-            this.checkBoxCurrentMarker = new System.Windows.Forms.CheckBox();
             this.checkBoxCanDrag = new System.Windows.Forms.CheckBox();
             this.btnSave = new System.Windows.Forms.Button();
-            this.checkBoxDebug = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.comboBoxMode = new System.Windows.Forms.ComboBox();
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btnMarker = new System.Windows.Forms.Button();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
-            this.btnCenterCursor = new System.Windows.Forms.Button();
-            this.btnCursor = new System.Windows.Forms.Button();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyPageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -90,6 +103,7 @@ namespace Demo.WindowsForms
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -110,15 +124,25 @@ namespace Demo.WindowsForms
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Coordinates";
             // 
-            // btnReload
+            // btnCursor
             // 
-            this.btnReload.Location = new System.Drawing.Point(94, 72);
-            this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(79, 22);
-            this.btnReload.TabIndex = 7;
-            this.btnReload.Text = "Reload";
-            this.btnReload.UseVisualStyleBackColor = true;
-            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            this.btnCursor.Location = new System.Drawing.Point(121, 97);
+            this.btnCursor.Name = "btnCursor";
+            this.btnCursor.Size = new System.Drawing.Size(52, 22);
+            this.btnCursor.TabIndex = 8;
+            this.btnCursor.Text = "Cursor";
+            this.btnCursor.UseVisualStyleBackColor = true;
+            this.btnCursor.Click += new System.EventHandler(this.btnCursor_Click);
+            // 
+            // btnMarker
+            // 
+            this.btnMarker.Location = new System.Drawing.Point(63, 97);
+            this.btnMarker.Name = "btnMarker";
+            this.btnMarker.Size = new System.Drawing.Size(52, 22);
+            this.btnMarker.TabIndex = 7;
+            this.btnMarker.Text = "Marker";
+            this.btnMarker.UseVisualStyleBackColor = true;
+            this.btnMarker.Click += new System.EventHandler(this.btnMarker_Click);
             // 
             // btnGoTo
             // 
@@ -181,6 +205,16 @@ namespace Demo.WindowsForms
             this.textBoxLat.TabIndex = 0;
             this.textBoxLat.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBoxLat_KeyPress);
             // 
+            // btnReload
+            // 
+            this.btnReload.Location = new System.Drawing.Point(94, 72);
+            this.btnReload.Name = "btnReload";
+            this.btnReload.Size = new System.Drawing.Size(79, 22);
+            this.btnReload.TabIndex = 7;
+            this.btnReload.Text = "Reload";
+            this.btnReload.UseVisualStyleBackColor = true;
+            this.btnReload.Click += new System.EventHandler(this.btnReload_Click);
+            // 
             // panel2
             // 
             this.panel2.Controls.Add(this.groupBox_Show);
@@ -191,9 +225,9 @@ namespace Demo.WindowsForms
             this.panel2.Controls.Add(this.groupBox2);
             this.panel2.Controls.Add(this.groupBox1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panel2.Location = new System.Drawing.Point(922, 0);
+            this.panel2.Location = new System.Drawing.Point(922, 24);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(233, 760);
+            this.panel2.Size = new System.Drawing.Size(233, 736);
             this.panel2.TabIndex = 3;
             // 
             // groupBox_Show
@@ -236,6 +270,19 @@ namespace Demo.WindowsForms
             this.checkBox_Routes.UseVisualStyleBackColor = true;
             this.checkBox_Routes.CheckedChanged += new System.EventHandler(this.checkBox_Routes_CheckedChanged);
             // 
+            // checkBoxCurrentMarker
+            // 
+            this.checkBoxCurrentMarker.AutoSize = true;
+            this.checkBoxCurrentMarker.Checked = true;
+            this.checkBoxCurrentMarker.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(78, 38);
+            this.checkBoxCurrentMarker.Name = "checkBoxCurrentMarker";
+            this.checkBoxCurrentMarker.Size = new System.Drawing.Size(56, 17);
+            this.checkBoxCurrentMarker.TabIndex = 6;
+            this.checkBoxCurrentMarker.Text = "Cursor";
+            this.checkBoxCurrentMarker.UseVisualStyleBackColor = true;
+            this.checkBoxCurrentMarker.CheckedChanged += new System.EventHandler(this.checkBoxCurrentMarker_CheckedChanged);
+            // 
             // checkBox_Markers
             // 
             this.checkBox_Markers.AutoSize = true;
@@ -248,6 +295,17 @@ namespace Demo.WindowsForms
             this.checkBox_Markers.Text = "Markers";
             this.checkBox_Markers.UseVisualStyleBackColor = true;
             this.checkBox_Markers.CheckedChanged += new System.EventHandler(this.checkBox_Markers_CheckedChanged);
+            // 
+            // checkBoxDebug
+            // 
+            this.checkBoxDebug.AutoSize = true;
+            this.checkBoxDebug.Location = new System.Drawing.Point(12, 39);
+            this.checkBoxDebug.Name = "checkBoxDebug";
+            this.checkBoxDebug.Size = new System.Drawing.Size(45, 17);
+            this.checkBoxDebug.TabIndex = 4;
+            this.checkBoxDebug.Text = "Grid";
+            this.checkBoxDebug.UseVisualStyleBackColor = true;
+            this.checkBoxDebug.CheckedChanged += new System.EventHandler(this.checkBoxDebug_CheckedChanged);
             // 
             // groupBoxProgress
             // 
@@ -424,6 +482,16 @@ namespace Demo.WindowsForms
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Markers";
             // 
+            // btnCenterCursor
+            // 
+            this.btnCenterCursor.Location = new System.Drawing.Point(12, 75);
+            this.btnCenterCursor.Name = "btnCenterCursor";
+            this.btnCenterCursor.Size = new System.Drawing.Size(79, 22);
+            this.btnCenterCursor.TabIndex = 5;
+            this.btnCenterCursor.Text = "Center Cursor";
+            this.btnCenterCursor.UseVisualStyleBackColor = true;
+            this.btnCenterCursor.Click += new System.EventHandler(this.btnCenterCursor_Click);
+            // 
             // btnAddPushpin
             // 
             this.btnAddPushpin.Location = new System.Drawing.Point(94, 19);
@@ -513,19 +581,6 @@ namespace Demo.WindowsForms
             this.checkBoxTileHost.UseVisualStyleBackColor = true;
             this.checkBoxTileHost.CheckedChanged += new System.EventHandler(this.checkBoxTileHost_CheckedChanged);
             // 
-            // checkBoxCurrentMarker
-            // 
-            this.checkBoxCurrentMarker.AutoSize = true;
-            this.checkBoxCurrentMarker.Checked = true;
-            this.checkBoxCurrentMarker.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(78, 38);
-            this.checkBoxCurrentMarker.Name = "checkBoxCurrentMarker";
-            this.checkBoxCurrentMarker.Size = new System.Drawing.Size(56, 17);
-            this.checkBoxCurrentMarker.TabIndex = 6;
-            this.checkBoxCurrentMarker.Text = "Cursor";
-            this.checkBoxCurrentMarker.UseVisualStyleBackColor = true;
-            this.checkBoxCurrentMarker.CheckedChanged += new System.EventHandler(this.checkBoxCurrentMarker_CheckedChanged);
-            // 
             // checkBoxCanDrag
             // 
             this.checkBoxCanDrag.AutoSize = true;
@@ -548,17 +603,6 @@ namespace Demo.WindowsForms
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
-            // checkBoxDebug
-            // 
-            this.checkBoxDebug.AutoSize = true;
-            this.checkBoxDebug.Location = new System.Drawing.Point(12, 39);
-            this.checkBoxDebug.Name = "checkBoxDebug";
-            this.checkBoxDebug.Size = new System.Drawing.Size(45, 17);
-            this.checkBoxDebug.TabIndex = 4;
-            this.checkBoxDebug.Text = "Grid";
-            this.checkBoxDebug.UseVisualStyleBackColor = true;
-            this.checkBoxDebug.CheckedChanged += new System.EventHandler(this.checkBoxDebug_CheckedChanged);
             // 
             // label5
             // 
@@ -611,16 +655,6 @@ namespace Demo.WindowsForms
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
             // 
-            // btnMarker
-            // 
-            this.btnMarker.Location = new System.Drawing.Point(63, 97);
-            this.btnMarker.Name = "btnMarker";
-            this.btnMarker.Size = new System.Drawing.Size(52, 22);
-            this.btnMarker.TabIndex = 7;
-            this.btnMarker.Text = "Marker";
-            this.btnMarker.UseVisualStyleBackColor = true;
-            this.btnMarker.Click += new System.EventHandler(this.btnMarker_Click);
-            // 
             // MainMap
             // 
             this.MainMap.Bearing = 0F;
@@ -630,7 +664,7 @@ namespace Demo.WindowsForms
             this.MainMap.GrayScaleMode = false;
             this.MainMap.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.MainMap.LevelsKeepInMemory = 5;
-            this.MainMap.Location = new System.Drawing.Point(0, 0);
+            this.MainMap.Location = new System.Drawing.Point(0, 24);
             this.MainMap.MarkersEnabled = true;
             this.MainMap.MaxZoom = 2;
             this.MainMap.MinZoom = 2;
@@ -644,29 +678,108 @@ namespace Demo.WindowsForms
             this.MainMap.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
             this.MainMap.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.MainMap.ShowTileGridLines = false;
-            this.MainMap.Size = new System.Drawing.Size(922, 760);
+            this.MainMap.Size = new System.Drawing.Size(922, 736);
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
             // 
-            // btnCenterCursor
+            // menuStrip1
             // 
-            this.btnCenterCursor.Location = new System.Drawing.Point(12, 75);
-            this.btnCenterCursor.Name = "btnCenterCursor";
-            this.btnCenterCursor.Size = new System.Drawing.Size(79, 22);
-            this.btnCenterCursor.TabIndex = 5;
-            this.btnCenterCursor.Text = "Center Cursor";
-            this.btnCenterCursor.UseVisualStyleBackColor = true;
-            this.btnCenterCursor.Click += new System.EventHandler(this.btnCenterCursor_Click);
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.editToolStripMenuItem,
+            this.helpToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(1155, 24);
+            this.menuStrip1.TabIndex = 6;
+            this.menuStrip1.Text = "menuStrip1";
             // 
-            // btnCursor
+            // fileToolStripMenuItem
             // 
-            this.btnCursor.Location = new System.Drawing.Point(121, 97);
-            this.btnCursor.Name = "btnCursor";
-            this.btnCursor.Size = new System.Drawing.Size(52, 22);
-            this.btnCursor.TabIndex = 8;
-            this.btnCursor.Text = "Cursor";
-            this.btnCursor.UseVisualStyleBackColor = true;
-            this.btnCursor.Click += new System.EventHandler(this.btnCursor_Click);
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newToolStripMenuItem,
+            this.openToolStripMenuItem,
+            this.saveToolStripMenuItem,
+            this.saveAsToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Text = "&File";
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyPageToolStripMenuItem,
+            this.saveToolStripMenuItem1});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Text = "&Edit";
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "&Help";
+            // 
+            // newToolStripMenuItem
+            // 
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newToolStripMenuItem.Text = "&New";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openToolStripMenuItem.Text = "&Open";
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem.Text = "&Save";
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.saveAsToolStripMenuItem.Text = "Save &as";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Text = "&Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // copyPageToolStripMenuItem
+            // 
+            this.copyPageToolStripMenuItem.Name = "copyPageToolStripMenuItem";
+            this.copyPageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.copyPageToolStripMenuItem.Text = "&Copy page";
+            this.copyPageToolStripMenuItem.Click += new System.EventHandler(this.copyPageToolStripMenuItem_Click);
+            // 
+            // saveToolStripMenuItem1
+            // 
+            this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.saveToolStripMenuItem1.Text = "&Save page";
+            this.saveToolStripMenuItem1.Click += new System.EventHandler(this.saveToolStripMenuItem1_Click);
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Text = "&About";
             // 
             // MainForm
             // 
@@ -677,11 +790,14 @@ namespace Demo.WindowsForms
             this.Controls.Add(this.MainMap);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.menuStrip1);
             this.KeyPreview = true;
+            this.MainMenuStrip = this.menuStrip1;
             this.MinimumSize = new System.Drawing.Size(554, 106);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GMap.NET - Great Maps for Windows Forms";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MainForm_KeyPress);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.MainForm_KeyUp);
@@ -700,6 +816,8 @@ namespace Demo.WindowsForms
             this.groupBox2.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -759,6 +877,19 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.Button btnMarker;
         private System.Windows.Forms.Button btnCenterCursor;
         private System.Windows.Forms.Button btnCursor;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyPageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
     }
 }
 
