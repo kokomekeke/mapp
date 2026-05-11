@@ -1,0 +1,113 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GMap.NET.WindowsForms
+{
+    public class GMapLine : ISerializable, IDeserializationCallback, IDisposable
+    {
+        public GMapOverlay Overlay { get; set; }
+        public PointLatLng Point1, Point2;
+        public Point LocalPosition1, LocalPosition2;
+
+        public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(155, Color.Gray));
+
+        /// <summary>
+        ///     specifies how the outline is painted
+        /// </summary>
+        [NonSerialized] public Pen Stroke = DefaultStroke;
+
+        public static readonly Brush DefaultFill = new SolidBrush(Color.FromArgb(155, Color.LightGray));
+
+        /// <summary>
+        ///     background color
+        /// </summary>
+        [NonSerialized] public Brush Fill = DefaultFill;
+
+
+
+        public GMapLine()
+        {
+        }
+
+        public GMapLine(PointLatLng point1, PointLatLng point2, Color color)
+        {
+            Point1 = point1;
+            Point2 = point2;
+
+            Stroke = new Pen(color, DefaultStroke.Width);
+            Fill = new SolidBrush(color);
+        }
+        
+
+        protected GMapLine(SerializationInfo info, StreamingContext context)
+        {
+        }
+
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+        }
+        public void OnDeserialization(object sender)
+        {
+        }
+        public void Dispose()
+        {
+        }
+
+        public Color LineColor
+        {
+            get { return Stroke.Color; }
+            set
+            {
+                if (Stroke.Color.ToArgb() != value.ToArgb())
+                {
+                    Stroke.Color = value;
+
+                    if (Overlay != null && Overlay.Control != null)
+                    {
+                        Overlay.Control.UpdateLineLocalPosition(this);
+                        if (!Overlay.Control.HoldInvalidation)
+                        {
+                            Overlay.Control.Invalidate();
+                        }
+                    }
+                }
+            }
+        }
+
+        GraphicsPath _graphicsPath;
+
+        internal void UpdateGraphicsPath()
+        {
+            if (_graphicsPath == null)
+            {
+                _graphicsPath = new GraphicsPath();
+            }
+            else
+            {
+                _graphicsPath.Reset();
+            }
+
+            _graphicsPath.AddLine(LocalPosition1, LocalPosition2);
+        }
+
+
+        public virtual void OnRender(Graphics g)
+        {
+            try
+            {
+                g.DrawLine(Stroke, LocalPosition1.X, LocalPosition1.Y, LocalPosition2.X, LocalPosition2.Y);
+            }
+            catch { };
+        }
+
+
+    } /* class GMapLine */
+
+} /* namespace GMap.NET.WindowsForms */
