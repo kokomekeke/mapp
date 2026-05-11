@@ -113,6 +113,13 @@ namespace GMap.NET.WindowsForms
         public readonly ObservableCollectionThreadSafe<GMapPolyLine> Polygons =
             new ObservableCollectionThreadSafe<GMapPolyLine>();
 
+        /// <summary>
+        ///     list of lines, should be thread safe
+        /// </summary>
+        public readonly ObservableCollectionThreadSafe<GMapLine> Lines =
+            new ObservableCollectionThreadSafe<GMapLine>();         
+
+
         GMapControl _control;
 
         public GMapControl Control
@@ -142,7 +149,8 @@ namespace GMap.NET.WindowsForms
         {
             Markers.CollectionChanged += Markers_CollectionChanged;
             Routes.CollectionChanged += Routes_CollectionChanged;
-            Polygons.CollectionChanged += Polygons_CollectionChanged;
+            Polygons.CollectionChanged += Polygons_CollectionChanged;   
+            Lines.CollectionChanged += Lines_CollectionChanged;   
         }
 
         void ClearEvents()
@@ -150,6 +158,7 @@ namespace GMap.NET.WindowsForms
             Markers.CollectionChanged -= Markers_CollectionChanged;
             Routes.CollectionChanged -= Routes_CollectionChanged;
             Polygons.CollectionChanged -= Polygons_CollectionChanged;
+            Lines.CollectionChanged -= Lines_CollectionChanged;
         }
 
         public void Clear()
@@ -157,7 +166,43 @@ namespace GMap.NET.WindowsForms
             Markers.Clear();
             Routes.Clear();
             Polygons.Clear();
+            Lines.Clear();
         }
+
+
+        void Lines_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (GMapLine obj in e.NewItems)
+                {
+                    if (obj != null)
+                    {
+                        obj.Overlay = this;
+                        if (Control != null)
+                        {
+                            Control.UpdateLineLocalPosition(obj);
+                        }
+                    }
+                }
+            }
+            if (Control != null)
+            {
+                if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    //if (Control.IsMouseOverLine)
+                    //{
+                    //    Control.IsMouseOverLine = false;
+                    //    Control.RestoreCursorOnLeave();
+                    //}
+                }
+                if (!Control.HoldInvalidation)
+                {
+                    Control.Invalidate();
+                }
+            }
+        }
+
 
         void Polygons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -294,6 +339,12 @@ namespace GMap.NET.WindowsForms
                         Control.UpdateRouteLocalPosition(obj);
                     }
                 }
+
+                foreach (var obj in Lines)
+                {
+                    Control.UpdateLineLocalPosition(obj);
+                }
+
             }
         }
 
@@ -326,6 +377,15 @@ namespace GMap.NET.WindowsForms
                         }
                     }
                 }
+
+                if (Control.LinesEnabled)
+                {
+                    foreach (var r in Lines)
+                    {
+                       r.OnRender(g);
+                    }
+                }
+
 
                 if (Control.MarkersEnabled)
                 {

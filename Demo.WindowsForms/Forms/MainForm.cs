@@ -29,6 +29,8 @@ namespace Demo.WindowsForms
         internal readonly GMapOverlay Objects = new GMapOverlay("objects");
         internal readonly GMapOverlay Routes = new GMapOverlay("routes");
         internal readonly GMapOverlay Polygons = new GMapOverlay("polygons");
+        internal readonly GMapOverlay Geogrid = new GMapOverlay("geogrid");
+        internal readonly GMapOverlay Geogrid10 = new GMapOverlay("geogrid10");
 
         // marker
         GMapMarker _currentMarker;
@@ -160,6 +162,8 @@ namespace Demo.WindowsForms
                 //----------------------------------------
                 MainMap.Overlays.Add(Routes);
                 MainMap.Overlays.Add(Polygons);
+                MainMap.Overlays.Add(Geogrid);
+                MainMap.Overlays.Add(Geogrid10);
                 MainMap.Overlays.Add(Objects);
                 MainMap.Overlays.Add(_top);
 
@@ -196,7 +200,7 @@ namespace Demo.WindowsForms
                 comboBoxMode.SelectedItem = MainMap.Manager.Mode;
 
                 // get cache modes
-                checkBoxUseRouteCache.Checked = MainMap.Manager.UseRouteCache;
+                //checkBoxUseRouteCache.Checked = MainMap.Manager.UseRouteCache;
 
                 // get zoom  
                 //trackBarZoom.Minimum = MainMap.MinZoom * 100;
@@ -246,6 +250,10 @@ namespace Demo.WindowsForms
 
                 //RegeneratePolygon();
 
+                GenerateGeoGrid();
+                Geogrid.IsVisibile = false;
+                Geogrid10.IsVisibile = false;
+
                 try
                 {
                     var overlay = DeepClone(Objects);
@@ -269,8 +277,12 @@ namespace Demo.WindowsForms
                 }
             }
 
+            routingToolStripMenuItem.Checked = MainMap.Manager.UseRouteCache;
+            geocodingToolStripMenuItem.Checked = MainMap.Manager.UseGeocoderCache;
+
             MainMap.Manager.Mode = AccessMode.ServerOnly;
-        }
+        } /* MainForm constructor */
+
 
         // center markers on start
         private void MainForm_Load(object sender, EventArgs e)
@@ -542,7 +554,52 @@ namespace Demo.WindowsForms
                     MainMap.UpdatePolygonLocalPosition(_polygon);
                 }
             }
-        }
+        } /* RegeneratePolygon */
+
+
+        private void GenerateGeoGrid()
+        {
+            Geogrid.Lines.Clear();
+            double lng1 = -180;
+            double lng2 = 180;
+            for (int i = -90; i < 90; i++)
+            {
+                double lat = i;
+                var p1 = new PointLatLng(lat, lng1);
+                var p2 = new PointLatLng(lat, lng2);
+                var line = new GMapLine(p1, p2, Color.Black);
+                Geogrid.Lines.Add(line);
+            }
+
+            for (int i = -170; i < 180; i++)
+            {
+                double lng = i;
+                var p1 = new PointLatLng(-90, lng);
+                var p2 = new PointLatLng(90, lng);
+                var line = new GMapLine(p1, p2, Color.Black);
+                Geogrid.Lines.Add(line);
+            }
+
+            Geogrid10.Lines.Clear();
+            for (int i = -90; i < 90; i += 10)
+            {
+                double lat = i;
+                var p1 = new PointLatLng(lat, lng1);
+                var p2 = new PointLatLng(lat, lng2);
+                var line = new GMapLine(p1, p2, Color.Black);
+                Geogrid10.Lines.Add(line);
+            }
+
+            for (int i = -170; i < 180; i+= 10)
+            {
+                double lng = i;
+                var p1 = new PointLatLng(-90, lng);
+                var p2 = new PointLatLng(90, lng);
+                var line = new GMapLine(p1, p2, Color.Black);
+                Geogrid10.Lines.Add(line);
+            }
+
+        } /* GenerateGeoGrid */
 
 
         /// <summary>
@@ -1066,6 +1123,8 @@ namespace Demo.WindowsForms
         {
             //trackBarZoom.Value = (int)(MainMap.Zoom * 100.0);
             //textBoxZoomCurrent.Text = MainMap.Zoom.ToString();
+            checkBoxShowGeoGrid_CheckedChanged(this, EventArgs.Empty);
+            toolStripStatusLabel2.Text = "Zoom: " + MainMap.Zoom.ToString();
         }
 
         // click on some marker
@@ -1260,10 +1319,10 @@ namespace Demo.WindowsForms
         // cache config
         private void checkBoxUseCache_CheckedChanged(object sender, EventArgs e)
         {
-            MainMap.Manager.UseRouteCache = checkBoxUseRouteCache.Checked;
-            MainMap.Manager.UseGeocoderCache = checkBoxUseRouteCache.Checked;
-            MainMap.Manager.UsePlacemarkCache = checkBoxUseRouteCache.Checked;
-            MainMap.Manager.UseDirectionsCache = checkBoxUseRouteCache.Checked;
+            //MainMap.Manager.UseRouteCache = checkBoxUseRouteCache.Checked;
+            //MainMap.Manager.UseGeocoderCache = checkBoxUseRouteCache.Checked;
+            //MainMap.Manager.UsePlacemarkCache = checkBoxUseRouteCache.Checked;
+            //MainMap.Manager.UseDirectionsCache = checkBoxUseRouteCache.Checked;
         }
 
         // clear cache
@@ -2043,6 +2102,49 @@ namespace Demo.WindowsForms
 
         } /* saveToolStripMenuItem1_Click */
 
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("GMap.NET demo application\n\n" +
+                            "Version: 2.1.71\n" +
+                            "Author: Jurgen De Leon Rodriguez\n" +
+                            "Company: MainSoft Technology\n" +
+                            //"License: GNU General Public License Version 3 (GPLv3)\n\n" +
+                            "Updated: 2024-05-06 by E.Kótai (SAGAX) for RH04 system\n\n" +
+                            "This application demonstrates the capabilities of GMap.NET library." , 
+                            "About GMap.NET", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void routingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainMap.Manager.UseRouteCache = !MainMap.Manager.UseRouteCache;
+            routingToolStripMenuItem.Checked = MainMap.Manager.UseRouteCache;
+        }
+
+        private void geocodingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MainMap.Manager.UseGeocoderCache = !MainMap.Manager.UseGeocoderCache;
+            geocodingToolStripMenuItem.Checked = MainMap.Manager.UseGeocoderCache;
+        }
+
+        private void checkBoxShowCenterMarker_CheckedChanged(object sender, EventArgs e)
+        {
+            MainMap.ShowCenter = checkBoxShowCenterMarker.Checked;
+        }
+
+        private void checkBoxShowGeoGrid_CheckedChanged(object sender, EventArgs e)
+        {
+            if (MainMap.Zoom < 5)
+            {
+                Geogrid10.IsVisibile = checkBoxShowGeoGrid.Checked;
+                Geogrid.IsVisibile = false;
+            }
+            else
+            {
+                Geogrid.IsVisibile = checkBoxShowGeoGrid.Checked;
+                Geogrid10.IsVisibile = false;
+            }
+        }
     } /* class MainForm */
 
 } /* namespace Demo.WindowsForms */

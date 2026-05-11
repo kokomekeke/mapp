@@ -31,6 +31,7 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         public event MapDoubleClick OnMapDoubleClick;
 
+
         /// <summary>
         ///     occurs when clicked on marker
         /// </summary>
@@ -224,7 +225,20 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         public Pen EmptyTileBorders = new Pen(Brushes.White, 1);
 
-        public bool ShowCenter = true;
+        public bool _showCenter = true;
+
+        public bool ShowCenter
+        {
+            get { return _showCenter; }
+            set
+            {
+                if (value != _showCenter)
+                {
+                    _showCenter = value;
+                    Invalidate();
+                }
+            }
+        }
 
         /// <summary>
         ///     pen for scale info
@@ -732,6 +746,31 @@ namespace GMap.NET.WindowsForms
 
             polygon.UpdateGraphicsPath();
         }
+
+
+        /// <summary>
+        ///     updates polygons local position
+        /// </summary>
+        /// <param name="polygon"></param>
+        public void UpdateLineLocalPosition(GMapLine line)
+        {
+            var p = FromLatLngToLocal(line.Point1);
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+            line.LocalPosition1 = new Point((int)p.X, (int)p.Y);
+
+            p = FromLatLngToLocal(line.Point2);
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+            line.LocalPosition2 = new Point((int)p.X, (int)p.Y);
+
+            line.UpdateGraphicsPath();
+        }
+
 
         /// <summary>
         ///     sets zoom to max to fit rect
@@ -1605,8 +1644,8 @@ namespace GMap.NET.WindowsForms
 #if DEBUG
                 if (!IsRotated)
                 {
-                    g.DrawLine(ScalePen, -20, 0, 20, 0);
-                    g.DrawLine(ScalePen, 0, -20, 0, 20);
+                    //g.DrawLine(ScalePen, -20, 0, 20, 0);
+                    //g.DrawLine(ScalePen, 0, -20, 0, 20);
                     g.DrawString("debug build", CopyrightFont, Brushes.Blue, 2, CopyrightFont.Height);
                 }
 #endif
@@ -1640,8 +1679,8 @@ namespace GMap.NET.WindowsForms
 
                 if (ShowCenter)
                 {
-                    g.DrawLine(CenterPen, Width / 2 - 5, Height / 2, Width / 2 + 5, Height / 2);
-                    g.DrawLine(CenterPen, Width / 2, Height / 2 - 5, Width / 2, Height / 2 + 5);
+                    g.DrawLine(ScalePen, Width / 2 - 10, Height / 2, Width / 2 + 10, Height / 2);
+                    g.DrawLine(ScalePen, Width / 2, Height / 2 - 10, Width / 2, Height / 2 + 10);
                 }
 
                 #region -- copyright --
@@ -3204,6 +3243,24 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+
+        /// <summary>
+        ///     is polygons enabled
+        /// </summary>
+        [Category("GMap.NET")]
+        public bool LinesEnabled
+        {
+            get
+            {
+                return Core.LinesEnabled;
+            }
+            set
+            {
+                Core.LinesEnabled = value;
+            }
+        }
+
+
         /// <summary>
         ///     is markers enabled
         /// </summary>
@@ -3458,5 +3515,6 @@ namespace GMap.NET.WindowsForms
     public delegate void MapClick(PointLatLng pointClick, MouseEventArgs e);
 
     public delegate void MapDoubleClick(PointLatLng pointClick, MouseEventArgs e);
+
 
 } /* namespace GMap.NET.WindowsForms */

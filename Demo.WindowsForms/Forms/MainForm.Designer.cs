@@ -42,6 +42,7 @@ namespace Demo.WindowsForms
             this.btnReload = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox_Show = new System.Windows.Forms.GroupBox();
+            this.checkBoxShowCenterMarker = new System.Windows.Forms.CheckBox();
             this.checkBox1_Infobox = new System.Windows.Forms.CheckBox();
             this.checkBox_Routes = new System.Windows.Forms.CheckBox();
             this.checkBoxCurrentMarker = new System.Windows.Forms.CheckBox();
@@ -49,13 +50,6 @@ namespace Demo.WindowsForms
             this.checkBoxDebug = new System.Windows.Forms.CheckBox();
             this.groupBoxProgress = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.groupBox6 = new System.Windows.Forms.GroupBox();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.checkBoxUseRouteCache = new System.Windows.Forms.CheckBox();
-            this.btnCachePrefetch = new System.Windows.Forms.Button();
-            this.btnCacheClear = new System.Windows.Forms.Button();
-            this.btnImport = new System.Windows.Forms.Button();
-            this.btnExport = new System.Windows.Forms.Button();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.btn_clear_routes = new System.Windows.Forms.Button();
             this.btn_addline = new System.Windows.Forms.Button();
@@ -80,25 +74,35 @@ namespace Demo.WindowsForms
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.MainMap = new GMap.NET.WindowsForms.GMapControl();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.copyPageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.cacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.routingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.geocodingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.importToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.prefetchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkBoxShowGeoGrid = new System.Windows.Forms.CheckBox();
+            this.MainMap = new GMap.NET.WindowsForms.GMapControl();
+            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
             this.groupBoxProgress.SuspendLayout();
-            this.groupBox6.SuspendLayout();
             this.groupBox4.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -219,7 +223,6 @@ namespace Demo.WindowsForms
             // 
             this.panel2.Controls.Add(this.groupBox_Show);
             this.panel2.Controls.Add(this.groupBoxProgress);
-            this.panel2.Controls.Add(this.groupBox6);
             this.panel2.Controls.Add(this.groupBox4);
             this.panel2.Controls.Add(this.groupBox3);
             this.panel2.Controls.Add(this.groupBox2);
@@ -227,11 +230,13 @@ namespace Demo.WindowsForms
             this.panel2.Dock = System.Windows.Forms.DockStyle.Right;
             this.panel2.Location = new System.Drawing.Point(922, 24);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(233, 736);
+            this.panel2.Size = new System.Drawing.Size(233, 732);
             this.panel2.TabIndex = 3;
             // 
             // groupBox_Show
             // 
+            this.groupBox_Show.Controls.Add(this.checkBoxShowGeoGrid);
+            this.groupBox_Show.Controls.Add(this.checkBoxShowCenterMarker);
             this.groupBox_Show.Controls.Add(this.checkBox1_Infobox);
             this.groupBox_Show.Controls.Add(this.checkBox_Routes);
             this.groupBox_Show.Controls.Add(this.checkBoxCurrentMarker);
@@ -239,10 +244,23 @@ namespace Demo.WindowsForms
             this.groupBox_Show.Controls.Add(this.checkBoxDebug);
             this.groupBox_Show.Location = new System.Drawing.Point(14, 542);
             this.groupBox_Show.Name = "groupBox_Show";
-            this.groupBox_Show.Size = new System.Drawing.Size(203, 58);
+            this.groupBox_Show.Size = new System.Drawing.Size(203, 83);
             this.groupBox_Show.TabIndex = 6;
             this.groupBox_Show.TabStop = false;
             this.groupBox_Show.Text = "Show";
+            // 
+            // checkBoxShowCenterMarker
+            // 
+            this.checkBoxShowCenterMarker.AutoSize = true;
+            this.checkBoxShowCenterMarker.Checked = true;
+            this.checkBoxShowCenterMarker.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxShowCenterMarker.Location = new System.Drawing.Point(133, 38);
+            this.checkBoxShowCenterMarker.Name = "checkBoxShowCenterMarker";
+            this.checkBoxShowCenterMarker.Size = new System.Drawing.Size(92, 17);
+            this.checkBoxShowCenterMarker.TabIndex = 7;
+            this.checkBoxShowCenterMarker.Text = "Center marker";
+            this.checkBoxShowCenterMarker.UseVisualStyleBackColor = true;
+            this.checkBoxShowCenterMarker.CheckedChanged += new System.EventHandler(this.checkBoxShowCenterMarker_CheckedChanged);
             // 
             // checkBox1_Infobox
             // 
@@ -299,7 +317,7 @@ namespace Demo.WindowsForms
             // checkBoxDebug
             // 
             this.checkBoxDebug.AutoSize = true;
-            this.checkBoxDebug.Location = new System.Drawing.Point(12, 39);
+            this.checkBoxDebug.Location = new System.Drawing.Point(12, 60);
             this.checkBoxDebug.Name = "checkBoxDebug";
             this.checkBoxDebug.Size = new System.Drawing.Size(45, 17);
             this.checkBoxDebug.TabIndex = 4;
@@ -309,8 +327,9 @@ namespace Demo.WindowsForms
             // 
             // groupBoxProgress
             // 
+            this.groupBoxProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.groupBoxProgress.Controls.Add(this.progressBar1);
-            this.groupBoxProgress.Location = new System.Drawing.Point(14, 704);
+            this.groupBoxProgress.Location = new System.Drawing.Point(14, 667);
             this.groupBoxProgress.Name = "groupBoxProgress";
             this.groupBoxProgress.Size = new System.Drawing.Size(203, 53);
             this.groupBoxProgress.TabIndex = 5;
@@ -323,85 +342,6 @@ namespace Demo.WindowsForms
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(167, 23);
             this.progressBar1.TabIndex = 0;
-            // 
-            // groupBox6
-            // 
-            this.groupBox6.Controls.Add(this.checkBox2);
-            this.groupBox6.Controls.Add(this.checkBoxUseRouteCache);
-            this.groupBox6.Controls.Add(this.btnCachePrefetch);
-            this.groupBox6.Controls.Add(this.btnCacheClear);
-            this.groupBox6.Controls.Add(this.btnImport);
-            this.groupBox6.Controls.Add(this.btnExport);
-            this.groupBox6.Location = new System.Drawing.Point(14, 604);
-            this.groupBox6.Name = "groupBox6";
-            this.groupBox6.Size = new System.Drawing.Size(203, 92);
-            this.groupBox6.TabIndex = 4;
-            this.groupBox6.TabStop = false;
-            this.groupBox6.Text = "Cache";
-            // 
-            // checkBox2
-            // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Checked = true;
-            this.checkBox2.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox2.Location = new System.Drawing.Point(107, 19);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(78, 17);
-            this.checkBox2.TabIndex = 12;
-            this.checkBox2.Text = "Geocoding";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // checkBoxUseRouteCache
-            // 
-            this.checkBoxUseRouteCache.AutoSize = true;
-            this.checkBoxUseRouteCache.Checked = true;
-            this.checkBoxUseRouteCache.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxUseRouteCache.Location = new System.Drawing.Point(15, 19);
-            this.checkBoxUseRouteCache.Name = "checkBoxUseRouteCache";
-            this.checkBoxUseRouteCache.Size = new System.Drawing.Size(63, 17);
-            this.checkBoxUseRouteCache.TabIndex = 11;
-            this.checkBoxUseRouteCache.Text = "Routing";
-            this.checkBoxUseRouteCache.UseVisualStyleBackColor = true;
-            // 
-            // btnCachePrefetch
-            // 
-            this.btnCachePrefetch.Location = new System.Drawing.Point(94, 64);
-            this.btnCachePrefetch.Name = "btnCachePrefetch";
-            this.btnCachePrefetch.Size = new System.Drawing.Size(79, 22);
-            this.btnCachePrefetch.TabIndex = 10;
-            this.btnCachePrefetch.Text = "Prefetch";
-            this.btnCachePrefetch.UseVisualStyleBackColor = true;
-            this.btnCachePrefetch.Click += new System.EventHandler(this.btnCachePrefetch_Click);
-            // 
-            // btnCacheClear
-            // 
-            this.btnCacheClear.Location = new System.Drawing.Point(9, 64);
-            this.btnCacheClear.Name = "btnCacheClear";
-            this.btnCacheClear.Size = new System.Drawing.Size(79, 22);
-            this.btnCacheClear.TabIndex = 9;
-            this.btnCacheClear.Text = "Clear";
-            this.btnCacheClear.UseVisualStyleBackColor = true;
-            this.btnCacheClear.Click += new System.EventHandler(this.btnCacheClear_Click);
-            // 
-            // btnImport
-            // 
-            this.btnImport.Location = new System.Drawing.Point(94, 39);
-            this.btnImport.Name = "btnImport";
-            this.btnImport.Size = new System.Drawing.Size(79, 22);
-            this.btnImport.TabIndex = 8;
-            this.btnImport.Text = "Import";
-            this.btnImport.UseVisualStyleBackColor = true;
-            this.btnImport.Click += new System.EventHandler(this.btnImport_Click);
-            // 
-            // btnExport
-            // 
-            this.btnExport.Location = new System.Drawing.Point(9, 39);
-            this.btnExport.Name = "btnExport";
-            this.btnExport.Size = new System.Drawing.Size(79, 22);
-            this.btnExport.TabIndex = 7;
-            this.btnExport.Text = "Export";
-            this.btnExport.UseVisualStyleBackColor = true;
-            this.btnExport.Click += new System.EventHandler(this.btnExport_Click);
             // 
             // groupBox4
             // 
@@ -643,8 +583,9 @@ namespace Demo.WindowsForms
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 760);
+            this.toolStripStatusLabel1,
+            this.toolStripStatusLabel2});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 756);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1155, 22);
             this.statusStrip1.TabIndex = 5;
@@ -655,38 +596,12 @@ namespace Demo.WindowsForms
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
             // 
-            // MainMap
-            // 
-            this.MainMap.Bearing = 0F;
-            this.MainMap.CanDragMap = true;
-            this.MainMap.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainMap.EmptyTileColor = System.Drawing.Color.Navy;
-            this.MainMap.GrayScaleMode = false;
-            this.MainMap.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
-            this.MainMap.LevelsKeepInMemory = 5;
-            this.MainMap.Location = new System.Drawing.Point(0, 24);
-            this.MainMap.MarkersEnabled = true;
-            this.MainMap.MaxZoom = 2;
-            this.MainMap.MinZoom = 2;
-            this.MainMap.MouseWheelZoomEnabled = true;
-            this.MainMap.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
-            this.MainMap.Name = "MainMap";
-            this.MainMap.NegativeMode = false;
-            this.MainMap.PolygonsEnabled = true;
-            this.MainMap.RetryLoadTile = 0;
-            this.MainMap.RoutesEnabled = true;
-            this.MainMap.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
-            this.MainMap.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
-            this.MainMap.ShowTileGridLines = false;
-            this.MainMap.Size = new System.Drawing.Size(922, 736);
-            this.MainMap.TabIndex = 4;
-            this.MainMap.Zoom = 0D;
-            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.editToolStripMenuItem,
+            this.cacheToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
@@ -707,6 +622,43 @@ namespace Demo.WindowsForms
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "&File";
             // 
+            // newToolStripMenuItem
+            // 
+            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.newToolStripMenuItem.Text = "&New";
+            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.openToolStripMenuItem.Text = "&Open";
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.saveToolStripMenuItem.Text = "&Save";
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.saveAsToolStripMenuItem.Text = "Save &as";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.exitToolStripMenuItem.Text = "&Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
             // editToolStripMenuItem
             // 
             this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -716,6 +668,87 @@ namespace Demo.WindowsForms
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "&Edit";
             // 
+            // copyPageToolStripMenuItem
+            // 
+            this.copyPageToolStripMenuItem.Name = "copyPageToolStripMenuItem";
+            this.copyPageToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.copyPageToolStripMenuItem.Text = "&Copy page";
+            this.copyPageToolStripMenuItem.Click += new System.EventHandler(this.copyPageToolStripMenuItem_Click);
+            // 
+            // saveToolStripMenuItem1
+            // 
+            this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(131, 22);
+            this.saveToolStripMenuItem1.Text = "&Save page";
+            this.saveToolStripMenuItem1.Click += new System.EventHandler(this.saveToolStripMenuItem1_Click);
+            // 
+            // cacheToolStripMenuItem
+            // 
+            this.cacheToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.routingToolStripMenuItem,
+            this.geocodingToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.exportToolStripMenuItem,
+            this.importToolStripMenuItem,
+            this.toolStripSeparator3,
+            this.clearToolStripMenuItem,
+            this.prefetchToolStripMenuItem});
+            this.cacheToolStripMenuItem.Name = "cacheToolStripMenuItem";
+            this.cacheToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            this.cacheToolStripMenuItem.Text = "&Cache";
+            // 
+            // routingToolStripMenuItem
+            // 
+            this.routingToolStripMenuItem.Name = "routingToolStripMenuItem";
+            this.routingToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.routingToolStripMenuItem.Text = "&Routing";
+            this.routingToolStripMenuItem.Click += new System.EventHandler(this.routingToolStripMenuItem_Click);
+            // 
+            // geocodingToolStripMenuItem
+            // 
+            this.geocodingToolStripMenuItem.Name = "geocodingToolStripMenuItem";
+            this.geocodingToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.geocodingToolStripMenuItem.Text = "&Geocoding";
+            this.geocodingToolStripMenuItem.Click += new System.EventHandler(this.geocodingToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(129, 6);
+            // 
+            // exportToolStripMenuItem
+            // 
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.exportToolStripMenuItem.Text = "&Export";
+            this.exportToolStripMenuItem.Click += new System.EventHandler(this.btnExport_Click);
+            // 
+            // importToolStripMenuItem
+            // 
+            this.importToolStripMenuItem.Name = "importToolStripMenuItem";
+            this.importToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.importToolStripMenuItem.Text = "&Import";
+            this.importToolStripMenuItem.Click += new System.EventHandler(this.btnImport_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(129, 6);
+            // 
+            // clearToolStripMenuItem
+            // 
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.clearToolStripMenuItem.Text = "&Clear";
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.btnCacheClear_Click);
+            // 
+            // prefetchToolStripMenuItem
+            // 
+            this.prefetchToolStripMenuItem.Name = "prefetchToolStripMenuItem";
+            this.prefetchToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.prefetchToolStripMenuItem.Text = "&Prefetch";
+            this.prefetchToolStripMenuItem.Click += new System.EventHandler(this.btnCachePrefetch_Click);
+            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -724,69 +757,65 @@ namespace Demo.WindowsForms
             this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "&Help";
             // 
-            // newToolStripMenuItem
-            // 
-            this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.newToolStripMenuItem.Text = "&New";
-            this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
-            // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.openToolStripMenuItem.Text = "&Open";
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.saveToolStripMenuItem.Text = "&Save";
-            // 
-            // saveAsToolStripMenuItem
-            // 
-            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.saveAsToolStripMenuItem.Text = "Save &as";
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
-            // 
-            // exitToolStripMenuItem
-            // 
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.exitToolStripMenuItem.Text = "&Exit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-            // 
-            // copyPageToolStripMenuItem
-            // 
-            this.copyPageToolStripMenuItem.Name = "copyPageToolStripMenuItem";
-            this.copyPageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.copyPageToolStripMenuItem.Text = "&Copy page";
-            this.copyPageToolStripMenuItem.Click += new System.EventHandler(this.copyPageToolStripMenuItem_Click);
-            // 
-            // saveToolStripMenuItem1
-            // 
-            this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.saveToolStripMenuItem1.Text = "&Save page";
-            this.saveToolStripMenuItem1.Click += new System.EventHandler(this.saveToolStripMenuItem1_Click);
-            // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "&About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // checkBoxShowGeoGrid
+            // 
+            this.checkBoxShowGeoGrid.AutoSize = true;
+            this.checkBoxShowGeoGrid.Location = new System.Drawing.Point(12, 38);
+            this.checkBoxShowGeoGrid.Name = "checkBoxShowGeoGrid";
+            this.checkBoxShowGeoGrid.Size = new System.Drawing.Size(63, 17);
+            this.checkBoxShowGeoGrid.TabIndex = 8;
+            this.checkBoxShowGeoGrid.Text = "Geogrid";
+            this.checkBoxShowGeoGrid.UseVisualStyleBackColor = true;
+            this.checkBoxShowGeoGrid.CheckedChanged += new System.EventHandler(this.checkBoxShowGeoGrid_CheckedChanged);
+            // 
+            // MainMap
+            // 
+            this.MainMap.Bearing = 0F;
+            this.MainMap.CanDragMap = true;
+            this.MainMap.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MainMap.EmptyTileColor = System.Drawing.Color.Navy;
+            this.MainMap.GrayScaleMode = false;
+            this.MainMap.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.MainMap.LevelsKeepInMemory = 5;
+            this.MainMap.LinesEnabled = true;
+            this.MainMap.Location = new System.Drawing.Point(0, 24);
+            this.MainMap.MarkersEnabled = true;
+            this.MainMap.MaxZoom = 2;
+            this.MainMap.MinZoom = 2;
+            this.MainMap.MouseWheelZoomEnabled = true;
+            this.MainMap.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
+            this.MainMap.Name = "MainMap";
+            this.MainMap.NegativeMode = false;
+            this.MainMap.PolygonsEnabled = true;
+            this.MainMap.RetryLoadTile = 0;
+            this.MainMap.RoutesEnabled = true;
+            this.MainMap.ScaleMode = GMap.NET.WindowsForms.ScaleModes.Integer;
+            this.MainMap.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
+            this.MainMap.ShowCenter = true;
+            this.MainMap.ShowTileGridLines = false;
+            this.MainMap.Size = new System.Drawing.Size(922, 732);
+            this.MainMap.TabIndex = 4;
+            this.MainMap.Zoom = 0D;
+            // 
+            // toolStripStatusLabel2
+            // 
+            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            this.toolStripStatusLabel2.Size = new System.Drawing.Size(42, 17);
+            this.toolStripStatusLabel2.Text = "Zoom:";
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
-            this.ClientSize = new System.Drawing.Size(1155, 782);
+            this.ClientSize = new System.Drawing.Size(1155, 778);
             this.Controls.Add(this.MainMap);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.statusStrip1);
@@ -807,8 +836,6 @@ namespace Demo.WindowsForms
             this.groupBox_Show.ResumeLayout(false);
             this.groupBox_Show.PerformLayout();
             this.groupBoxProgress.ResumeLayout(false);
-            this.groupBox6.ResumeLayout(false);
-            this.groupBox6.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
@@ -851,16 +878,9 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.Button btnSetStart;
         private System.Windows.Forms.GroupBox groupBoxProgress;
         private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.GroupBox groupBox6;
-        private System.Windows.Forms.Button btnImport;
-        private System.Windows.Forms.Button btnExport;
-        private System.Windows.Forms.Button btnCachePrefetch;
-        private System.Windows.Forms.Button btnCacheClear;
         private System.Windows.Forms.Button btnGoTo;
         private System.Windows.Forms.Button btnReload;
         private System.Windows.Forms.Button btnSave;
-        private System.Windows.Forms.CheckBox checkBox2;
-        private System.Windows.Forms.CheckBox checkBoxUseRouteCache;
         private System.Windows.Forms.CheckBox checkBoxCanDrag;
         private System.Windows.Forms.CheckBox checkBoxCurrentMarker;
         private System.Windows.Forms.CheckBox checkBoxTileHost;
@@ -890,6 +910,18 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.ToolStripMenuItem copyPageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem cacheToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem routingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem geocodingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem importToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem prefetchToolStripMenuItem;
+        private System.Windows.Forms.CheckBox checkBoxShowCenterMarker;
+        private System.Windows.Forms.CheckBox checkBoxShowGeoGrid;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
     }
 }
 
