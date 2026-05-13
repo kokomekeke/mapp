@@ -286,10 +286,14 @@ namespace GMap.NET.Internals
         public bool PolygonsEnabled = true;
 
         /// <summary>
-        ///     is liness enabled
+        ///     is lines enabled
         /// </summary>
         public bool LinesEnabled = true;
 
+        /// <summary>
+        ///     is text enabled
+        /// </summary>
+        public bool TextEnabled = true;
 
         /// <summary>
         ///     is routes enabled

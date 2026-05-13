@@ -560,8 +560,10 @@ namespace Demo.WindowsForms
         private void GenerateGeoGrid()
         {
             Geogrid.Lines.Clear();
+            Geogrid.Labels.Clear();
             double lng1 = -180;
             double lng2 = 180;
+
             for (int i = -90; i < 90; i++)
             {
                 double lat = i;
@@ -569,6 +571,8 @@ namespace Demo.WindowsForms
                 var p2 = new PointLatLng(lat, lng2);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid.Lines.Add(line);
+                var text = new GMapLabel(p1, lat.ToString(), new Font("Arial", 12), TextPositionOnScreen.left);
+                //Geogrid.Labels.Add(text);
             }
 
             for (int i = -170; i < 180; i++)
@@ -578,9 +582,12 @@ namespace Demo.WindowsForms
                 var p2 = new PointLatLng(90, lng);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid.Lines.Add(line);
+                var text = new GMapLabel(p1, lng.ToString(), new Font("Arial", 12), TextPositionOnScreen.top);
+                Geogrid.Labels.Add(text);
             }
 
             Geogrid10.Lines.Clear();
+            Geogrid10.Labels.Clear();
             for (int i = -90; i < 90; i += 10)
             {
                 double lat = i;
@@ -588,6 +595,8 @@ namespace Demo.WindowsForms
                 var p2 = new PointLatLng(lat, lng2);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid10.Lines.Add(line);
+                var text = new GMapLabel(p1, lat.ToString(), new Font("Arial", 12), TextPositionOnScreen.left);
+                //Geogrid10.Labels.Add(text);
             }
 
             for (int i = -170; i < 180; i+= 10)
@@ -597,6 +606,8 @@ namespace Demo.WindowsForms
                 var p2 = new PointLatLng(90, lng);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid10.Lines.Add(line);
+                var text = new GMapLabel(p1, lng.ToString(), new Font("Arial", 12), TextPositionOnScreen.top);
+                Geogrid10.Labels.Add(text);
             }
 
         } /* GenerateGeoGrid */

@@ -751,7 +751,7 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     updates polygons local position
         /// </summary>
-        /// <param name="polygon"></param>
+        /// <param name="line"></param>
         public void UpdateLineLocalPosition(GMapLine line)
         {
             var p = FromLatLngToLocal(line.Point1);
@@ -771,7 +771,17 @@ namespace GMap.NET.WindowsForms
             line.UpdateGraphicsPath();
         }
 
-
+        public void UpdateLabelLocalPosition(GMapLabel text)
+        {
+            var p = FromLatLngToLocal(text.Point1);
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+            text.LocalPosition1 = new Point((int)p.X, (int)p.Y);
+            text.UpdateGraphicsPath();
+        }
+        
         /// <summary>
         ///     sets zoom to max to fit rect
         /// </summary>
@@ -3245,7 +3255,7 @@ namespace GMap.NET.WindowsForms
 
 
         /// <summary>
-        ///     is polygons enabled
+        ///     is lines enabled
         /// </summary>
         [Category("GMap.NET")]
         public bool LinesEnabled
@@ -3259,6 +3269,23 @@ namespace GMap.NET.WindowsForms
                 Core.LinesEnabled = value;
             }
         }
+
+        /// <summary>
+        ///     is text enabled
+        /// </summary>
+        [Category("GMap.NET")]
+        public bool LabelEnabled
+        {
+            get
+            {
+                return Core.TextEnabled;
+            }
+            set
+            {
+                Core.TextEnabled = value;
+            }
+        }
+
 
 
         /// <summary>
