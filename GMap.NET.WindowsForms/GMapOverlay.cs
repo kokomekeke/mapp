@@ -120,7 +120,7 @@ namespace GMap.NET.WindowsForms
             new ObservableCollectionThreadSafe<GMapLine>();
 
         /// <summary>
-        ///     list of lines, should be thread safe
+        ///     list of labels, should be thread safe
         /// </summary>
         public readonly ObservableCollectionThreadSafe<GMapLabel> Labels =
             new ObservableCollectionThreadSafe<GMapLabel>();

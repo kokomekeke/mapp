@@ -16,9 +16,10 @@ namespace GMap.NET.WindowsForms
     {
 
         public GMapOverlay Overlay { get; set; }
-        public PointLatLng Point1;
-        public Point LocalPosition1;
-        public Point LabelPosition;
+
+        public PointLatLng GeoPosition;     // position in geo coordinates
+        public Point LocalPosition1;        // original position of label in screen
+        public Point LabelPosition;         // current position of label in screen, can be changed by TextPositionOnScreen    
 
         public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(155, Color.Black));
 
@@ -93,7 +94,7 @@ namespace GMap.NET.WindowsForms
 
         public GMapLabel(PointLatLng pointLatLng, string text)
         {
-            Point1 = pointLatLng;
+            GeoPosition = pointLatLng;
             Text = text;
         }
 
@@ -102,7 +103,7 @@ namespace GMap.NET.WindowsForms
             Font = font;
             Text = text;
             DrawBorder = border;
-            Point1 = pointLatLng;
+            GeoPosition = pointLatLng;
             TextPosition = textPosition;
         }
 
@@ -127,7 +128,7 @@ namespace GMap.NET.WindowsForms
 
         GraphicsPath _graphicsPath;
 
-        internal void UpdateGraphicsPath()
+        public void UpdateGraphicsPath()
         {
             if (_graphicsPath == null)
             {
@@ -139,6 +140,8 @@ namespace GMap.NET.WindowsForms
             }
 
             var point = LocalPosition1;
+            //var center = Overlay.Control.Core.Position;
+            //var cp = Overlay.Control.FromLatLngToLocal(center);
             //point.X = 0; point.Y = 0;
             switch (TextPosition)
             {
@@ -146,7 +149,7 @@ namespace GMap.NET.WindowsForms
                     point.Y = Overlay.Control.Height / 2 - Size.Height - 3;
                     break;
                 case TextPositionOnScreen.top:
-                    point.Y = -Overlay.Control.Height/2 + 3;
+                    point.Y =  -Overlay.Control.Height/2 + 3;
                     break;
                 case TextPositionOnScreen.left:
                         point.X = -Overlay.Control.Width / 2 + 3;
@@ -157,7 +160,17 @@ namespace GMap.NET.WindowsForms
             }
             LabelPosition = point;
             _graphicsPath.AddString(Text, Font.FontFamily, (int)Font.Style, Font.Size, point, StringFormat.GenericDefault);
-        }
+        } /* UpdateGraphicsPath */
+
+
+        public void UpdateLocalPosition()
+        {
+            if (Overlay != null && Overlay.Control != null)
+            {
+                Overlay.Control.UpdateLabelLocalPosition(this);
+                UpdateGraphicsPath();
+            }
+        } /* UpdateLocalPosition */
 
 
         public virtual void OnRender(Graphics g)
@@ -171,4 +184,4 @@ namespace GMap.NET.WindowsForms
         }
 
     } /* class GMapText */
-} /* namespace GMap.NET.WindowsForms */
+    } /* namespace GMap.NET.WindowsForms */

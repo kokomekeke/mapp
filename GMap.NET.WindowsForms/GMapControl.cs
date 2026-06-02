@@ -773,7 +773,7 @@ namespace GMap.NET.WindowsForms
 
         public void UpdateLabelLocalPosition(GMapLabel text)
         {
-            var p = FromLatLngToLocal(text.Point1);
+            var p = FromLatLngToLocal(text.GeoPosition);
             if (!MobileMode)
             {
                 p.OffsetNegative(Core.RenderOffset);
@@ -1937,6 +1937,9 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        public delegate void OnDragged();
+        public event OnDragged OnDraggedDone;
+
         bool _isSelected;
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -1948,6 +1951,8 @@ namespace GMap.NET.WindowsForms
                 if (e.Button == DragButton && CanDragMap)
                 {
                     Core.MouseDown = ApplyRotationInversion(e.X, e.Y);
+                    //if (OnDraggedDone != null)
+                    //    OnDraggedDone.Invoke();
                     Invalidate();
                 }
                 else if (!_isSelected && e.Button == SelectioButton)
@@ -1960,7 +1965,8 @@ namespace GMap.NET.WindowsForms
             }
             else if (IsMouseOverPolygon)
                 IsMouseOverPolygon = false;
-        }
+        } /* OnMouseDown */
+
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
@@ -1979,6 +1985,8 @@ namespace GMap.NET.WindowsForms
                     Debug.WriteLine("IsDragging = " + _isDragging);
                     Cursor = _cursorBefore;
                     _cursorBefore = null;
+                    if (OnDraggedDone != null)
+                        OnDraggedDone.Invoke();
                 }
 
                 Core.EndDrag();

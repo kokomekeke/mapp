@@ -157,6 +157,8 @@ namespace Demo.WindowsForms
                 MainMap.MouseUp += MainMap_MouseUp;
                 MainMap.MouseDoubleClick += MainMap_MouseDoubleClick;
 
+                //MainMap.OnDraggedDone += AlignGeoLabels;
+
                 //----------------------------------------
                 // Custom Layers
                 //----------------------------------------
@@ -572,7 +574,7 @@ namespace Demo.WindowsForms
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid.Lines.Add(line);
                 var text = new GMapLabel(p1, lat.ToString(), new Font("Arial", 12), TextPositionOnScreen.left);
-                //Geogrid.Labels.Add(text);
+                Geogrid.Labels.Add(text);
             }
 
             for (int i = -170; i < 180; i++)
@@ -596,7 +598,7 @@ namespace Demo.WindowsForms
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid10.Lines.Add(line);
                 var text = new GMapLabel(p1, lat.ToString(), new Font("Arial", 12), TextPositionOnScreen.left);
-                //Geogrid10.Labels.Add(text);
+                Geogrid10.Labels.Add(text);
             }
 
             for (int i = -170; i < 180; i+= 10)
@@ -611,6 +613,20 @@ namespace Demo.WindowsForms
             }
 
         } /* GenerateGeoGrid */
+
+        public void AlignGeoLabels()
+        {
+            foreach (var l in Geogrid.Labels)
+            {
+                l.UpdateLocalPosition(); 
+            }
+
+            foreach (var l in Geogrid10.Labels)
+            {
+                l.UpdateLocalPosition(); 
+            }
+
+        } /* AlignGeoLabels */  
 
 
         /// <summary>
@@ -2148,11 +2164,15 @@ namespace Demo.WindowsForms
             if (MainMap.Zoom < 5)
             {
                 Geogrid10.IsVisibile = checkBoxShowGeoGrid.Checked;
+                if (checkBoxShowGeoGrid.Checked)
+                    GenerateGeoGrid(); 
                 Geogrid.IsVisibile = false;
             }
             else
             {
                 Geogrid.IsVisibile = checkBoxShowGeoGrid.Checked;
+                if (checkBoxShowGeoGrid.Checked)
+                    GenerateGeoGrid();
                 Geogrid10.IsVisibile = false;
             }
         }
