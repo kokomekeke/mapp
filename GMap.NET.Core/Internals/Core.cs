@@ -249,6 +249,14 @@ namespace GMap.NET.Internals
             }
         }
 
+        public string ProjectionName
+        {
+            get
+            {
+                return Provider != null ? Provider.Projection.ToString() : string.Empty;
+            }
+        }
+
         internal bool ZoomToArea = true;
 
         /// <summary>
@@ -535,6 +543,13 @@ namespace GMap.NET.Internals
             pLocal.OffsetNegative(CompensationOffset);
             return pLocal;
         }
+
+        public GPoint FromLatLngToPixel(PointLatLng latlng)
+        {
+            var pLocal = Provider.Projection.FromLatLngToPixel(latlng, Zoom);
+            return pLocal;
+        }
+
 
         /// <summary>
         ///     gets max zoom level to fit rectangle

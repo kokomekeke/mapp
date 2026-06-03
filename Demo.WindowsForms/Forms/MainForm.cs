@@ -562,30 +562,32 @@ namespace Demo.WindowsForms
         private void GenerateGeoGrid()
         {
             Geogrid.Lines.Clear();
-            Geogrid.Labels.Clear();
+            Geogrid.ScaleLabels.Clear();
             double lng1 = -180;
             double lng2 = 180;
 
             for (int i = -90; i < 90; i++)
             {
                 double lat = i;
+                double lng = 20;
                 var p1 = new PointLatLng(lat, lng1);
                 var p2 = new PointLatLng(lat, lng2);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid.Lines.Add(line);
-                var text = new GMapLabel(p1, lat.ToString(), new Font("Arial", 12), TextPositionOnScreen.left);
-                Geogrid.Labels.Add(text);
+                var text = new GMapScaleLabel(new PointLatLng(lat, lng), lat.ToString(), new Font("Arial", 12), AnchorType.Left);
+                Geogrid.ScaleLabels.Add(text);
             }
 
             for (int i = -170; i < 180; i++)
             {
                 double lng = i;
+                double lat = 45;
                 var p1 = new PointLatLng(-90, lng);
                 var p2 = new PointLatLng(90, lng);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid.Lines.Add(line);
-                var text = new GMapLabel(p1, lng.ToString(), new Font("Arial", 12), TextPositionOnScreen.top);
-                Geogrid.Labels.Add(text);
+                var text = new GMapScaleLabel(new PointLatLng(lat, lng), lng.ToString(), new Font("Arial", 12), AnchorType.Top);
+                Geogrid.ScaleLabels.Add(text);
             }
 
             Geogrid10.Lines.Clear();
@@ -593,40 +595,43 @@ namespace Demo.WindowsForms
             for (int i = -90; i < 90; i += 10)
             {
                 double lat = i;
+                double lng = 20;
                 var p1 = new PointLatLng(lat, lng1);
                 var p2 = new PointLatLng(lat, lng2);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid10.Lines.Add(line);
-                var text = new GMapLabel(p1, lat.ToString(), new Font("Arial", 12), TextPositionOnScreen.left);
-                Geogrid10.Labels.Add(text);
+                var text = new GMapScaleLabel(new PointLatLng(lat, lng), lat.ToString(), new Font("Arial", 12), AnchorType.Left);
+                Geogrid10.ScaleLabels.Add(text);
             }
 
             for (int i = -170; i < 180; i+= 10)
             {
                 double lng = i;
+                double lat = 45;
                 var p1 = new PointLatLng(-90, lng);
                 var p2 = new PointLatLng(90, lng);
                 var line = new GMapLine(p1, p2, Color.Black);
                 Geogrid10.Lines.Add(line);
-                var text = new GMapLabel(p1, lng.ToString(), new Font("Arial", 12), TextPositionOnScreen.top);
-                Geogrid10.Labels.Add(text);
+                var text = new GMapScaleLabel(new PointLatLng(lat, lng), lng.ToString(), new Font("Arial", 12), AnchorType.Top);
+                Geogrid10.ScaleLabels.Add(text);
             }
 
         } /* GenerateGeoGrid */
 
-        public void AlignGeoLabels()
-        {
-            foreach (var l in Geogrid.Labels)
-            {
-                l.UpdateLocalPosition(); 
-            }
 
-            foreach (var l in Geogrid10.Labels)
-            {
-                l.UpdateLocalPosition(); 
-            }
+        //public void AlignGeoLabels()
+        //{
+        //    foreach (var l in Geogrid.Labels)
+        //    {
+        //        l.UpdateLocalPosition(); 
+        //    }
 
-        } /* AlignGeoLabels */  
+        //    foreach (var l in Geogrid10.Labels)
+        //    {
+        //        l.UpdateLocalPosition(); 
+        //    }
+
+        //} /* AlignGeoLabels */  
 
 
         /// <summary>
@@ -2176,6 +2181,13 @@ namespace Demo.WindowsForms
                 Geogrid10.IsVisibile = false;
             }
         }
+
+        private void ckb_show_scale_CheckedChanged(object sender, EventArgs e)
+        {
+            MainMap.MapScaleInfoEnabled = ckb_show_scale.Checked;
+            MainMap.Invalidate();
+        }
+
     } /* class MainForm */
 
 } /* namespace Demo.WindowsForms */

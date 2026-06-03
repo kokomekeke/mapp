@@ -125,6 +125,13 @@ namespace GMap.NET.WindowsForms
         public readonly ObservableCollectionThreadSafe<GMapLabel> Labels =
             new ObservableCollectionThreadSafe<GMapLabel>();
 
+        /// <summary>
+        ///     list of labels, should be thread safe
+        /// </summary>
+        public readonly ObservableCollectionThreadSafe<GMapScaleLabel> ScaleLabels =
+            new ObservableCollectionThreadSafe<GMapScaleLabel>();
+
+
         GMapControl _control;
 
         public GMapControl Control
@@ -157,6 +164,7 @@ namespace GMap.NET.WindowsForms
             Polygons.CollectionChanged += Polygons_CollectionChanged;   
             Lines.CollectionChanged += Lines_CollectionChanged;   
             Labels.CollectionChanged += Labels_CollectionChanged;
+            ScaleLabels.CollectionChanged += ScaleLabels_CollectionChanged; 
         }
 
         void ClearEvents()
@@ -166,6 +174,7 @@ namespace GMap.NET.WindowsForms
             Polygons.CollectionChanged -= Polygons_CollectionChanged;
             Lines.CollectionChanged -= Lines_CollectionChanged;
             Labels.CollectionChanged -= Labels_CollectionChanged;
+            ScaleLabels.CollectionChanged -= ScaleLabels_CollectionChanged;
         }
 
         public void Clear()
@@ -245,6 +254,35 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+
+        void ScaleLabels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (GMapScaleLabel obj in e.NewItems)
+                {
+                    if (obj != null)
+                    {
+                        obj.Overlay = this;
+                        if (Control != null)
+                        {
+                            Control.UpdateLabelLocalPosition(obj);
+                        }
+                    }
+                }
+            }
+            if (Control != null)
+            {
+                if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    //..
+                }
+                if (!Control.HoldInvalidation)
+                {
+                    Control.Invalidate();
+                }
+            }
+        }
 
         void Polygons_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -460,6 +498,28 @@ namespace GMap.NET.WindowsForms
                 }
             }
         }
+
+
+        /// <summary>
+        ///     renders objects/routes/polygons
+        /// </summary>
+        /// <param name="g"></param>
+        public virtual void OnRenderScale(Graphics g)
+        {
+            if (Control != null)
+            {
+                if (Control.LabelEnabled)                       //.. TODO: add separate flag for scale labels
+                {
+                    foreach (var r in ScaleLabels)
+                    {
+                        r.OnRender(g);
+                    }
+                }
+            }
+        }
+
+
+
 
         public virtual void OnRenderToolTips(Graphics g)
         {

@@ -134,10 +134,12 @@ namespace GMap.NET
 
         public static string DegreeToString(double degree)
         {
+            string sign = degree < 0 ? "-" : "";
+            degree = Math.Abs(degree);
             int d = (int)degree;
             int m = (int)((degree - d) * 60);
             int s = (int)(((degree - d) * 60 - m) * 60);
-            return string.Format(CultureInfo.CurrentCulture, "{0}°{1:D2}'{2:D2}\"", d, m, s);
+            return string.Format(CultureInfo.CurrentCulture, "{0}{1}°{2:D2}'{3:D2}\"", sign, d, m, s);
         }
 
     }

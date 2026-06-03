@@ -215,6 +215,14 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        public string ProjectionName
+        {
+            get
+            {
+                return Core.ProjectionName;
+            }
+        }
+
         /// <summary>
         ///     text on empty tiles
         /// </summary>
@@ -771,17 +779,25 @@ namespace GMap.NET.WindowsForms
             line.UpdateGraphicsPath();
         }
 
-        public void UpdateLabelLocalPosition(GMapLabel text)
+        public void UpdateLabelLocalPosition(GMapLabel label)
         {
-            var p = FromLatLngToLocal(text.GeoPosition);
+            var p = FromLatLngToLocal(label.GeoPosition);
             if (!MobileMode)
             {
                 p.OffsetNegative(Core.RenderOffset);
             }
-            text.LocalPosition1 = new Point((int)p.X, (int)p.Y);
-            text.UpdateGraphicsPath();
+            label.LocalPosition = new Point((int)p.X, (int)p.Y);
+            label.UpdateGraphicsPath();
         }
-        
+
+        public void UpdateScaleLabelLocalPosition(GMapLabel label)
+        {
+            var p = FromLatLngToPixel(label.GeoPosition);
+            label.LocalPosition = new Point((int)p.X, (int)p.Y);
+            //label.UpdateGraphicsPath();
+        }
+
+
         /// <summary>
         ///     sets zoom to max to fit rect
         /// </summary>
@@ -1697,7 +1713,7 @@ namespace GMap.NET.WindowsForms
 
                 if (!string.IsNullOrEmpty(Core.Provider.Copyright))
                 {
-                    g.DrawString(Core.Provider.Copyright,
+                    g.DrawString(Core.Provider.Copyright + " | " + Core.ProjectionName,
                         CopyrightFont,
                         Brushes.Navy,
                         3,
@@ -1745,6 +1761,15 @@ namespace GMap.NET.WindowsForms
                     }
                 }
 
+
+                foreach (var o in Overlays)
+                {
+                    if (o.IsVisibile)
+                    {
+                        o.OnRenderScale(g);
+                    }
+                }
+
                 #endregion
             }
             catch (Exception ex)
@@ -1768,6 +1793,8 @@ namespace GMap.NET.WindowsForms
 
             g.DrawString(caption, ScaleFont, Brushes.Black, right + 3, top - 5);
         }
+
+
 
         readonly Matrix _rotationMatrix = new Matrix();
         readonly Matrix _rotationMatrixInvert = new Matrix();
@@ -2768,6 +2795,18 @@ namespace GMap.NET.WindowsForms
 
             return ret;
         }
+
+
+        /// <summary>
+        /// Get screen coordinate from world coordinate
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public GPoint FromLatLngToPixel(PointLatLng point)
+        {
+            return Core.FromLatLngToPixel(point);
+        }
+
 
         /// <summary>
         ///     shows map db export dialog

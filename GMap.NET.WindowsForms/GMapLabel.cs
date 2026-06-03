@@ -10,7 +10,6 @@ using System.Windows.Forms;
 
 namespace GMap.NET.WindowsForms
 {
-    public enum TextPositionOnScreen { custom = 0, left, bottom, top, right };
         
     public class GMapLabel : ISerializable, IDeserializationCallback, IDisposable
     {
@@ -18,8 +17,7 @@ namespace GMap.NET.WindowsForms
         public GMapOverlay Overlay { get; set; }
 
         public PointLatLng GeoPosition;     // position in geo coordinates
-        public Point LocalPosition1;        // original position of label in screen
-        public Point LabelPosition;         // current position of label in screen, can be changed by TextPositionOnScreen    
+        public Point LocalPosition;        // position of label in screen buffer
 
         public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(155, Color.Black));
 
@@ -65,29 +63,6 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-        private TextPositionOnScreen _textPosition = TextPositionOnScreen.custom;
-        public TextPositionOnScreen TextPosition 
-        { 
-            get { return _textPosition; }
-            set 
-            {
-                if (value != _textPosition)
-                {
-                    _textPosition = value;
-                    if (Overlay != null && Overlay.Control != null)
-                    {
-                        Overlay.Control.UpdateLabelLocalPosition(this);
-                        if (!Overlay.Control.HoldInvalidation)
-                        {
-                            Overlay.Control.Invalidate();
-                        }
-                    }
-                }
-            }
-        }
-
-
-
         public GMapLabel()
         {
         }
@@ -98,13 +73,12 @@ namespace GMap.NET.WindowsForms
             Text = text;
         }
 
-        public GMapLabel(PointLatLng pointLatLng, string text, Font font, TextPositionOnScreen textPosition = TextPositionOnScreen.custom, bool border = false)
+        public GMapLabel(PointLatLng pointLatLng, string text, Font font, bool border = false)
         {
             Font = font;
             Text = text;
             DrawBorder = border;
             GeoPosition = pointLatLng;
-            TextPosition = textPosition;
         }
 
         protected GMapLabel(SerializationInfo info, StreamingContext context)
@@ -139,31 +113,11 @@ namespace GMap.NET.WindowsForms
                 _graphicsPath.Reset();
             }
 
-            var point = LocalPosition1;
-            //var center = Overlay.Control.Core.Position;
-            //var cp = Overlay.Control.FromLatLngToLocal(center);
-            //point.X = 0; point.Y = 0;
-            switch (TextPosition)
-            {
-                case TextPositionOnScreen.bottom:
-                    point.Y = Overlay.Control.Height / 2 - Size.Height - 3;
-                    break;
-                case TextPositionOnScreen.top:
-                    point.Y =  -Overlay.Control.Height/2 + 3;
-                    break;
-                case TextPositionOnScreen.left:
-                        point.X = -Overlay.Control.Width / 2 + 3;
-                    break;
-                case TextPositionOnScreen.right:
-                    point.X = Overlay.Control.Width / 2 - Size.Width - 3;
-                    break;
-            }
-            LabelPosition = point;
-            _graphicsPath.AddString(Text, Font.FontFamily, (int)Font.Style, Font.Size, point, StringFormat.GenericDefault);
+            _graphicsPath.AddString(Text, Font.FontFamily, (int)Font.Style, Font.Size, LocalPosition, StringFormat.GenericDefault);
         } /* UpdateGraphicsPath */
 
 
-        public void UpdateLocalPosition()
+        public virtual void UpdateLocalPosition()
         {
             if (Overlay != null && Overlay.Control != null)
             {
@@ -177,11 +131,11 @@ namespace GMap.NET.WindowsForms
         {
             try
             {
-                g.DrawString(Text, Font, Fill, LabelPosition);
+                g.DrawString(Text, Font, Fill, LocalPosition);
             }
             catch { }
             ;
         }
 
     } /* class GMapText */
-    } /* namespace GMap.NET.WindowsForms */
+} /* namespace GMap.NET.WindowsForms */

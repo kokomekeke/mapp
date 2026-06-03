@@ -42,6 +42,7 @@ namespace Demo.WindowsForms
             this.btnReload = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox_Show = new System.Windows.Forms.GroupBox();
+            this.checkBoxShowGeoGrid = new System.Windows.Forms.CheckBox();
             this.checkBoxShowCenterMarker = new System.Windows.Forms.CheckBox();
             this.checkBox1_Infobox = new System.Windows.Forms.CheckBox();
             this.checkBox_Routes = new System.Windows.Forms.CheckBox();
@@ -74,6 +75,7 @@ namespace Demo.WindowsForms
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,9 +98,8 @@ namespace Demo.WindowsForms
             this.prefetchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.checkBoxShowGeoGrid = new System.Windows.Forms.CheckBox();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
-            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ckb_show_scale = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -235,6 +236,7 @@ namespace Demo.WindowsForms
             // 
             // groupBox_Show
             // 
+            this.groupBox_Show.Controls.Add(this.ckb_show_scale);
             this.groupBox_Show.Controls.Add(this.checkBoxShowGeoGrid);
             this.groupBox_Show.Controls.Add(this.checkBoxShowCenterMarker);
             this.groupBox_Show.Controls.Add(this.checkBox1_Infobox);
@@ -248,6 +250,17 @@ namespace Demo.WindowsForms
             this.groupBox_Show.TabIndex = 6;
             this.groupBox_Show.TabStop = false;
             this.groupBox_Show.Text = "Show";
+            // 
+            // checkBoxShowGeoGrid
+            // 
+            this.checkBoxShowGeoGrid.AutoSize = true;
+            this.checkBoxShowGeoGrid.Location = new System.Drawing.Point(12, 38);
+            this.checkBoxShowGeoGrid.Name = "checkBoxShowGeoGrid";
+            this.checkBoxShowGeoGrid.Size = new System.Drawing.Size(63, 17);
+            this.checkBoxShowGeoGrid.TabIndex = 8;
+            this.checkBoxShowGeoGrid.Text = "Geogrid";
+            this.checkBoxShowGeoGrid.UseVisualStyleBackColor = true;
+            this.checkBoxShowGeoGrid.CheckedChanged += new System.EventHandler(this.checkBoxShowGeoGrid_CheckedChanged);
             // 
             // checkBoxShowCenterMarker
             // 
@@ -293,7 +306,7 @@ namespace Demo.WindowsForms
             this.checkBoxCurrentMarker.AutoSize = true;
             this.checkBoxCurrentMarker.Checked = true;
             this.checkBoxCurrentMarker.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(78, 38);
+            this.checkBoxCurrentMarker.Location = new System.Drawing.Point(75, 38);
             this.checkBoxCurrentMarker.Name = "checkBoxCurrentMarker";
             this.checkBoxCurrentMarker.Size = new System.Drawing.Size(56, 17);
             this.checkBoxCurrentMarker.TabIndex = 6;
@@ -596,6 +609,12 @@ namespace Demo.WindowsForms
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(0, 17);
             // 
+            // toolStripStatusLabel2
+            // 
+            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            this.toolStripStatusLabel2.Size = new System.Drawing.Size(42, 17);
+            this.toolStripStatusLabel2.Text = "Zoom:";
+            // 
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -764,17 +783,6 @@ namespace Demo.WindowsForms
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // checkBoxShowGeoGrid
-            // 
-            this.checkBoxShowGeoGrid.AutoSize = true;
-            this.checkBoxShowGeoGrid.Location = new System.Drawing.Point(12, 38);
-            this.checkBoxShowGeoGrid.Name = "checkBoxShowGeoGrid";
-            this.checkBoxShowGeoGrid.Size = new System.Drawing.Size(63, 17);
-            this.checkBoxShowGeoGrid.TabIndex = 8;
-            this.checkBoxShowGeoGrid.Text = "Geogrid";
-            this.checkBoxShowGeoGrid.UseVisualStyleBackColor = true;
-            this.checkBoxShowGeoGrid.CheckedChanged += new System.EventHandler(this.checkBoxShowGeoGrid_CheckedChanged);
-            // 
             // MainMap
             // 
             this.MainMap.Bearing = 0F;
@@ -783,6 +791,7 @@ namespace Demo.WindowsForms
             this.MainMap.EmptyTileColor = System.Drawing.Color.Navy;
             this.MainMap.GrayScaleMode = false;
             this.MainMap.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
+            this.MainMap.LabelEnabled = true;
             this.MainMap.LevelsKeepInMemory = 5;
             this.MainMap.LinesEnabled = true;
             this.MainMap.Location = new System.Drawing.Point(0, 24);
@@ -804,11 +813,16 @@ namespace Demo.WindowsForms
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
             // 
-            // toolStripStatusLabel2
+            // ckb_show_scale
             // 
-            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(42, 17);
-            this.toolStripStatusLabel2.Text = "Zoom:";
+            this.ckb_show_scale.AutoSize = true;
+            this.ckb_show_scale.Location = new System.Drawing.Point(75, 60);
+            this.ckb_show_scale.Name = "ckb_show_scale";
+            this.ckb_show_scale.Size = new System.Drawing.Size(53, 17);
+            this.ckb_show_scale.TabIndex = 9;
+            this.ckb_show_scale.Text = "Scale";
+            this.ckb_show_scale.UseVisualStyleBackColor = true;
+            this.ckb_show_scale.CheckedChanged += new System.EventHandler(this.ckb_show_scale_CheckedChanged);
             // 
             // MainForm
             // 
@@ -922,6 +936,7 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.CheckBox checkBoxShowCenterMarker;
         private System.Windows.Forms.CheckBox checkBoxShowGeoGrid;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
+        private System.Windows.Forms.CheckBox ckb_show_scale;
     }
 }
 
