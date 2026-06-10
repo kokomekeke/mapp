@@ -30,6 +30,8 @@ namespace Demo.WindowsForms
       private void InitializeComponent()
       {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btn_setEnd = new System.Windows.Forms.Button();
+            this.btn_setStart = new System.Windows.Forms.Button();
             this.btnCursor = new System.Windows.Forms.Button();
             this.btnMarker = new System.Windows.Forms.Button();
             this.btnGoTo = new System.Windows.Forms.Button();
@@ -42,6 +44,7 @@ namespace Demo.WindowsForms
             this.btnReload = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox_Show = new System.Windows.Forms.GroupBox();
+            this.ckb_show_scale = new System.Windows.Forms.CheckBox();
             this.checkBoxShowGeoGrid = new System.Windows.Forms.CheckBox();
             this.checkBoxShowCenterMarker = new System.Windows.Forms.CheckBox();
             this.checkBox1_Infobox = new System.Windows.Forms.CheckBox();
@@ -99,7 +102,9 @@ namespace Demo.WindowsForms
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
-            this.ckb_show_scale = new System.Windows.Forms.CheckBox();
+            this.btn_add_dfline = new System.Windows.Forms.Button();
+            this.txe_direction = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -113,6 +118,8 @@ namespace Demo.WindowsForms
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btn_setEnd);
+            this.groupBox1.Controls.Add(this.btn_setStart);
             this.groupBox1.Controls.Add(this.btnCursor);
             this.groupBox1.Controls.Add(this.btnMarker);
             this.groupBox1.Controls.Add(this.btnGoTo);
@@ -124,16 +131,36 @@ namespace Demo.WindowsForms
             this.groupBox1.Controls.Add(this.textBoxLat);
             this.groupBox1.Location = new System.Drawing.Point(14, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(203, 126);
+            this.groupBox1.Size = new System.Drawing.Size(203, 149);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Coordinates";
             // 
+            // btn_setEnd
+            // 
+            this.btn_setEnd.Location = new System.Drawing.Point(94, 121);
+            this.btn_setEnd.Name = "btn_setEnd";
+            this.btn_setEnd.Size = new System.Drawing.Size(67, 22);
+            this.btn_setEnd.TabIndex = 10;
+            this.btn_setEnd.Text = "Set End";
+            this.btn_setEnd.UseVisualStyleBackColor = true;
+            this.btn_setEnd.Click += new System.EventHandler(this.btnSetEnd_Click);
+            // 
+            // btn_setStart
+            // 
+            this.btn_setStart.Location = new System.Drawing.Point(9, 121);
+            this.btn_setStart.Name = "btn_setStart";
+            this.btn_setStart.Size = new System.Drawing.Size(67, 22);
+            this.btn_setStart.TabIndex = 9;
+            this.btn_setStart.Text = "SetStart";
+            this.btn_setStart.UseVisualStyleBackColor = true;
+            this.btn_setStart.Click += new System.EventHandler(this.btnSetStart_Click);
+            // 
             // btnCursor
             // 
-            this.btnCursor.Location = new System.Drawing.Point(121, 97);
+            this.btnCursor.Location = new System.Drawing.Point(113, 97);
             this.btnCursor.Name = "btnCursor";
-            this.btnCursor.Size = new System.Drawing.Size(52, 22);
+            this.btnCursor.Size = new System.Drawing.Size(48, 22);
             this.btnCursor.TabIndex = 8;
             this.btnCursor.Text = "Cursor";
             this.btnCursor.UseVisualStyleBackColor = true;
@@ -141,9 +168,9 @@ namespace Demo.WindowsForms
             // 
             // btnMarker
             // 
-            this.btnMarker.Location = new System.Drawing.Point(63, 97);
+            this.btnMarker.Location = new System.Drawing.Point(60, 97);
             this.btnMarker.Name = "btnMarker";
-            this.btnMarker.Size = new System.Drawing.Size(52, 22);
+            this.btnMarker.Size = new System.Drawing.Size(48, 22);
             this.btnMarker.TabIndex = 7;
             this.btnMarker.Text = "Marker";
             this.btnMarker.UseVisualStyleBackColor = true;
@@ -212,9 +239,9 @@ namespace Demo.WindowsForms
             // 
             // btnReload
             // 
-            this.btnReload.Location = new System.Drawing.Point(94, 72);
+            this.btnReload.Location = new System.Drawing.Point(9, 99);
             this.btnReload.Name = "btnReload";
-            this.btnReload.Size = new System.Drawing.Size(79, 22);
+            this.btnReload.Size = new System.Drawing.Size(55, 22);
             this.btnReload.TabIndex = 7;
             this.btnReload.Text = "Reload";
             this.btnReload.UseVisualStyleBackColor = true;
@@ -244,12 +271,23 @@ namespace Demo.WindowsForms
             this.groupBox_Show.Controls.Add(this.checkBoxCurrentMarker);
             this.groupBox_Show.Controls.Add(this.checkBox_Markers);
             this.groupBox_Show.Controls.Add(this.checkBoxDebug);
-            this.groupBox_Show.Location = new System.Drawing.Point(14, 542);
+            this.groupBox_Show.Location = new System.Drawing.Point(14, 565);
             this.groupBox_Show.Name = "groupBox_Show";
             this.groupBox_Show.Size = new System.Drawing.Size(203, 83);
             this.groupBox_Show.TabIndex = 6;
             this.groupBox_Show.TabStop = false;
             this.groupBox_Show.Text = "Show";
+            // 
+            // ckb_show_scale
+            // 
+            this.ckb_show_scale.AutoSize = true;
+            this.ckb_show_scale.Location = new System.Drawing.Point(75, 60);
+            this.ckb_show_scale.Name = "ckb_show_scale";
+            this.ckb_show_scale.Size = new System.Drawing.Size(53, 17);
+            this.ckb_show_scale.TabIndex = 9;
+            this.ckb_show_scale.Text = "Scale";
+            this.ckb_show_scale.UseVisualStyleBackColor = true;
+            this.ckb_show_scale.CheckedChanged += new System.EventHandler(this.ckb_show_scale_CheckedChanged);
             // 
             // checkBoxShowGeoGrid
             // 
@@ -358,21 +396,24 @@ namespace Demo.WindowsForms
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.label6);
+            this.groupBox4.Controls.Add(this.txe_direction);
+            this.groupBox4.Controls.Add(this.btn_add_dfline);
             this.groupBox4.Controls.Add(this.btn_clear_routes);
             this.groupBox4.Controls.Add(this.btn_addline);
             this.groupBox4.Controls.Add(this.btnAddRoute);
             this.groupBox4.Controls.Add(this.btnSetEnd);
             this.groupBox4.Controls.Add(this.btnSetStart);
-            this.groupBox4.Location = new System.Drawing.Point(14, 411);
+            this.groupBox4.Location = new System.Drawing.Point(14, 412);
             this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(203, 130);
+            this.groupBox4.Size = new System.Drawing.Size(203, 152);
             this.groupBox4.TabIndex = 2;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Routes";
             // 
             // btn_clear_routes
             // 
-            this.btn_clear_routes.Location = new System.Drawing.Point(94, 101);
+            this.btn_clear_routes.Location = new System.Drawing.Point(94, 125);
             this.btn_clear_routes.Name = "btn_clear_routes";
             this.btn_clear_routes.Size = new System.Drawing.Size(96, 22);
             this.btn_clear_routes.TabIndex = 8;
@@ -382,7 +423,7 @@ namespace Demo.WindowsForms
             // 
             // btn_addline
             // 
-            this.btn_addline.Location = new System.Drawing.Point(9, 75);
+            this.btn_addline.Location = new System.Drawing.Point(9, 72);
             this.btn_addline.Name = "btn_addline";
             this.btn_addline.Size = new System.Drawing.Size(164, 22);
             this.btn_addline.TabIndex = 7;
@@ -392,7 +433,7 @@ namespace Demo.WindowsForms
             // 
             // btnAddRoute
             // 
-            this.btnAddRoute.Location = new System.Drawing.Point(9, 47);
+            this.btnAddRoute.Location = new System.Drawing.Point(9, 46);
             this.btnAddRoute.Name = "btnAddRoute";
             this.btnAddRoute.Size = new System.Drawing.Size(164, 22);
             this.btnAddRoute.TabIndex = 6;
@@ -428,7 +469,7 @@ namespace Demo.WindowsForms
             this.groupBox3.Controls.Add(this.btnClearAll);
             this.groupBox3.Controls.Add(this.btnZoomCenter);
             this.groupBox3.Controls.Add(this.btnAddMarker);
-            this.groupBox3.Location = new System.Drawing.Point(14, 301);
+            this.groupBox3.Location = new System.Drawing.Point(14, 302);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(203, 104);
             this.groupBox3.TabIndex = 2;
@@ -473,7 +514,7 @@ namespace Demo.WindowsForms
             this.btnClearAll.TabIndex = 2;
             this.btnClearAll.Text = "Clear Markers";
             this.btnClearAll.UseVisualStyleBackColor = true;
-            this.btnClearAll.Click += new System.EventHandler(this.btnClearAll_Click);
+            this.btnClearAll.Click += new System.EventHandler(this.btnClearAllMarkers_Click);
             // 
             // btnZoomCenter
             // 
@@ -506,18 +547,18 @@ namespace Demo.WindowsForms
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.comboBoxMode);
             this.groupBox2.Controls.Add(this.comboBoxMapType);
-            this.groupBox2.Location = new System.Drawing.Point(14, 144);
+            this.groupBox2.Location = new System.Drawing.Point(14, 167);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(203, 151);
+            this.groupBox2.Size = new System.Drawing.Size(203, 129);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Gmap";
             // 
             // button_centerMarker
             // 
-            this.button_centerMarker.Location = new System.Drawing.Point(94, 96);
+            this.button_centerMarker.Location = new System.Drawing.Point(72, 99);
             this.button_centerMarker.Name = "button_centerMarker";
-            this.button_centerMarker.Size = new System.Drawing.Size(79, 22);
+            this.button_centerMarker.Size = new System.Drawing.Size(55, 22);
             this.button_centerMarker.TabIndex = 8;
             this.button_centerMarker.Text = "Center marker";
             this.button_centerMarker.UseVisualStyleBackColor = true;
@@ -526,7 +567,7 @@ namespace Demo.WindowsForms
             // checkBoxTileHost
             // 
             this.checkBoxTileHost.AutoSize = true;
-            this.checkBoxTileHost.Location = new System.Drawing.Point(9, 123);
+            this.checkBoxTileHost.Location = new System.Drawing.Point(95, 73);
             this.checkBoxTileHost.Name = "checkBoxTileHost";
             this.checkBoxTileHost.Size = new System.Drawing.Size(68, 17);
             this.checkBoxTileHost.TabIndex = 7;
@@ -539,7 +580,7 @@ namespace Demo.WindowsForms
             this.checkBoxCanDrag.AutoSize = true;
             this.checkBoxCanDrag.Checked = true;
             this.checkBoxCanDrag.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxCanDrag.Location = new System.Drawing.Point(9, 100);
+            this.checkBoxCanDrag.Location = new System.Drawing.Point(9, 76);
             this.checkBoxCanDrag.Name = "checkBoxCanDrag";
             this.checkBoxCanDrag.Size = new System.Drawing.Size(73, 17);
             this.checkBoxCanDrag.TabIndex = 5;
@@ -549,9 +590,9 @@ namespace Demo.WindowsForms
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(94, 121);
+            this.btnSave.Location = new System.Drawing.Point(135, 99);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(79, 22);
+            this.btnSave.Size = new System.Drawing.Size(55, 22);
             this.btnSave.TabIndex = 4;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -813,16 +854,34 @@ namespace Demo.WindowsForms
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
             // 
-            // ckb_show_scale
+            // btn_add_dfline
             // 
-            this.ckb_show_scale.AutoSize = true;
-            this.ckb_show_scale.Location = new System.Drawing.Point(75, 60);
-            this.ckb_show_scale.Name = "ckb_show_scale";
-            this.ckb_show_scale.Size = new System.Drawing.Size(53, 17);
-            this.ckb_show_scale.TabIndex = 9;
-            this.ckb_show_scale.Text = "Scale";
-            this.ckb_show_scale.UseVisualStyleBackColor = true;
-            this.ckb_show_scale.CheckedChanged += new System.EventHandler(this.ckb_show_scale_CheckedChanged);
+            this.btn_add_dfline.Location = new System.Drawing.Point(9, 99);
+            this.btn_add_dfline.Name = "btn_add_dfline";
+            this.btn_add_dfline.Size = new System.Drawing.Size(79, 22);
+            this.btn_add_dfline.TabIndex = 9;
+            this.btn_add_dfline.Text = "Add DF Line";
+            this.btn_add_dfline.UseVisualStyleBackColor = true;
+            this.btn_add_dfline.Click += new System.EventHandler(this.btn_add_dfline_Click);
+            // 
+            // txe_direction
+            // 
+            this.txe_direction.Location = new System.Drawing.Point(96, 99);
+            this.txe_direction.Margin = new System.Windows.Forms.Padding(3, 3, 10, 3);
+            this.txe_direction.Name = "txe_direction";
+            this.txe_direction.Size = new System.Drawing.Size(45, 20);
+            this.txe_direction.TabIndex = 10;
+            this.txe_direction.Text = "0";
+            this.txe_direction.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(150, 102);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(40, 13);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "degree";
             // 
             // MainForm
             // 
@@ -851,6 +910,7 @@ namespace Demo.WindowsForms
             this.groupBox_Show.PerformLayout();
             this.groupBoxProgress.ResumeLayout(false);
             this.groupBox4.ResumeLayout(false);
+            this.groupBox4.PerformLayout();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -937,6 +997,11 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.CheckBox checkBoxShowGeoGrid;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
         private System.Windows.Forms.CheckBox ckb_show_scale;
+        private System.Windows.Forms.Button btn_setEnd;
+        private System.Windows.Forms.Button btn_setStart;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txe_direction;
+        private System.Windows.Forms.Button btn_add_dfline;
     }
 }
 

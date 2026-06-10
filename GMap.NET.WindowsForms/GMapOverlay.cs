@@ -120,6 +120,12 @@ namespace GMap.NET.WindowsForms
             new ObservableCollectionThreadSafe<GMapLine>();
 
         /// <summary>
+        ///     list of lines, should be thread safe
+        /// </summary>
+        public readonly ObservableCollectionThreadSafe<GMapDFLine> DFLines =
+            new ObservableCollectionThreadSafe<GMapDFLine>();
+
+        /// <summary>
         ///     list of labels, should be thread safe
         /// </summary>
         public readonly ObservableCollectionThreadSafe<GMapLabel> Labels =
@@ -163,6 +169,7 @@ namespace GMap.NET.WindowsForms
             Routes.CollectionChanged += Routes_CollectionChanged;
             Polygons.CollectionChanged += Polygons_CollectionChanged;   
             Lines.CollectionChanged += Lines_CollectionChanged;   
+            DFLines.CollectionChanged += DFLines_CollectionChanged;   
             Labels.CollectionChanged += Labels_CollectionChanged;
             ScaleLabels.CollectionChanged += ScaleLabels_CollectionChanged; 
         }
@@ -173,6 +180,7 @@ namespace GMap.NET.WindowsForms
             Routes.CollectionChanged -= Routes_CollectionChanged;
             Polygons.CollectionChanged -= Polygons_CollectionChanged;
             Lines.CollectionChanged -= Lines_CollectionChanged;
+            DFLines.CollectionChanged -= DFLines_CollectionChanged;
             Labels.CollectionChanged -= Labels_CollectionChanged;
             ScaleLabels.CollectionChanged -= ScaleLabels_CollectionChanged;
         }
@@ -183,6 +191,7 @@ namespace GMap.NET.WindowsForms
             Routes.Clear();
             Polygons.Clear();
             Lines.Clear();
+            DFLines.Clear();
             Labels.Clear();
         }
 
@@ -219,6 +228,41 @@ namespace GMap.NET.WindowsForms
                 }
             }
         }
+
+        void DFLines_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (GMapDFLine obj in e.NewItems)
+                {
+                    if (obj != null)
+                    {
+                        obj.Overlay = this;
+                        if (Control != null)
+                        {
+                            Control.UpdateDFLineLocalPosition(obj);
+                        }
+                    }
+                }
+            }
+            if (Control != null)
+            {
+                if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    //if (Control.IsMouseOverLine)
+                    //{
+                    //    Control.IsMouseOverLine = false;
+                    //    Control.RestoreCursorOnLeave();
+                    //}
+                }
+                if (!Control.HoldInvalidation)
+                {
+                    Control.Invalidate();
+                }
+            }
+        } /* DFLines_CollectionChanged */
+
+
 
 
         void Labels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -425,6 +469,12 @@ namespace GMap.NET.WindowsForms
                     Control.UpdateLineLocalPosition(obj);
                 }
 
+                foreach (var obj in DFLines)
+                {
+                    Control.UpdateDFLineLocalPosition(obj);
+                }
+
+
                 foreach (var obj in Labels)
                 {
                     Control.UpdateLabelLocalPosition(obj);
@@ -469,6 +519,12 @@ namespace GMap.NET.WindowsForms
                     {
                        r.OnRender(g);
                     }
+
+                    foreach (var r in DFLines)
+                    {
+                        r.OnRender(g);
+                    }
+
                 }
 
 

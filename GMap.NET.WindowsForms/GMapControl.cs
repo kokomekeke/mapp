@@ -779,6 +779,25 @@ namespace GMap.NET.WindowsForms
             line.UpdateGraphicsPath();
         }
 
+        /// <summary>
+        ///     updates polygons local position
+        /// </summary>
+        /// <param name="line"></param>
+        public void UpdateDFLineLocalPosition(GMapDFLine line)
+        {
+            var p = FromLatLngToLocal(line.Point1);
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+            line.LocalPosition1 = new Point((int)p.X, (int)p.Y);
+
+            line.UpdateLocalPosition2();
+
+            //line.UpdateGraphicsPath();
+        }
+
+
         public void UpdateLabelLocalPosition(GMapLabel label)
         {
             var p = FromLatLngToLocal(label.GeoPosition);

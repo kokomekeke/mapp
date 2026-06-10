@@ -81,9 +81,9 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-        GraphicsPath _graphicsPath;
+        internal GraphicsPath _graphicsPath;
 
-        internal void UpdateGraphicsPath()
+        internal virtual void UpdateGraphicsPath()
         {
             if (_graphicsPath == null)
             {

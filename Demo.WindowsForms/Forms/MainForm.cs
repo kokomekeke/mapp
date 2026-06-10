@@ -1513,7 +1513,7 @@ namespace Demo.WindowsForms
 
 
         // clear markers
-        private void btnClearAll_Click(object sender, EventArgs e)
+        private void btnClearAllMarkers_Click(object sender, EventArgs e)
         {
             ClearStartEnd();
             Objects.Markers.Clear();
@@ -1526,6 +1526,7 @@ namespace Demo.WindowsForms
         {
             Routes.Routes.Clear();
             Polygons.Polygons.Clear();
+            Polygons.DFLines.Clear();
             ClearStartEnd();
         }
 
@@ -2187,6 +2188,23 @@ namespace Demo.WindowsForms
             MainMap.MapScaleInfoEnabled = ckb_show_scale.Checked;
             MainMap.Invalidate();
         }
+
+        private void btn_add_dfline_Click(object sender, EventArgs e)
+        {
+            if (_start == PointLatLng.Empty)
+            {
+                MessageBox.Show("A kezdőpontot meg kell adni!", "WARNING");
+                return;
+            }
+            if (double.TryParse(txe_direction.Text, out double degree))
+            {
+                var dfline = new GMapDFLine(_start, degree, Color.DarkBlue);
+                Polygons.DFLines.Add(dfline);
+            }
+            else
+                MessageBox.Show("A szöget meg kell adni!", "WARNING");
+        }
+
 
     } /* class MainForm */
 
