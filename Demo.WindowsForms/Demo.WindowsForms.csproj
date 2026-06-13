@@ -56,6 +56,8 @@
         <EmbeddedResource Include="..\References\Web\LeafletJS\**" LinkBase="leafletjs\dist" />
         <None Remove="leafletjs\**" />
         <EmbeddedResource Include="leafletjs\**" />
+        <Compile Remove="CustomMarkers\GMapMarkerCircle.cs" />
+        <Compile Remove="CustomMarkers\GMapMarkerRect.cs" />
         <Content Include="GMap.ico" />
         <ProjectReference Include="..\GMap.NET.Core\GMap.NET.Core.csproj" />
         <ProjectReference Include="..\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj" />

@@ -12,14 +12,15 @@ using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace GMap.NET.WindowsForms
 {
     public class GMapDFLine : GMapLine
     {
         private static int _r = 6;
-        private double _direction = 0;
-        private double _distance = 1000;
+        private double _direction = 0;          // direction from North in degree
+        private double _distance = 7000;        // distance in km
         private bool _updated = false;          // true, when line locations are set.
         private CustomLineCap endCap;
 
@@ -40,6 +41,10 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+
+        /// <summary>
+        /// Distance in km
+        /// </summary>
         public double Distance
         {
             get { return _distance; }
@@ -65,6 +70,7 @@ namespace GMap.NET.WindowsForms
         {
             Direction = degree;
             CreateCap();
+            ToolTipText = string.IsNullOrEmpty(Name) ? point1.ToGeoString() : Name;
         }
 
 
@@ -87,21 +93,21 @@ namespace GMap.NET.WindowsForms
             {
                 _updated = true;
                 Overlay.Control.UpdateDFLineLocalPosition(this);
-                //UpdateLocalPosition2();
+                LocalPosition = LocalPosition1;
 
+                //UpdateLocalPosition2();
                 //if (!Overlay.Control.HoldInvalidation)
-                //{
                 //    Overlay.Control.Invalidate();
-                //}
             }
         }
 
         public void UpdateLocalPosition2()
         {
-            double x = Math.Sin(_direction * Math.PI / 180);
-            double y = Math.Cos(_direction * Math.PI / 180);
-            LocalPosition2.X = LocalPosition1.X + (int)(x * _distance);
-            LocalPosition2.Y = LocalPosition1.Y - (int)(y * _distance);
+            double len = _distance * 1000.0 / Overlay.Control.MapProvider.Projection.GetGroundResolution((int)Overlay.Control.Zoom, Position.Lat);
+            double x = Math.Sin(Direction * Math.PI / 180);
+            double y = Math.Cos(Direction * Math.PI / 180);
+            LocalPosition2.X = LocalPosition1.X + (int)(x * len);
+            LocalPosition2.Y = LocalPosition1.Y - (int)(y * len);
         }
 
         internal override void UpdateGraphicsPath()

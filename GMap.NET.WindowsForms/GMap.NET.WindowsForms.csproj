@@ -28,6 +28,9 @@ https://github.com/judero01col/GMap.NET/blob/master/README.md#release-notes
     <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(TargetFramework)', '^netcoreapp\d'))">
         <DefineConstants>NETCORE;ContinuesMapNo;$(DefineConstants)</DefineConstants>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="GMapDFToolTip.cs" />
+    </ItemGroup>
     
   <ItemGroup>
     <ProjectReference Include="..\GMap.NET.Core\GMap.NET.Core.csproj" />

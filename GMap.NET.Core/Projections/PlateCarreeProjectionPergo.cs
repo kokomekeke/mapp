@@ -49,6 +49,11 @@
          }
       }
 
+      public PlateCarreeProjectionPergo():base()
+      {
+        Name = "PlateCarree.Pergo";
+      }
+
       public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
       {
          GPoint ret = GPoint.Empty;

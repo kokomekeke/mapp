@@ -5,7 +5,7 @@ using System.Security.Policy;
 using System.Windows.Forms;
 using GMap.NET.WindowsForms.ToolTips;
 
-namespace GMap.NET.WindowsForms
+namespace GMap.NET.WindowsForms.Markers
 {
     /// <summary>
     ///     GMap.NET marker
@@ -13,8 +13,8 @@ namespace GMap.NET.WindowsForms
     [Serializable]
     public abstract class GMapMarker : ISerializable, IDisposable
     {
-        Object _parent = null;
-        public Object Parent
+        object _parent = null;
+        public object Parent
         {
             get { return _parent; }
             protected set { _parent = value; }
@@ -316,7 +316,7 @@ namespace GMap.NET.WindowsForms
         /// <exception cref="T:System.Security.SecurityException">
         ///     The caller does not have the required permission.
         /// </exception>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("Position", Position);
             info.AddValue("Tag", Tag);

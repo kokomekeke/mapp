@@ -5,7 +5,7 @@ using System.Text;
 using System.Linq;
 using static System.Math;
 
-namespace GMap.NET
+namespace GMap.NET.Projections
 {
     /// <summary>
     ///     defines projection
@@ -18,6 +18,8 @@ namespace GMap.NET
         private readonly List<Dictionary<GPoint, PointLatLng>> _fromPixelToLatLngCache =
             new List<Dictionary<GPoint, PointLatLng>>(33);
 
+        protected string Name = "NO";
+
         public PureProjection()
         {
             for (int i = 0; i < _fromLatLngToPixelCache.Capacity; i++)
@@ -25,6 +27,11 @@ namespace GMap.NET
                 _fromLatLngToPixelCache.Add(new Dictionary<PointLatLng, GPoint>());
                 _fromPixelToLatLngCache.Add(new Dictionary<GPoint, PointLatLng>());
             }
+        }
+
+        public override string ToString()
+        {
+            return Name + " projection";
         }
 
         /// <summary>
@@ -560,7 +567,7 @@ namespace GMap.NET
             path.AddRange(PolylineDecode(encodedPath));
         }
 
-        public static String PolylineEncode(List<PointLatLng> path)
+        public static string PolylineEncode(List<PointLatLng> path)
         {
             long lastLat = 0;
             long lastLng = 0;
@@ -591,7 +598,7 @@ namespace GMap.NET
 
             while (point >= 0x20)
             {
-                result.Append(Convert.ToChar((int)((0x20 | (point & 0x1f)) + 63)));
+                result.Append(Convert.ToChar((int)((0x20 | point & 0x1f) + 63)));
                 point >>= 5;
             }
 

@@ -2,8 +2,9 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
+using GMap.NET.WindowsForms.Markers;
 
-namespace GMap.NET.WindowsForms
+namespace GMap.NET.WindowsForms.ToolTips
 {
     /// <summary>
     ///     GMap.NET marker
@@ -196,7 +197,7 @@ namespace GMap.NET.WindowsForms
                     if (vec2.Length > 0)
                     {
                         var st = g.MeasureString(vec2[0], TitleFont).ToSize();
-                        g.DrawString(String.Format("{0}", vec2[0]), TitleFont, Foreground, rectText, Format);
+                        g.DrawString(string.Format("{0}", vec2[0]), TitleFont, Foreground, rectText, Format);
                         rectText.X += st.Width + 2;
                         if (vec2.Length > 1)
                         {

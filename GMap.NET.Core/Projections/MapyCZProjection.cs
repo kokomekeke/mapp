@@ -218,6 +218,13 @@ namespace GMap.NET.Projections
             }
         }
 
+
+        public MapyCZProjection() : base()
+        {
+            Name = "MapyCZ";
+        }
+
+
         public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
         {
             var ret = GPoint.Empty;

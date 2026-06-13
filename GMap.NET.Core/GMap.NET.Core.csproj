@@ -37,6 +37,9 @@ https://github.com/judero01col/GMap.NET/blob/master/README.md#release-notes
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net48|AnyCPU'">
       <IsPublishable>False</IsPublishable>
     </PropertyGroup>
+    <ItemGroup>
+      <None Remove="Projections\Projections.zip" />
+    </ItemGroup>
     
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

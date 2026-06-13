@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Runtime.Serialization;
 using GMap.NET.ObjectModel;
+using GMap.NET.WindowsForms.Markers;
 
 namespace GMap.NET.WindowsForms
 {
@@ -583,7 +584,7 @@ namespace GMap.NET.WindowsForms
             {
                 if (Control.MarkersEnabled)
                 {
-                    // tooltips above
+                    // tooltips of markers 
                     foreach (var m in Markers)
                     {
                         //if(m.ToolTip != null && m.IsVisible && Control.Core.currentRegion.Contains(m.LocalPosition.X, m.LocalPosition.Y))
@@ -597,9 +598,41 @@ namespace GMap.NET.WindowsForms
                             }
                         }
                     }
+
+                    // tooltips of lines 
+                    foreach (var m in Lines)
+                    {
+                        //if(m.ToolTip != null && m.IsVisible && Control.Core.currentRegion.Contains(m.LocalPosition.X, m.LocalPosition.Y))
+                        if (m.ToolTip != null && m.IsVisible)
+                        {
+                            if (!string.IsNullOrEmpty(m.ToolTipText) &&
+                                (m.ToolTipMode == MarkerTooltipMode.Always ||
+                                 m.ToolTipMode == MarkerTooltipMode.OnMouseOver && m.IsMouseOver))
+                            {
+                                m.ToolTip.OnRender(g);
+                            }
+                        }
+                    }
+
+                    // tooltips of lines 
+                    foreach (var m in DFLines)
+                    {
+                        //if(m.ToolTip != null && m.IsVisible && Control.Core.currentRegion.Contains(m.LocalPosition.X, m.LocalPosition.Y))
+                        if (m.ToolTip != null && m.IsVisible)
+                        {
+                            if (!string.IsNullOrEmpty(m.ToolTipText) &&
+                                (m.ToolTipMode == MarkerTooltipMode.Always ||
+                                 m.ToolTipMode == MarkerTooltipMode.OnMouseOver && m.IsMouseOver))
+                            {
+                                m.ToolTip.OnRender(g);
+                            }
+                        }
+                    }
+
+
                 }
             }
-        }
+        } /* OnRenderToolTips */
 
         #region ISerializable Members
 
@@ -714,6 +747,16 @@ namespace GMap.NET.WindowsForms
                 }
 
                 foreach (var p in Polygons)
+                {
+                    p.Dispose();
+                }
+
+                foreach (var p in Lines)
+                {
+                    p.Dispose();
+                }
+
+                foreach (var p in DFLines)
                 {
                     p.Dispose();
                 }

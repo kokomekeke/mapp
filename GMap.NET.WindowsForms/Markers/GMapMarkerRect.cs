@@ -1,14 +1,13 @@
 ﻿
 namespace Demo.WindowsForms.CustomMarkers
 {
-   using System.Drawing;
-   using GMap.NET.WindowsForms;
-   using GMap.NET.WindowsForms.Markers;
-   using GMap.NET;
-   using System;
-   using System.Runtime.Serialization;
+    using System.Drawing;
+    using GMap.NET.WindowsForms.Markers;
+    using GMap.NET;
+    using System;
+    using System.Runtime.Serialization;
 
-   [Serializable]
+    [Serializable]
    public class GMapMarkerRect : GMapMarker, ISerializable
    {
       [NonSerialized]

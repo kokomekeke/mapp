@@ -59,6 +59,12 @@ namespace GMap.NET.Projections
             }
         }
 
+        public LKS94rProjection(): base()
+        {
+            Name = "LKS94r";
+        }
+
+
         public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
         {
             lat = Clip(lat, MinLatitude, MaxLatitude);

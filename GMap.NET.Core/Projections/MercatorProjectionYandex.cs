@@ -44,6 +44,11 @@ namespace GMap.NET.Projections
             }
         }
 
+        public MercatorProjectionYandex() : base()
+        {
+            Name = "Mercator.Yandex";
+        }
+
         public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
         {
             lat = Clip(lat, MinLatitude, MaxLatitude);

@@ -13,6 +13,7 @@ using GMap.NET.Internals;
 using GMap.NET.MapProviders;
 using GMap.NET.ObjectModel;
 using GMap.NET.Projections;
+using GMap.NET.WindowsForms.Markers;
 
 namespace GMap.NET.WindowsForms
 {

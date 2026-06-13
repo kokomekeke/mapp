@@ -33,6 +33,13 @@
             get { return tileSize; }
         }
 
+
+        public SwissTopoProjection():base()
+        {
+            Name = "SwissTopo";
+        }
+
+
         public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
         {
             var ret = GPoint.Empty;

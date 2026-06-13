@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.Serialization;
+using GMap.NET.WindowsForms.Markers;
 
 namespace GMap.NET.WindowsForms.ToolTips
 {
@@ -79,6 +80,9 @@ namespace GMap.NET.WindowsForms.ToolTips
             {
                 rect.Offset(TextPadding.Width, 0);
             }
+
+            rect.Y = rect.Top + TextPadding.Height/2;
+            rect.Height = rect.Height - TextPadding.Height;
 
             g.DrawString(Marker.ToolTipText, Font, Foreground, rect, Format);
         }

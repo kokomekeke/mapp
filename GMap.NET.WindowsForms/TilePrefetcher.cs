@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using GMap.NET.Internals;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
+using GMap.NET.WindowsForms.Markers;
 
 namespace GMap.NET
 {

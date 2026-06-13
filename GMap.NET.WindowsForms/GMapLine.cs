@@ -6,14 +6,17 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using GMap.NET.WindowsForms.Markers;
 
 namespace GMap.NET.WindowsForms
 {
-    public class GMapLine : ISerializable, IDeserializationCallback, IDisposable
+    public class GMapLine : GMapMarker, ISerializable, IDeserializationCallback, IDisposable
     {
-        public GMapOverlay Overlay { get; set; }
+        //public GMapOverlay Overlay { get; set; }
         public PointLatLng Point1, Point2;
         public Point LocalPosition1, LocalPosition2;
+
+        protected string _name;
 
         public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(155, Color.Gray));
 
@@ -29,6 +32,19 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         [NonSerialized] public Brush Fill = DefaultFill;
 
+        public string Name
+        {
+            get { return _name; }
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    ToolTipText = _name;
+                }
+            }
+        }
+
 
 
         public GMapLine()
@@ -42,21 +58,31 @@ namespace GMap.NET.WindowsForms
 
             Stroke = new Pen(color, DefaultStroke.Width);
             Fill = new SolidBrush(color);
+            Position = point1;
         }
         
 
         protected GMapLine(SerializationInfo info, StreamingContext context)
+            :base(info, context) 
         {
+            Point2 = Extensions.GetStruct(info, "Position2", PointLatLng.Empty);
+            Point1 = Position;
+
         }
 
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            base.GetObjectData(info, context);
+            info.AddValue("Position2", Point2);
+
         }
+
         public void OnDeserialization(object sender)
         {
         }
-        public void Dispose()
+
+        public override void Dispose()
         {
         }
 

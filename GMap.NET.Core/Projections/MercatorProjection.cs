@@ -44,6 +44,11 @@ namespace GMap.NET.Projections
             }
         }
 
+        public MercatorProjection() : base ()
+        {
+            Name = "Mercator";
+        }
+
         public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
         {
             var ret = GPoint.Empty;

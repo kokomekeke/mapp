@@ -45,6 +45,12 @@ namespace GMap.NET.Projections
             }
         }
 
+
+        public PlateCarreeProjection() : base()
+        {
+            Name = "PlateCarree";
+        }
+
         public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
         {
             var ret = GPoint.Empty;

@@ -61,6 +61,13 @@ namespace GMap.NET.Projections
             }
         }
 
+
+        public SWEREF99_TMProjection() : base()
+        {
+            Name = "SWEREF99_TM";
+        }
+
+
         public override GPoint FromLatLngToPixel(double lat, double lng, int zoom)
         {
             var ret = GPoint.Empty;

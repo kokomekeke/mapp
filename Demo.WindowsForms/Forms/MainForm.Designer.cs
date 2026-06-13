@@ -55,6 +55,9 @@ namespace Demo.WindowsForms
             this.groupBoxProgress = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txe_direction = new System.Windows.Forms.TextBox();
+            this.btn_add_dfline = new System.Windows.Forms.Button();
             this.btn_clear_routes = new System.Windows.Forms.Button();
             this.btn_addline = new System.Windows.Forms.Button();
             this.btnAddRoute = new System.Windows.Forms.Button();
@@ -102,9 +105,6 @@ namespace Demo.WindowsForms
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
-            this.btn_add_dfline = new System.Windows.Forms.Button();
-            this.txe_direction = new System.Windows.Forms.TextBox();
-            this.label6 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -411,6 +411,35 @@ namespace Demo.WindowsForms
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Routes";
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(150, 102);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(40, 13);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "degree";
+            // 
+            // txe_direction
+            // 
+            this.txe_direction.Location = new System.Drawing.Point(96, 99);
+            this.txe_direction.Margin = new System.Windows.Forms.Padding(3, 3, 10, 3);
+            this.txe_direction.Name = "txe_direction";
+            this.txe_direction.Size = new System.Drawing.Size(45, 20);
+            this.txe_direction.TabIndex = 10;
+            this.txe_direction.Text = "0";
+            this.txe_direction.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // btn_add_dfline
+            // 
+            this.btn_add_dfline.Location = new System.Drawing.Point(9, 99);
+            this.btn_add_dfline.Name = "btn_add_dfline";
+            this.btn_add_dfline.Size = new System.Drawing.Size(79, 22);
+            this.btn_add_dfline.TabIndex = 9;
+            this.btn_add_dfline.Text = "Add DF Line";
+            this.btn_add_dfline.UseVisualStyleBackColor = true;
+            this.btn_add_dfline.Click += new System.EventHandler(this.btn_add_dfline_Click);
+            // 
             // btn_clear_routes
             // 
             this.btn_clear_routes.Location = new System.Drawing.Point(94, 125);
@@ -685,37 +714,38 @@ namespace Demo.WindowsForms
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "&Open";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save &as";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "&Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -731,14 +761,14 @@ namespace Demo.WindowsForms
             // copyPageToolStripMenuItem
             // 
             this.copyPageToolStripMenuItem.Name = "copyPageToolStripMenuItem";
-            this.copyPageToolStripMenuItem.Size = new System.Drawing.Size(131, 22);
+            this.copyPageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.copyPageToolStripMenuItem.Text = "&Copy page";
             this.copyPageToolStripMenuItem.Click += new System.EventHandler(this.copyPageToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem1
             // 
             this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem1";
-            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(131, 22);
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem1.Text = "&Save page";
             this.saveToolStripMenuItem1.Click += new System.EventHandler(this.saveToolStripMenuItem1_Click);
             // 
@@ -853,35 +883,6 @@ namespace Demo.WindowsForms
             this.MainMap.Size = new System.Drawing.Size(922, 732);
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
-            // 
-            // btn_add_dfline
-            // 
-            this.btn_add_dfline.Location = new System.Drawing.Point(9, 99);
-            this.btn_add_dfline.Name = "btn_add_dfline";
-            this.btn_add_dfline.Size = new System.Drawing.Size(79, 22);
-            this.btn_add_dfline.TabIndex = 9;
-            this.btn_add_dfline.Text = "Add DF Line";
-            this.btn_add_dfline.UseVisualStyleBackColor = true;
-            this.btn_add_dfline.Click += new System.EventHandler(this.btn_add_dfline_Click);
-            // 
-            // txe_direction
-            // 
-            this.txe_direction.Location = new System.Drawing.Point(96, 99);
-            this.txe_direction.Margin = new System.Windows.Forms.Padding(3, 3, 10, 3);
-            this.txe_direction.Name = "txe_direction";
-            this.txe_direction.Size = new System.Drawing.Size(45, 20);
-            this.txe_direction.TabIndex = 10;
-            this.txe_direction.Text = "0";
-            this.txe_direction.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(150, 102);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(40, 13);
-            this.label6.TabIndex = 11;
-            this.label6.Text = "degree";
             // 
             // MainForm
             // 

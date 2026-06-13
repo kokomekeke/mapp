@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Reflection;
+using System.Security.Permissions;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
@@ -1989,6 +1990,17 @@ namespace Demo.WindowsForms
             {
                 m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             }
+
+            foreach (var m in Polygons.Lines)
+            {
+                m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+            }
+
+            foreach (var m in Polygons.DFLines)
+            {
+                m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+            }
+
             MainMap.Refresh();
         }
 
@@ -2205,6 +2217,134 @@ namespace Demo.WindowsForms
                 MessageBox.Show("A szöget meg kell adni!", "WARNING");
         }
 
+
+        private void ClearAll()
+        {
+            Objects.Clear();
+            Routes.Clear();
+            Polygons.Clear();
+            foreach (var m in MainMap.Overlays)
+                m.Clear();
+        }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.CheckFileExists = true;
+            dlg.CheckPathExists = true;
+            dlg.DefaultExt = "gmc";
+            dlg.Filter = "GMap macro file (*.gmc)|*.gmc|All file (*.*)|*.*";
+            dlg.Title = "Select GMAp Macro file";
+
+            char[] separator = new Char[] { ',', ';' };
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                using (var rd = new StreamReader(dlg.FileName))
+                {
+                    while (!rd.EndOfStream)
+                    {
+                        string st = rd.ReadLine().ToLower();
+                        if (string.IsNullOrWhiteSpace(st))
+                            continue;
+                        if (st[0] == '#')               // comments
+                            continue;
+
+                        if (st.StartsWith("clear all"))
+                        {
+                            ClearAll();
+                            continue;
+                        }
+
+                        if (st.StartsWith("clear objects"))
+                        {
+                            Objects.Clear();
+                            continue;
+                        }
+
+                        if (st.StartsWith("clear routes"))
+                        {
+                            Routes.Clear();
+                            continue;
+                        }
+
+                        if (st.StartsWith("clear polygons"))
+                        {
+                            Polygons.Clear();
+                            continue;
+                        }
+
+                        if (st.StartsWith("clear lines"))
+                        {
+                            Polygons.Clear();
+                            continue;
+                        }
+
+                        if (st.StartsWith("clear markers"))
+                        {
+                            _top.Markers.Clear();
+                            foreach (var m in MainMap.Overlays)
+                                m.Markers.Clear();
+                            continue;
+                        }
+
+
+                        string[] ls = st.Split(separator);
+
+
+                        switch (ls[0])
+                        {
+                            case "line": break;
+                            case "dfline": break;
+                            case "polyline": break;
+                            case "image": break;
+                            case "label": break;
+                            case "route": break;
+                            case "marker":
+                                if (ls.Length > 2)
+                                {
+                                    switch (ls[1])
+                                    {
+                                        case "circle": break;
+                                        case "cross": break;
+                                        case "rectangle": break;
+                                        case "google": break;
+                                        case "hfsystem": break;
+                                        default:
+                                            MessageBox.Show("Invalid marker type : " + ls[1], "ERROR");
+                                            continue;
+                                    }
+                                }
+                                break;
+
+                            case "show":
+                                if (ls.Length >1)
+                                {
+                                    switch (ls[1])
+                                    {
+                                        case "markers": break;
+                                        case "routes": break;
+                                        case "infobox": break;
+                                        case "center": break;
+                                        case "cursor": break;
+                                        case "grid": break;
+                                        case "geogrid": break;
+                                        case "scale": break;
+                                        default:
+                                            MessageBox.Show("Invalid parameter : " + st, "ERROR");
+                                            continue;
+                                    }
+                                }
+                                break;
+                            default: 
+                                MessageBox.Show("Invalid command : " + st, "ERROR");
+                                break;
+                        }
+
+                    } /* while */
+                } /* using */
+            }
+        } /* openToolStripMenuItem_Click */
 
     } /* class MainForm */
 
