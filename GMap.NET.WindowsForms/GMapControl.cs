@@ -784,7 +784,7 @@ namespace GMap.NET.WindowsForms
         ///     updates polygons local position
         /// </summary>
         /// <param name="line"></param>
-        public void UpdateDFLineLocalPosition(GMapDFLine line)
+        public void UpdateDFLineLocalPosition(GMapRay line)
         {
             var p = FromLatLngToLocal(line.Point1);
             if (!MobileMode)

@@ -16,7 +16,7 @@ using System.Xml.Linq;
 
 namespace GMap.NET.WindowsForms
 {
-    public class GMapDFLine : GMapLine
+    public class GMapRay : GMapLine
     {
         private static int _r = 6;
         private double _direction = 0;          // direction from North in degree
@@ -59,13 +59,13 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-        public GMapDFLine()
+        public GMapRay()
             : base()
         {
 
         }
 
-        public GMapDFLine(PointLatLng point1, double degree, Color color)
+        public GMapRay(PointLatLng point1, double degree, Color color)
             : base(point1, point1, color)
         {
             Direction = degree;

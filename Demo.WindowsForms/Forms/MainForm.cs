@@ -2210,7 +2210,7 @@ namespace Demo.WindowsForms
             }
             if (double.TryParse(txe_direction.Text, out double degree))
             {
-                var dfline = new GMapDFLine(_start, degree, Color.DarkBlue);
+                var dfline = new GMapRay(_start, degree, Color.DarkBlue);
                 Polygons.DFLines.Add(dfline);
             }
             else

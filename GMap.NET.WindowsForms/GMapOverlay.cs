@@ -123,8 +123,8 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     list of lines, should be thread safe
         /// </summary>
-        public readonly ObservableCollectionThreadSafe<GMapDFLine> DFLines =
-            new ObservableCollectionThreadSafe<GMapDFLine>();
+        public readonly ObservableCollectionThreadSafe<GMapRay> DFLines =
+            new ObservableCollectionThreadSafe<GMapRay>();
 
         /// <summary>
         ///     list of labels, should be thread safe
@@ -234,7 +234,7 @@ namespace GMap.NET.WindowsForms
         {
             if (e.NewItems != null)
             {
-                foreach (GMapDFLine obj in e.NewItems)
+                foreach (GMapRay obj in e.NewItems)
                 {
                     if (obj != null)
                     {
