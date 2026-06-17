@@ -1,5 +1,5 @@
 ﻿/*=============================================================================
-*  DF line: direction line
+*  GMapRay: DF line- direction line
 *
 * (c) Kótai 2026.
 *

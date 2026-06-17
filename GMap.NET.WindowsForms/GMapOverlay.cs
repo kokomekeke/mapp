@@ -123,7 +123,7 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     list of lines, should be thread safe
         /// </summary>
-        public readonly ObservableCollectionThreadSafe<GMapRay> DFLines =
+        public readonly ObservableCollectionThreadSafe<GMapRay> Rays =
             new ObservableCollectionThreadSafe<GMapRay>();
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace GMap.NET.WindowsForms
             Routes.CollectionChanged += Routes_CollectionChanged;
             Polygons.CollectionChanged += Polygons_CollectionChanged;   
             Lines.CollectionChanged += Lines_CollectionChanged;   
-            DFLines.CollectionChanged += DFLines_CollectionChanged;   
+            Rays.CollectionChanged += DFLines_CollectionChanged;   
             Labels.CollectionChanged += Labels_CollectionChanged;
             ScaleLabels.CollectionChanged += ScaleLabels_CollectionChanged; 
         }
@@ -181,7 +181,7 @@ namespace GMap.NET.WindowsForms
             Routes.CollectionChanged -= Routes_CollectionChanged;
             Polygons.CollectionChanged -= Polygons_CollectionChanged;
             Lines.CollectionChanged -= Lines_CollectionChanged;
-            DFLines.CollectionChanged -= DFLines_CollectionChanged;
+            Rays.CollectionChanged -= DFLines_CollectionChanged;
             Labels.CollectionChanged -= Labels_CollectionChanged;
             ScaleLabels.CollectionChanged -= ScaleLabels_CollectionChanged;
         }
@@ -192,7 +192,7 @@ namespace GMap.NET.WindowsForms
             Routes.Clear();
             Polygons.Clear();
             Lines.Clear();
-            DFLines.Clear();
+            Rays.Clear();
             Labels.Clear();
         }
 
@@ -470,7 +470,7 @@ namespace GMap.NET.WindowsForms
                     Control.UpdateLineLocalPosition(obj);
                 }
 
-                foreach (var obj in DFLines)
+                foreach (var obj in Rays)
                 {
                     Control.UpdateDFLineLocalPosition(obj);
                 }
@@ -521,7 +521,7 @@ namespace GMap.NET.WindowsForms
                        r.OnRender(g);
                     }
 
-                    foreach (var r in DFLines)
+                    foreach (var r in Rays)
                     {
                         r.OnRender(g);
                     }
@@ -615,7 +615,7 @@ namespace GMap.NET.WindowsForms
                     }
 
                     // tooltips of lines 
-                    foreach (var m in DFLines)
+                    foreach (var m in Rays)
                     {
                         //if(m.ToolTip != null && m.IsVisible && Control.Core.currentRegion.Contains(m.LocalPosition.X, m.LocalPosition.Y))
                         if (m.ToolTip != null && m.IsVisible)
@@ -756,7 +756,7 @@ namespace GMap.NET.WindowsForms
                     p.Dispose();
                 }
 
-                foreach (var p in DFLines)
+                foreach (var p in Rays)
                 {
                     p.Dispose();
                 }

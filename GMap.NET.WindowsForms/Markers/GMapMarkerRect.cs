@@ -16,8 +16,8 @@ namespace Demo.WindowsForms.CustomMarkers
       [NonSerialized]
       public GMarkerGoogle InnerMarker;
 
-      public GMapMarkerRect(PointLatLng p)
-         : base(p)
+      public GMapMarkerRect(PointLatLng p, string name = null)
+         : base(p,name)
       {
          Pen = new Pen(Brushes.Blue, 2);
 

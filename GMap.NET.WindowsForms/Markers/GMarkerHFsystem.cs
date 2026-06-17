@@ -147,8 +147,8 @@ namespace GMap.NET.WindowsForms.Markers
         /// <param name="p">position in geo coordinates</param>
         /// <param name="type">type of bitmap of marker</param>
         /// <param name="magnification">magnification of bitmap</param>
-        public GMarkerHFsystem(PointLatLng p, GMarkerHFsystemType type, int magnification = 1)
-            : base(p)
+        public GMarkerHFsystem(PointLatLng p, GMarkerHFsystemType type, int magnification = 1, string name = null)
+            : base(p, name)
         {
             Symbol = type;
             Offset = Point.Empty;

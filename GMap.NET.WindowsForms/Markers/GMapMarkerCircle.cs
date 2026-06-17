@@ -32,8 +32,8 @@ namespace Demo.WindowsForms.CustomMarkers
       /// </summary>
       public bool IsFilled = true;
 
-      public GMapMarkerCircle(PointLatLng p)
-         : base(p)
+      public GMapMarkerCircle(PointLatLng p, string name = null)
+         : base(p, name)
       {
          Radius = 888; // 888m
          IsHitTestVisible = false;

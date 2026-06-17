@@ -14,17 +14,21 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml;
 using Demo.WindowsForms.CustomMarkers;
+using Demo.WindowsForms.Forms;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using GMap.NET.WindowsForms.ToolTips;
+using static System.Net.Mime.MediaTypeNames;
 using static GMap.NET.Entity.OpenStreetMapRouteEntity;
 
 namespace Demo.WindowsForms
 {
     public partial class MainForm : Form
     {
+        public static MainForm Instance = null;
+
         // layers
         readonly GMapOverlay _top = new GMapOverlay();
         internal readonly GMapOverlay Objects = new GMapOverlay("objects");
@@ -63,6 +67,8 @@ namespace Demo.WindowsForms
         public MainForm()
         {
             InitializeComponent();
+
+            Instance = this;
 
             if (!GMapControl.IsDesignerHosted)
             {
@@ -211,7 +217,7 @@ namespace Demo.WindowsForms
                 //trackBarZoom.TickFrequency = 100;
 
 #if DEBUG
-                checkBoxDebug.Checked = false;
+                checkBox_Debug.Checked = false;
                 MainMap.ShowTileGridLines = false;
 #endif
 
@@ -1475,7 +1481,7 @@ namespace Demo.WindowsForms
                 {
                     mBorders.Tag = _polygon.Points.Count;
                 }
-                mBorders.ToolTipMode = checkBox1_Infobox.Checked?  MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                mBorders.ToolTipMode = checkBox_Infobox.Checked?  MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             }
 
             Placemark? p = null;
@@ -1508,7 +1514,7 @@ namespace Demo.WindowsForms
         {
             var m = new GMarkerHFsystem(_currentMarker.Position, GMarkerHFsystemType.Piroskör, 1);
             m.SetDefaultInfo();
-            m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+            m.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             Objects.Markers.Add(m);
         }
 
@@ -1527,7 +1533,7 @@ namespace Demo.WindowsForms
         {
             Routes.Routes.Clear();
             Polygons.Polygons.Clear();
-            Polygons.DFLines.Clear();
+            Polygons.Rays.Clear();
             ClearStartEnd();
         }
 
@@ -1547,7 +1553,7 @@ namespace Demo.WindowsForms
         // show current marker
         private void checkBoxCurrentMarker_CheckedChanged(object sender, EventArgs e)
         {
-            _currentMarker.IsVisible = checkBoxCurrentMarker.Checked;
+            _currentMarker.IsVisible = checkBox_CurrentMarker.Checked;
         }
 
         // can drag
@@ -1632,7 +1638,7 @@ namespace Demo.WindowsForms
         // debug tile grid
         private void checkBoxDebug_CheckedChanged(object sender, EventArgs e)
         {
-            MainMap.ShowTileGridLines = checkBoxDebug.Checked;
+            MainMap.ShowTileGridLines = checkBox_Debug.Checked;
         }
 
         // launch static map maker
@@ -1988,17 +1994,17 @@ namespace Demo.WindowsForms
         {
             foreach (var m in Objects.Markers)
             {
-                m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                m.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             }
 
             foreach (var m in Polygons.Lines)
             {
-                m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                m.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             }
 
-            foreach (var m in Polygons.DFLines)
+            foreach (var m in Polygons.Rays)
             {
-                m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                m.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             }
 
             MainMap.Refresh();
@@ -2039,9 +2045,10 @@ namespace Demo.WindowsForms
                     double.TryParse(textBoxLng.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out double lng))
                 {
                     var p = new PointLatLng(lat, lng);
-                    var m = new GMarkerHFsystem(p, GMarkerHFsystemType.Piroskör, 1);
-                    m.SetDefaultInfo();
-                    m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                    //var m = new GMarkerHFsystem(p, GMarkerHFsystemType.Piroskör, 1);
+                    var m = new GMarkerGoogle(p, GMarkerGoogleType.pink_pushpin);
+                    //m.SetDefaultInfo();
+                    m.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
                     Objects.Markers.Add(m);
                 }
                 return;
@@ -2051,9 +2058,11 @@ namespace Demo.WindowsForms
                 var pos = MainMap.GetPositionBySettlement(textBoxGeo.Text);
                 if (!pos.IsEmpty)
                 {
-                    var m = new GMarkerHFsystem(pos, GMarkerHFsystemType.Piroskör, 1);
-                    m.SetDefaultInfo();
-                    m.ToolTipMode = checkBox1_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                    //var m = new GMarkerHFsystem(pos, GMarkerHFsystemType.Piroskör, 1);
+                    //m.SetDefaultInfo();
+                    var m = new GMarkerGoogle(pos, GMarkerGoogleType.pink_pushpin, textBoxGeo.Text);
+                    m.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                    m.ToolTipText = textBoxGeo.Text;
                     Objects.Markers.Add(m);
                 }
             }
@@ -2174,22 +2183,22 @@ namespace Demo.WindowsForms
 
         private void checkBoxShowCenterMarker_CheckedChanged(object sender, EventArgs e)
         {
-            MainMap.ShowCenter = checkBoxShowCenterMarker.Checked;
+            MainMap.ShowCenter = checkBox_CenterMarker.Checked;
         }
 
         private void checkBoxShowGeoGrid_CheckedChanged(object sender, EventArgs e)
         {
             if (MainMap.Zoom < 5)
             {
-                Geogrid10.IsVisibile = checkBoxShowGeoGrid.Checked;
-                if (checkBoxShowGeoGrid.Checked)
+                Geogrid10.IsVisibile = checkBox_GeoGrid.Checked;
+                if (checkBox_GeoGrid.Checked)
                     GenerateGeoGrid(); 
                 Geogrid.IsVisibile = false;
             }
             else
             {
-                Geogrid.IsVisibile = checkBoxShowGeoGrid.Checked;
-                if (checkBoxShowGeoGrid.Checked)
+                Geogrid.IsVisibile = checkBox_GeoGrid.Checked;
+                if (checkBox_GeoGrid.Checked)
                     GenerateGeoGrid();
                 Geogrid10.IsVisibile = false;
             }
@@ -2197,7 +2206,7 @@ namespace Demo.WindowsForms
 
         private void ckb_show_scale_CheckedChanged(object sender, EventArgs e)
         {
-            MainMap.MapScaleInfoEnabled = ckb_show_scale.Checked;
+            MainMap.MapScaleInfoEnabled = checkBox_scale.Checked;
             MainMap.Invalidate();
         }
 
@@ -2211,7 +2220,7 @@ namespace Demo.WindowsForms
             if (double.TryParse(txe_direction.Text, out double degree))
             {
                 var dfline = new GMapRay(_start, degree, Color.DarkBlue);
-                Polygons.DFLines.Add(dfline);
+                Polygons.Rays.Add(dfline);
             }
             else
                 MessageBox.Show("A szöget meg kell adni!", "WARNING");
@@ -2227,16 +2236,150 @@ namespace Demo.WindowsForms
                 m.Clear();
         }
 
+
+        /// <summary>
+        /// Process macro command
+        /// Formatr: command name parameters..
+        /// </summary>
+        /// <param name="st"></param>
+        /// <param name="errorstring"></param>
+        /// <returns></returns>
+        public bool ProcessMacroCommand(string st, out string errorstring)
+        {
+            char[] separator = new Char[] { ',', ';', ' ' };
+            errorstring = null;
+
+            if (string.IsNullOrEmpty(st))
+                return true;
+
+            st = st.Trim();
+            if (st.Length == 0)
+                return true;
+
+            if (st.StartsWith("clear all"))
+            {
+                ClearAll();
+                return true;
+            }
+
+            if (st.StartsWith("clear objects"))
+            {
+                Objects.Clear();
+                return true;
+            }
+
+            if (st.StartsWith("clear routes"))
+            {
+                btn_clear_routes_Click(this, EventArgs.Empty);
+                return true;
+            }
+
+            if (st.StartsWith("clear polygons"))
+            {
+                Polygons.Clear();
+                return true;
+            }
+
+            if (st.StartsWith("clear lines"))
+            {
+                Polygons.Clear();
+                return true;
+            }
+
+            if (st.StartsWith("clear markers"))
+            {
+                _top.Markers.Clear();
+                foreach (var m in MainMap.Overlays)
+                    m.Markers.Clear();
+                return true;
+            }
+
+
+            string[] ls = st.Split(separator);
+
+            switch (ls[0])
+            {
+                case "line": break;
+                case "ray": break;
+                case "polyline": break;
+                case "image": break;
+                case "label": break;
+                case "route": break;
+                case "marker":
+                    if (ls.Length > 5)
+                    {
+                        var g = GMapMarker.CreateMarker(ls, out errorstring);
+                        if (g == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+
+                        Objects.Markers.Add(g);
+
+                        if (g is GMarkerGoogle)
+                        {
+                            var mBorders = new GMapMarkerRect(g.Position);
+                            mBorders.InnerMarker = g as GMarkerGoogle;
+                            mBorders.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                            mBorders.ToolTipText = g.Name;
+                            Objects.Markers.Add(mBorders);
+                        }
+
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
+                case "show":
+                    if (ls.Length > 1)
+                    {
+                        bool showit = true;
+                        if ((ls.Length > 2) && 
+                            ((ls[2] == "no") || (ls[2] == "0") || (ls[2] == "off"))) showit = false;
+
+                        switch (ls[1])
+                        {
+                            case "markers": checkBox_Markers.Checked = showit; break;
+                            case "routes" : checkBox_Routes.Checked = showit; break;
+                            case "infobox": checkBox_Infobox.Checked = showit;  break;
+                            case "center" : checkBox_CenterMarker.Checked = showit; break;
+                            case "cursor" : checkBox_CurrentMarker.Checked = showit;  break;
+                            case "grid"   : checkBox_Debug.Checked = showit; break;
+                            case "geogrid": checkBox_GeoGrid.Checked = showit; break;
+                            case "scale"  : checkBox_scale.Checked = showit;  break;
+                            default:
+                                //MessageBox.Show("Invalid parameter : " + st, "ERROR");
+                                errorstring = "Invalid parameter : " + st;
+                                return false;
+                        }
+                    }
+                    break;
+                default:
+                    //MessageBox.Show("Invalid command : " + st, "ERROR");
+                    errorstring = "Invalid command : " + st;
+                    return false;
+            } /* switch */
+
+
+            return true;
+        } /* ProcessMacroCommand */
+
+
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+        } /* openToolStripMenuItem_Click */
+
+
+        private void macroToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
             dlg.CheckFileExists = true;
             dlg.CheckPathExists = true;
             dlg.DefaultExt = "gmc";
             dlg.Filter = "GMap macro file (*.gmc)|*.gmc|All file (*.*)|*.*";
-            dlg.Title = "Select GMAp Macro file";
-
-            char[] separator = new Char[] { ',', ';' };
+            dlg.Title = "Select GMAP Macro file";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -2250,101 +2393,41 @@ namespace Demo.WindowsForms
                         if (st[0] == '#')               // comments
                             continue;
 
-                        if (st.StartsWith("clear all"))
+                        if (st.StartsWith("exit"))
+                            break;
+
+                        if (!ProcessMacroCommand(st, out string errorstring))
                         {
-                            ClearAll();
-                            continue;
+                            if (!string.IsNullOrEmpty(errorstring))
+                                MessageBox.Show(errorstring, "ERROR");
+                            break;
                         }
-
-                        if (st.StartsWith("clear objects"))
-                        {
-                            Objects.Clear();
-                            continue;
-                        }
-
-                        if (st.StartsWith("clear routes"))
-                        {
-                            Routes.Clear();
-                            continue;
-                        }
-
-                        if (st.StartsWith("clear polygons"))
-                        {
-                            Polygons.Clear();
-                            continue;
-                        }
-
-                        if (st.StartsWith("clear lines"))
-                        {
-                            Polygons.Clear();
-                            continue;
-                        }
-
-                        if (st.StartsWith("clear markers"))
-                        {
-                            _top.Markers.Clear();
-                            foreach (var m in MainMap.Overlays)
-                                m.Markers.Clear();
-                            continue;
-                        }
-
-
-                        string[] ls = st.Split(separator);
-
-
-                        switch (ls[0])
-                        {
-                            case "line": break;
-                            case "dfline": break;
-                            case "polyline": break;
-                            case "image": break;
-                            case "label": break;
-                            case "route": break;
-                            case "marker":
-                                if (ls.Length > 2)
-                                {
-                                    switch (ls[1])
-                                    {
-                                        case "circle": break;
-                                        case "cross": break;
-                                        case "rectangle": break;
-                                        case "google": break;
-                                        case "hfsystem": break;
-                                        default:
-                                            MessageBox.Show("Invalid marker type : " + ls[1], "ERROR");
-                                            continue;
-                                    }
-                                }
-                                break;
-
-                            case "show":
-                                if (ls.Length >1)
-                                {
-                                    switch (ls[1])
-                                    {
-                                        case "markers": break;
-                                        case "routes": break;
-                                        case "infobox": break;
-                                        case "center": break;
-                                        case "cursor": break;
-                                        case "grid": break;
-                                        case "geogrid": break;
-                                        case "scale": break;
-                                        default:
-                                            MessageBox.Show("Invalid parameter : " + st, "ERROR");
-                                            continue;
-                                    }
-                                }
-                                break;
-                            default: 
-                                MessageBox.Show("Invalid command : " + st, "ERROR");
-                                break;
-                        }
-
                     } /* while */
+
                 } /* using */
+
+                MacroEditor.MacroText = new StreamReader(dlg.FileName).ReadToEnd();
             }
-        } /* openToolStripMenuItem_Click */
+        } /* macroToolStripMenuItem_Click */
+
+        private void editToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var frm = new MacroEditor();
+            frm.Show();
+        }
+
+        private void licenceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = new Demo.WindowsForms.Forms.Message();
+
+            if (DialogResult.Yes == d.ShowDialog())
+            {
+                _userAcceptedLicenseOnce = true;
+                if (!Text.Contains("license"))
+                    Text += " - license accepted by " + Environment.UserName + " at " + DateTime.Now;
+            }
+        }
+
 
     } /* class MainForm */
 

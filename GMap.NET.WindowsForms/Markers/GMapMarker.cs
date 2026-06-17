@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Runtime.Serialization;
 using System.Security.Policy;
 using System.Windows.Forms;
+using Demo.WindowsForms.CustomMarkers;
 using GMap.NET.WindowsForms.ToolTips;
 
 namespace GMap.NET.WindowsForms.Markers
@@ -20,6 +21,7 @@ namespace GMap.NET.WindowsForms.Markers
             protected set { _parent = value; }
         }
 
+        public string Name { get; protected set; }  
 
         GMapOverlay _overlay;
 
@@ -286,10 +288,91 @@ namespace GMap.NET.WindowsForms.Markers
         {
         }
 
-        public GMapMarker(PointLatLng pos)
+        public GMapMarker(PointLatLng pos, string name = null)
         {
             Position = pos;
+            Name = name;
         }
+
+        public static GMapMarker CreateMarker(string[] ls, out string errorstr)
+        {
+            // 0: marker, 1:type, 2:name, 3:lat, 4:long, 5:color
+            string name = ls[2];
+            if (name == ".") name = "";
+            double lat = 0;
+            double lng = 0;
+            errorstr = null;
+
+            if (!double.TryParse(ls[3], out lat))
+            {
+                errorstr = "Invalid latitude";
+                return null;
+            }
+            if (!double.TryParse(ls[4], out lng))
+            {
+                errorstr = "Invalid longitude";
+                return null;
+            }
+            var p = new PointLatLng(lat, lng);
+
+
+            if ((ls[1] == "hfsystem") && ls.Length > 5)
+            {
+                int magnification = 1;
+                var t = GMarkerHFsystemType.Feketekör;
+
+                if (!int.TryParse(ls[4], out magnification))
+                {
+                    errorstr = "Invalid magnification";
+                    return null;
+                }
+
+                switch (ls[5])
+                {
+                    case "blue"  : t = GMarkerHFsystemType.Kékkör; break;
+                    case "red"   : t = GMarkerHFsystemType.Piroskör; break;
+                    case "yellow": t = GMarkerHFsystemType.Sárgakör; break;
+                    case "black" : t = GMarkerHFsystemType.Feketekör; break;
+                    case "green" : t = GMarkerHFsystemType.Zöldkör; break;
+                    case "pink"   : t = GMarkerHFsystemType.Lilakör; break;
+                    case "brown" : t = GMarkerHFsystemType.Bíborkör; break;
+                }
+
+                return new GMarkerHFsystem(p, t, 1, name);
+
+            }
+
+            if ((ls[1] == "google") && ls.Length > 5)
+            {
+                var t = GMarkerGoogleType.blue_pushpin;
+
+                switch (ls[5])
+                {
+                    case "blue"  : t = GMarkerGoogleType.blue_pushpin; break;
+                    case "red"   : t = GMarkerGoogleType.red_pushpin; break;
+                    case "yellow": t = GMarkerGoogleType.yellow_pushpin; break;
+                    case "black" : t = GMarkerGoogleType.black_small; break;
+                    case "green" : t = GMarkerGoogleType.green_pushpin; break;
+                    case "purple": t = GMarkerGoogleType.purple_pushpin; break;
+                    case "brown" : t = GMarkerGoogleType.brown_small; break;
+                }
+
+                return new GMarkerGoogle(p, t, name);
+            }
+
+            switch (ls[1])
+            {
+                case "circle": return new GMapMarkerCircle(p, name); 
+                case "cross" : return new GMarkerCross(p, name);
+                case "rectangle": return new GMapMarkerRect(p, name);
+                default:
+                    errorstr = "Invalid marker";
+                    return null;
+            }
+
+            return null;
+        }
+
 
         public virtual void OnRender(Graphics g)
         {

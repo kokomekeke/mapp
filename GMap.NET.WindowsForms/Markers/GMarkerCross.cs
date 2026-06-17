@@ -11,8 +11,8 @@ namespace GMap.NET.WindowsForms.Markers
 
         [NonSerialized] public Pen Pen = DefaultPen;
 
-        public GMarkerCross(PointLatLng p)
-            : base(p)
+        public GMarkerCross(PointLatLng p, string name = null)
+            : base(p, name)
         {
             IsHitTestVisible = false;
         }

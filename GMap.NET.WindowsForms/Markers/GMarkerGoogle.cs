@@ -72,8 +72,8 @@ namespace GMap.NET.WindowsForms.Markers
 
         public readonly GMarkerGoogleType Type;
 
-        public GMarkerGoogle(PointLatLng p, GMarkerGoogleType type)
-            : base(p)
+        public GMarkerGoogle(PointLatLng p, GMarkerGoogleType type, string name = null)
+            : base(p, name)
         {
             Type = type;
 
