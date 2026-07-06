@@ -91,6 +91,9 @@ namespace GMap.NET.WindowsForms.ToolTips
 
         public virtual void OnRender(Graphics g)
         {
+            if (string.IsNullOrEmpty(Marker.ToolTipText))
+                return;
+
             var st = g.MeasureString(Marker.ToolTipText, Font).ToSize();
             RectangleF rect = new Rectangle(Marker.ToolTipPosition.X,
                 Marker.ToolTipPosition.Y - st.Height,

@@ -942,21 +942,22 @@ namespace Demo.WindowsForms
                     _isMouseDown = false;
                     MainMap.ClearSelection();
 
-                    MenuItem m1 = new MenuItem("Center");
-                    MenuItem m2 = new MenuItem("Infobox");
-                    MenuItem m3 = new MenuItem("Highlight");
-                    MenuItem m4 = new MenuItem("Delete");
+                    MenuItem mCenter = new MenuItem("Center");
+                    MenuItem mInfobox = new MenuItem("Infobox");
+                    MenuItem mHighlight = new MenuItem("Highlight");
+                    MenuItem mCopy = new MenuItem("Copy");
+                    MenuItem mDelete = new MenuItem("Delete");
 
-                    m1.Click += M1_Click;
-                    m2.Click += M2_Click;
-                    m2.Checked = _currentHFmarker.BallonState == GeoBallonState.geoDisplayBalloon;
-                    m3.Click += M3_Click;
-                    m3.Checked = _currentHFmarker.Highlight;
-                    m4.Click += M4_Click;
-
+                    mCenter.Click += MCenter_Click;
+                    mInfobox.Click += MInfobox_Click;
+                    mInfobox.Checked = _currentHFmarker.BallonState == GeoBallonState.geoDisplayBalloon;
+                    mHighlight.Click += MHighlight_Click;
+                    mHighlight.Checked = _currentHFmarker.Highlight;
+                    mDelete.Click += MDelete_Click;
+                    mCopy.Click += MCopy_Click;   
                     _tempHFmarker = _currentHFmarker;
 
-                    ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3, m4 });
+                    ContextMenu m = new ContextMenu(new MenuItem[] { mCenter, mInfobox, mHighlight, mCopy, mDelete });
                     m.Show(MainMap, new Point(e.X, e.Y));
                     _isMouseDown = false;
                     _currentHFmarker = null;
@@ -965,49 +966,69 @@ namespace Demo.WindowsForms
                 {
                     _currentLatLong = MainMap.FromLocalToLatLng(e.X, e.Y);
 
-                    if (_currentPolyline == null)
+                    if (_currentRectMarker != null)
                     {
-                        foreach (var p in Polygons.Polygons)
+                        MenuItem mCenter = new MenuItem("Center");
+                        MenuItem mCopy = new MenuItem("Copy");
+                        MenuItem mDelete = new MenuItem("Delete");
+
+                        mCenter.Click += MRecCenter_Click;
+                        mDelete.Click += MRecDelete_Click;
+                        mCopy.Click += MRecCopy_Click;
+                        _tempHFmarker = _currentHFmarker;
+
+                        ContextMenu m = new ContextMenu(new MenuItem[] { mCenter, mCopy, mDelete });
+                        m.Show(MainMap, new Point(e.X, e.Y));
+                        _isMouseDown = false;
+                        _currentHFmarker = null;
+
+                    }
+                    else
+                    { 
+                        if (_currentPolyline == null)
                         {
-                            if (p.IsInside(_currentLatLong))
+                            foreach (var p in Polygons.Polygons)
                             {
-                                _currentPolyline = p;
-                                break;
+                                if (p.IsInside(_currentLatLong))
+                                {
+                                    _currentPolyline = p;
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    if (_currentPolyline != null)
-                    {
-                        if (_currentPolyline.IsInside(_currentLatLong))
+                        if (_currentPolyline != null)
                         {
-                            MainMap.ClearSelection();
-                            _currentPolyline.IsSelected = true;
+                            if (_currentPolyline.IsInside(_currentLatLong))
+                            {
+                                MainMap.ClearSelection();
+                                _currentPolyline.IsSelected = true;
 
-                            MenuItem m1 = new MenuItem("Add point");
-                            MenuItem m2 = new MenuItem("Close curve");
-                            MenuItem m3 = new MenuItem("Change color");
+                                MenuItem m1 = new MenuItem("Add point");
+                                MenuItem m2 = new MenuItem("Close curve");
+                                MenuItem m3 = new MenuItem("Change color");
 
-                            m1.Click += M1P_Click;
-                            m2.Click += M2P_Click;
-                            m3.Click += M3P_Click;
+                                m1.Click += M1P_Click;
+                                m2.Click += M2P_Click;
+                                m3.Click += M3P_Click;
 
-                            _tempHFmarker = _currentHFmarker;
+                                _tempHFmarker = _currentHFmarker;
 
-                            ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3});
-                            m.Show(MainMap, new Point(e.X, e.Y));
-                            _isMouseDown = false;
-                            MainMap.ClearSelection();
-                            MainMap.IsMouseOverPolygon = true;
+                                ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3 });
+                                m.Show(MainMap, new Point(e.X, e.Y));
+                                _isMouseDown = false;
+                                MainMap.ClearSelection();
+                                MainMap.IsMouseOverPolygon = true;
+                            }
+                            else MainMap.IsMouseOverPolygon = false;
                         }
-                        else MainMap.IsMouseOverPolygon = false;
                     }
                 }
             }
 
         } /* MainMap_MouseDown */
 
-        private void M3_Click(object sender, EventArgs e)
+        private void MHighlight_Click(object sender, EventArgs e)
         {
             if (_tempHFmarker != null)
             {
@@ -1027,7 +1048,7 @@ namespace Demo.WindowsForms
             }
         }
 
-        private void M4_Click(object sender, EventArgs e)
+        private void MDelete_Click(object sender, EventArgs e)
         {
             if ((_tempHFmarker != null) && _tempHFmarker.IsVisible)
             {
@@ -1039,7 +1060,7 @@ namespace Demo.WindowsForms
         }
 
 
-        private void M2_Click(object sender, EventArgs e)
+        private void MInfobox_Click(object sender, EventArgs e)
         {
             if (_tempHFmarker != null)
             {
@@ -1051,13 +1072,58 @@ namespace Demo.WindowsForms
             MainMap.ClearSelection();
         }
 
-        private void M1_Click(object sender, EventArgs e)
+        private void MCenter_Click(object sender, EventArgs e)
         {
             if (_tempHFmarker != null)
                 MainMap.Position = _tempHFmarker.Position;   
             _isMouseDown = false;
             MainMap.ClearSelection();
         }
+
+        private void MCopy_Click(object sender, EventArgs e)
+        {
+            if (_tempHFmarker != null)
+            {
+                _tempHFmarker.CopyToClipboard();
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+
+        private void MRecDelete_Click(object sender, EventArgs e)
+        {
+            if ((_currentRectMarker != null) && _currentRectMarker.IsVisible)
+            {
+                if (_currentRectMarker.InnerMarker != null)
+                    Objects.Markers.Remove(_currentRectMarker.InnerMarker);
+
+                Objects.Markers.Remove(_currentRectMarker);
+                _currentRectMarker = null;
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+
+        private void MRecCenter_Click(object sender, EventArgs e)
+        {
+            if (_currentRectMarker != null)
+                MainMap.Position = _currentRectMarker.Position;
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+        private void MRecCopy_Click(object sender, EventArgs e)
+        {
+            if (_currentRectMarker != null)
+            {
+                _currentRectMarker.CopyToClipboard();
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
 
 
 
@@ -1111,6 +1177,7 @@ namespace Demo.WindowsForms
                     if (_currentMarker.IsVisible)
                     {
                         _currentMarker.Position = pos;
+                        _currentMarker.ToolTipText = pos.ToGeoString();
                         statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
                     }
 
@@ -1144,12 +1211,16 @@ namespace Demo.WindowsForms
                     if (_currentMarker.IsVisible)
                     {
                         _currentMarker.Position = pnew;
+                        _currentMarker.ToolTipText = pnew.ToGeoString();
+
                     }
                     _currentRectMarker.Position = pnew;
+                    _currentRectMarker.UpdateToolTip();
 
                     if (_currentRectMarker.InnerMarker != null)
                     {
                         _currentRectMarker.InnerMarker.Position = pnew;
+                        _currentRectMarker.InnerMarker.ToolTipText = pnew.ToGeoString();
                     }
                 }
 

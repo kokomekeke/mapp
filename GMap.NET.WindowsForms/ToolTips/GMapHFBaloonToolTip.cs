@@ -34,6 +34,9 @@ namespace GMap.NET.WindowsForms.ToolTips
 
         public override void OnRender(Graphics g)
         {
+            if (string.IsNullOrEmpty(Marker.ToolTipText))
+                return;
+
             var st = g.MeasureString(Marker.ToolTipText, Font).ToSize();
             var rect = new Rectangle(Marker.ToolTipPosition.X,
                 Marker.ToolTipPosition.Y - st.Height,

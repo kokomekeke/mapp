@@ -75,7 +75,7 @@ namespace GMap.NET.WindowsForms.Markers
         }
 
         private string _name;
-        public string Name
+        public new string Name
         {
             get { return _name; }
             set 
@@ -159,12 +159,6 @@ namespace GMap.NET.WindowsForms.Markers
             }
         }
 
-        void LoadBitmap(int magnification)
-        {
-            Bitmap = GetIcon(Symbol.ToString());
-            Size = new Size(Bitmap.Width*magnification + padding, Bitmap.Height*magnification + padding);
-            Offset = Point.Empty;
-        }
 
         /// <summary>
         ///     marker using manual bitmap, NonSerialized
@@ -194,19 +188,45 @@ namespace GMap.NET.WindowsForms.Markers
             return ret;
         }
 
+        void LoadBitmap(int magnification)
+        {
+            Bitmap = GetIcon(Symbol.ToString());
+            Size = new Size(Bitmap.Width * magnification + padding, Bitmap.Height * magnification + padding);
+            Offset = Point.Empty;
+        }
+
+
         public static int ID = 0;
         public void SetDefaultInfo()
         {
             Name = $"[ { ++ID}] DF";
-            Note = $",, 21 000 000 Hz\n{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\n{Position.ToGeoString()}," ;
+            Note = $",, 21 000 000 Hz\r\n{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\r\n{Position.ToGeoString()}," ;
             BallonState = GeoBallonState.geoDisplayBalloon;
         }
 
         public void UpdateDefaultInfo()
         {
             Name = $"[ {ID}] DF";
-            Note = $",, 21 000 000 Hz\n{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\n{Position.ToGeoString()},";
+            Note = $",, 21 000 000 Hz\r\n{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\r\n{Position.ToGeoString()},";
             BallonState = GeoBallonState.geoDisplayBalloon;
+        }
+
+
+        public void CopyToClipboard()
+        {
+            if (_ballonstate == GeoBallonState.geoDisplayNone)
+            {
+                System.Windows.Forms.Clipboard.SetText(Position.ToGeoString());
+            }
+            else if (_ballonstate == GeoBallonState.geoDisplayName)
+            {
+                System.Windows.Forms.Clipboard.SetText(Name);
+            }
+            else if (_ballonstate == GeoBallonState.geoDisplayBalloon)
+            {
+                System.Windows.Forms.Clipboard.SetText(Name + "\r\n" + Note);
+            }
+            else System.Windows.Forms.Clipboard.SetDataObject(this);
         }
 
 
@@ -255,6 +275,7 @@ namespace GMap.NET.WindowsForms.Markers
             base.GetObjectData(info, context);
         }
 
+
         protected GMarkerHFsystem(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -263,6 +284,8 @@ namespace GMap.NET.WindowsForms.Markers
             Name = info.GetString("Name");
             Note = info.GetString("Note");
         }
+
+
 
         #endregion
 

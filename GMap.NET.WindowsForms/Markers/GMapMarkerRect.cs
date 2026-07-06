@@ -25,7 +25,18 @@ namespace Demo.WindowsForms.CustomMarkers
          // if so, you shall have no event on it ;}
          Size = new Size(11, 11);
          Offset = new Point(-Size.Width / 2, -Size.Height / 2);
+         ToolTipText = "";
       }
+
+        public void CopyToClipboard()
+        {
+            System.Windows.Forms.Clipboard.SetText(Position.ToGeoString());
+        }
+
+        public void UpdateToolTip()
+        {
+            ToolTipText = Position.ToString();
+        }
 
       public override void OnRender(Graphics g)
       {
