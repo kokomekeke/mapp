@@ -32,6 +32,11 @@ namespace GMap.NET.Entity
             public string postcode { get; set; }
             public string country { get; set; }
             public string country_code { get; set; }
+
+            public override string ToString()
+            {
+                return $"{country},{postcode}, {city}, {road} ";
+            }
         }
     }
 

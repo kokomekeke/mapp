@@ -316,7 +316,8 @@ namespace GMap.NET.MapProviders
                     geo = GetContentUsingHttp(url);
 
                     if (!string.IsNullOrEmpty(geo))
-                    {
+                    {;
+                        geo = geo.Replace(",\"village\":", ",\"city\":").Replace(",\"town\":", ",\"city\":");
                         result = JsonConvert.DeserializeObject<OpenStreetMapGeocodeEntity>(geo);
 
                         if (GMaps.Instance.UsePlacemarkCache && result != null)
@@ -327,6 +328,7 @@ namespace GMap.NET.MapProviders
                 }
                 else
                 {
+                    geo = geo.Replace(",\"village\":", ",\"city\":").Replace(",\"town\":", ",\"city\":");
                     result = JsonConvert.DeserializeObject<OpenStreetMapGeocodeEntity>(geo);
                 }
 
@@ -339,7 +341,7 @@ namespace GMap.NET.MapProviders
                     p = new Placemark
                     {
                         PlacemarkId = result.place_id,
-                        Address = result.address.ToString(),
+                        Address = result.address.ToString(),                // ERROR : 'OpenStreetMapGeocodeEntity.Address' does not contain a definition for 'ToString' and no accessible extension method 'ToString' accepting a first argument of type 'OpenStreetMapGeocodeEntity.Address' could be found (are you missing a using directive or an assembly reference?)
                         CountryName = result.address.country,
                         CountryNameCode = result.address.country_code,
                         PostalCodeNumber = result.address.postcode,

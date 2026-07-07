@@ -1007,14 +1007,15 @@ namespace Demo.WindowsForms
                                 MenuItem m1 = new MenuItem("Add point");
                                 MenuItem m2 = new MenuItem("Close curve");
                                 MenuItem m3 = new MenuItem("Change color");
+                                MenuItem m4 = new MenuItem("Delete");
 
                                 m1.Click += M1P_Click;
                                 m2.Click += M2P_Click;
                                 m3.Click += M3P_Click;
-
+                                m4.Click += M4P_Click;
                                 _tempHFmarker = _currentHFmarker;
 
-                                ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3 });
+                                ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3, m4 });
                                 m.Show(MainMap, new Point(e.X, e.Y));
                                 _isMouseDown = false;
                                 MainMap.ClearSelection();
@@ -1164,6 +1165,18 @@ namespace Demo.WindowsForms
                 _currentPolyline.LineColor = cd.Color;
             }
         }
+
+
+        private void M4P_Click(object sender, EventArgs e)
+        {
+            // delete polygon
+            if (_currentPolyline != null)
+            {
+                Polygons.Polygons.Remove(_currentPolyline);
+                _currentPolyline = null;
+            }
+        }
+
 
         // move current marker with left holding
         void MainMap_MouseMove(object sender, MouseEventArgs e)
