@@ -2383,13 +2383,75 @@ namespace Demo.WindowsForms
 
             switch (ls[0])
             {
-                case "line": break;
-                case "ray": break;
-                case "polyline": break;
+                case "line":                        // draw line: "line", name, lat1, lng1, lat2, lng2, color
+                    if (ls.Length > 6)
+                    {
+                        var l = GMapLine.CreateLine(ls, out errorstring);
+                        if (l == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+
+                        Polygons.Lines.Add(l);
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
+                case "ray":                         // draw ray: "ray", name, lat, lng, degree, color
+                    if (ls.Length > 5)
+                    {
+                        var r = GMapRay.CreateRay(ls, out errorstring);
+                        if (r == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Polygons.Rays.Add(r);
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+                    
+                case "polyline":                    // draw poliline: "polyline", name, lat1, lng1, lat2, lng2, lat3, lng3, ..., color
+                    if (ls.Length > 6)
+                    {
+                        var p = GMapPolyLine.CreatePolyline(ls, out errorstring);
+                        if (p == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Polygons.Polygons.Add(p);
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
                 case "image": break;
-                case "label": break;
+
+                case "label":                       // draw label: "label", name, lat,lng, text
+                    if (ls.Length > 4)
+                    {
+                        var g = GMapLabel.CreateLabel(ls, out errorstring);
+                        if (g == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Objects.Labels.Add(g);
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
                 case "route": break;
-                case "marker":
+
+                case "marker":                      // draw marker: "marker", type, name, lat,lng, color
                     if (ls.Length > 5)
                     {
                         var g = GMapMarker.CreateMarker(ls, out errorstring);

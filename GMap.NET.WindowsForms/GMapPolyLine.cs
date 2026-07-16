@@ -674,6 +674,28 @@ namespace GMap.NET.WindowsForms
         }
 
         #endregion
+
+        public static GMapPolyLine CreatePolyline(string[] ls, out string errorstring)
+        {
+            try
+            {
+                // 0: "polyline", 1: name,  2: lat1, 3: lng1, 4: lat2, 5: lng2, 6: lat3, 7: lng3, ... , x: color
+                errorstring = null;
+                var points = new List<PointLatLng>();
+                for (int i = 2; i < ls.Length - 1; i += 2)
+                {
+                    points.Add(new PointLatLng(double.Parse(ls[i]), double.Parse(ls[i + 1])));
+                }
+                var color = ColorTranslator.FromHtml(ls[ls.Length - 1]);
+                return new GMapPolyLine(points, color, ls[1]);
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.ToString();
+                return null;
+            }
+        }
+
     }
 
     public delegate void PolygonClick(GMapPolyLine item, MouseEventArgs e);

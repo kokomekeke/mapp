@@ -144,6 +144,24 @@ namespace GMap.NET.WindowsForms
         }
 
 
+        public static GMapRay CreateRay(string[] ls, out string errorstring)
+        {
+            // 0: "ray", 1: name,  2: lat1, 3: lng1, 4: direction, 5: distance, 6: color
+            try
+            {
+                errorstring = null;
+                var p1 = new PointLatLng(double.Parse(ls[2]), double.Parse(ls[3]));
+                var direction = double.Parse(ls[4]);
+                var distance = double.Parse(ls[5]);
+                var color = ColorTranslator.FromHtml(ls[6]);
+                return new GMapRay(p1, direction, color) { Name = ls[1], Distance = distance };
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.Message;
+                return null;
+            }
+        }
 
-    }
-}
+    } /* class GMapRay */
+} /* namespace GMap.NET.WindowsForms */

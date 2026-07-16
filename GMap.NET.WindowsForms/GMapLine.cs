@@ -107,6 +107,25 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        public static GMapLine CreateLine(string[] ls, out string errorstring)
+        {
+            try
+            {
+                // 0: "line", 1: name,  2: lat1, 3: lng1, 4: lat2, 5: lng2, 6: color
+                errorstring = null;
+                var p1 = new PointLatLng(double.Parse(ls[2]), double.Parse(ls[3]));
+                var p2 = new PointLatLng(double.Parse(ls[4]), double.Parse(ls[5]));
+                var color = ColorTranslator.FromHtml(ls[6]);
+
+                return new GMapLine(p1, p2, color) { Name = ls[1] };
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.ToString();
+                return null;
+            }
+        }
+
         internal GraphicsPath _graphicsPath;
 
         internal virtual void UpdateGraphicsPath()

@@ -137,5 +137,38 @@ namespace GMap.NET.WindowsForms
             ;
         }
 
+        public static GMapLabel CreateLabelExt(string[] ls, out string errorstring)
+        {
+            // 0: "label", 2: "lat", 3: "lng", 4: "text", 5: "fontname", 6: "fontsize", 7: "fontstyle", 8: "drawborder"
+            errorstring = string.Empty;
+            var pointLatLng = new PointLatLng(double.Parse(ls[2]), double.Parse(ls[3]));
+            string text = ls[4];
+            string fontName = ls[5];
+            float fontSize = float.Parse(ls[6]);
+            var fontStyle = (FontStyle)Enum.Parse(typeof(FontStyle), ls[7]);
+            bool drawBorder = bool.Parse(ls[8]);
+
+            return new GMapLabel(pointLatLng, text, new Font(fontName, fontSize, fontStyle), drawBorder);
+        }
+
+
+        public static GMapLabel CreateLabel(string[] ls, out string errorstring)
+        {
+            // 0: "label", 2: "lat", 3: "lng", 4: "text"
+            try
+            {
+                errorstring = string.Empty;
+                var pointLatLng = new PointLatLng(double.Parse(ls[2]), double.Parse(ls[3]));
+                string text = ls[4];
+
+                return new GMapLabel(pointLatLng, text);
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.Message;
+                return null;
+            }
+        }
+
     } /* class GMapText */
 } /* namespace GMap.NET.WindowsForms */
