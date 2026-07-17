@@ -82,6 +82,7 @@ namespace Demo.WindowsForms
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel3 = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -109,6 +110,8 @@ namespace Demo.WindowsForms
             this.licenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.angleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -671,7 +674,8 @@ namespace Demo.WindowsForms
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2});
+            this.toolStripStatusLabel2,
+            this.toolStripStatusLabel3});
             this.statusStrip1.Location = new System.Drawing.Point(0, 756);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(1155, 22);
@@ -686,8 +690,13 @@ namespace Demo.WindowsForms
             // toolStripStatusLabel2
             // 
             this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
-            this.toolStripStatusLabel2.Size = new System.Drawing.Size(42, 17);
-            this.toolStripStatusLabel2.Text = "Zoom:";
+            this.toolStripStatusLabel2.Size = new System.Drawing.Size(51, 17);
+            this.toolStripStatusLabel2.Text = "Zoom: ; ";
+            // 
+            // toolStripStatusLabel3
+            // 
+            this.toolStripStatusLabel3.Name = "toolStripStatusLabel3";
+            this.toolStripStatusLabel3.Size = new System.Drawing.Size(0, 17);
             // 
             // menuStrip1
             // 
@@ -781,7 +790,9 @@ namespace Demo.WindowsForms
             // 
             this.macroToolStripMenuItem1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openFileToolStripMenuItem,
-            this.editToolStripMenuItem1});
+            this.editToolStripMenuItem1,
+            this.toolStripMenuItem1,
+            this.angleToolStripMenuItem});
             this.macroToolStripMenuItem1.Name = "macroToolStripMenuItem1";
             this.macroToolStripMenuItem1.Size = new System.Drawing.Size(53, 20);
             this.macroToolStripMenuItem1.Text = "Macro";
@@ -789,14 +800,14 @@ namespace Demo.WindowsForms
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openFileToolStripMenuItem.Text = "&Open and Run";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.macroToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem1
             // 
             this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            this.editToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
+            this.editToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
             this.editToolStripMenuItem1.Text = "&Edit";
             this.editToolStripMenuItem1.Click += new System.EventHandler(this.editToolStripMenuItem1_Click);
             // 
@@ -919,6 +930,18 @@ namespace Demo.WindowsForms
             this.MainMap.Size = new System.Drawing.Size(922, 732);
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // angleToolStripMenuItem
+            // 
+            this.angleToolStripMenuItem.Name = "angleToolStripMenuItem";
+            this.angleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.angleToolStripMenuItem.Text = "Angle";
+            this.angleToolStripMenuItem.Click += new System.EventHandler(this.angleToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -1043,6 +1066,9 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.ToolStripMenuItem openFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem licenceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem angleToolStripMenuItem;
     }
 }
 

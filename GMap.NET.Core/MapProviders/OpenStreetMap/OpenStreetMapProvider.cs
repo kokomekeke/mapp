@@ -332,7 +332,7 @@ namespace GMap.NET.MapProviders
                     result = JsonConvert.DeserializeObject<OpenStreetMapGeocodeEntity>(geo);
                 }
 
-                if (!string.IsNullOrEmpty(geo))
+                if (!string.IsNullOrEmpty(geo) && result != null && result.address != null)
                 {
                     ret = new List<Placemark>();
 
@@ -355,6 +355,11 @@ namespace GMap.NET.MapProviders
 
                     status = GeoCoderStatusCode.OK;                    
                 }
+                else
+                {
+                    ret = null;
+                    status = GeoCoderStatusCode.ZERO_RESULTS;
+                }   
             }
             catch (Exception ex)
             {

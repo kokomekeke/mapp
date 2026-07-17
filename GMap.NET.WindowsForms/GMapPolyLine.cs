@@ -696,7 +696,7 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-    }
+    } /* class GMapPolyLine */
 
     public delegate void PolygonClick(GMapPolyLine item, MouseEventArgs e);
 
@@ -705,4 +705,5 @@ namespace GMap.NET.WindowsForms
     public delegate void PolygonEnter(GMapPolyLine item);
 
     public delegate void PolygonLeave(GMapPolyLine item);
-}
+
+} /* namespace GMap.NET.WindowsForms */

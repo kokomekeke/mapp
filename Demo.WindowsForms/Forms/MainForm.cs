@@ -300,6 +300,7 @@ namespace Demo.WindowsForms
             Activate();
             TopMost = true;
             TopMost = false;
+            toolStripStatusLabel2.Text = "Zoom: " + MainMap.Zoom.ToString() + "; ";
         }
 
         public static DateTime AssemblyCreationDate()
@@ -894,6 +895,17 @@ namespace Demo.WindowsForms
         {
             if (e.Button == MouseButtons.Left)
             {
+                if (_isMouseDown && _currentMarker.IsVisible)
+                {
+                    GeoCoderStatusCode status;
+                    var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
+                    if (status == GeoCoderStatusCode.OK && pos != null)
+                        toolStripStatusLabel3.Text = pos.Value.Address;
+                    else
+                        toolStripStatusLabel3.Text = string.Empty;
+                    //_currentMarker.ToolTipText = toolStripStatusLabel3.Text;
+                }
+
                 _isMouseDown = false;
             }
 
@@ -925,6 +937,13 @@ namespace Demo.WindowsForms
 
                     Debug.WriteLine("MouseDown: geo: " + _currentMarker.Position + " | px: " + px + " | tile: " + tile);
                     statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
+
+                    GeoCoderStatusCode status;
+                    var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
+                    if (status == GeoCoderStatusCode.OK && pos != null)
+                        toolStripStatusLabel3.Text = pos.Value.Address;
+                    else
+                        toolStripStatusLabel3.Text = string.Empty;
                 }
 
                 foreach (var m in Objects.Markers)
@@ -1130,6 +1149,7 @@ namespace Demo.WindowsForms
 
         private void M1P_Click(object sender, EventArgs e)
         {
+            //.. insert point in polyline
             if (_currentLatLong != null && _currentPolyline != null)
             {
                 int index = _currentPolyline.IndexOfPoint(_currentLatLong);
@@ -1145,6 +1165,7 @@ namespace Demo.WindowsForms
 
         private void M2P_Click(object sender, EventArgs e)
         {
+            //.. close polyline
             if (_currentPolyline != null)
             {
                 _currentPolyline.IsClosed = true;
@@ -1192,6 +1213,7 @@ namespace Demo.WindowsForms
                         _currentMarker.Position = pos;
                         _currentMarker.ToolTipText = pos.ToGeoString();
                         statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
+                        toolStripStatusLabel3.Text = string.Empty;
                     }
 
                     if (_currentHFmarker != null)
@@ -1225,7 +1247,8 @@ namespace Demo.WindowsForms
                     {
                         _currentMarker.Position = pnew;
                         _currentMarker.ToolTipText = pnew.ToGeoString();
-
+                        statusStrip1.Items[0].Text = pnew.ToGeoString();
+                        toolStripStatusLabel3.Text = string.Empty;
                     }
                     _currentRectMarker.Position = pnew;
                     _currentRectMarker.UpdateToolTip();
@@ -1234,6 +1257,8 @@ namespace Demo.WindowsForms
                     {
                         _currentRectMarker.InnerMarker.Position = pnew;
                         _currentRectMarker.InnerMarker.ToolTipText = pnew.ToGeoString();
+                        statusStrip1.Items[0].Text = pnew.ToGeoString();
+                        toolStripStatusLabel3.Text = string.Empty;
                     }
                 }
 
@@ -1247,7 +1272,7 @@ namespace Demo.WindowsForms
             //trackBarZoom.Value = (int)(MainMap.Zoom * 100.0);
             //textBoxZoomCurrent.Text = MainMap.Zoom.ToString();
             checkBoxShowGeoGrid_CheckedChanged(this, EventArgs.Empty);
-            toolStripStatusLabel2.Text = "Zoom: " + MainMap.Zoom.ToString();
+            toolStripStatusLabel2.Text = "Zoom: " + MainMap.Zoom.ToString() + "; ";
         }
 
         // click on some marker
@@ -2318,6 +2343,10 @@ namespace Demo.WindowsForms
             Polygons.Clear();
             foreach (var m in MainMap.Overlays)
                 m.Clear();
+            // set current marker
+            _currentMarker = new GMarkerGoogle(MainMap.Position, GMarkerGoogleType.arrow);
+            _currentMarker.IsHitTestVisible = false;
+            _top.Markers.Add(_currentMarker);
         }
 
 
@@ -2360,13 +2389,20 @@ namespace Demo.WindowsForms
 
             if (st.StartsWith("clear polygons"))
             {
-                Polygons.Clear();
+                Polygons.Polygons.Clear();
                 return true;
             }
 
+            if (st.StartsWith("clear rays"))
+            {
+                Polygons.Rays.Clear();
+                return true;
+            }
+
+
             if (st.StartsWith("clear lines"))
             {
-                Polygons.Clear();
+                Polygons.Lines.Clear();
                 return true;
             }
 
@@ -2432,7 +2468,8 @@ namespace Demo.WindowsForms
                     }
                     break;
 
-                case "image": break;
+                case "image": 
+                    break;
 
                 case "label":                       // draw label: "label", name, lat,lng, text
                     if (ls.Length > 4)
@@ -2449,7 +2486,30 @@ namespace Demo.WindowsForms
                     }
                     break;
 
-                case "route": break;
+                case "route":
+                    if (ls.Length > 5)
+                    {
+                        var p = GMapRoute.CreateRoute(ls, out errorstring);
+                        if (p == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Routes.Routes.Add(p);
+                        //. add markers for each point in the route
+                        for (int i = 0; i < p.Points.Count; i++)
+                        {
+                            var m = new GMapMarkerRect(p.Points[i], p.Name + " point " + i);
+                            m.InnerMarker = new GMarkerGoogle(p.Points[i], GMarkerGoogleType.green_small);
+                            m.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                            m.ToolTipText = p.Name + " point " + i;
+                            Objects.Markers.Add(m);
+                        }
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
 
                 case "marker":                      // draw marker: "marker", type, name, lat,lng, color
                     if (ls.Length > 5)
@@ -2518,6 +2578,11 @@ namespace Demo.WindowsForms
         } /* openToolStripMenuItem_Click */
 
 
+        /// <summary>
+        /// Load macro file and process commands
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void macroToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dlg = new OpenFileDialog();
@@ -2540,12 +2605,16 @@ namespace Demo.WindowsForms
                             continue;
 
                         if (st.StartsWith("exit"))
+                        {
+                            rd.Close();
                             break;
+                        }
 
                         if (!ProcessMacroCommand(st, out string errorstring))
                         {
                             if (!string.IsNullOrEmpty(errorstring))
                                 MessageBox.Show(errorstring, "ERROR");
+                            rd.Close();
                             break;
                         }
                     } /* while */
@@ -2574,6 +2643,13 @@ namespace Demo.WindowsForms
             }
         }
 
+        private void angleToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var frm = AngleCalculator.Instance;
+            if (frm == null) frm = new AngleCalculator();
+            frm.Show();
+            frm.BringToFront();
+        }
 
     } /* class MainForm */
 

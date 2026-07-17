@@ -262,6 +262,28 @@ namespace GMap.NET.WindowsForms
         }
 
         #endregion
+
+        public static GMapRoute CreateRoute(string[] ls, out string errorstring)
+        {
+            try
+            {
+                // 0: "route", 1: name,  2: lat1, 3: lng1, 4: lat2, 5: lng2, 6: lat3, 7: lng3, ... 
+                errorstring = null;
+                var points = new List<PointLatLng>();
+                for (int i = 2; i < ls.Length - 1; i += 2)
+                {
+                    points.Add(new PointLatLng(double.Parse(ls[i]), double.Parse(ls[i + 1])));
+                }
+                var color = ColorTranslator.FromHtml(ls[ls.Length - 1]);
+                return new GMapRoute(points, ls[1]);
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.ToString();
+                return null;
+            }
+        }
+
     }
 
     public delegate void RouteClick(GMapRoute item, MouseEventArgs e);
