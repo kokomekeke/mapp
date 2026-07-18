@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using GMap.NET.Internals;
 
 namespace GMap.NET.WindowsForms
 {
@@ -129,14 +130,76 @@ namespace GMap.NET.WindowsForms
         }
 
 
+        GraphicsPath _graphicsPath;
+
+
         public override void OnRender(Graphics g)
         {
             try
             {
-                if (!_updated)
-                    UpdateLocalPosition();
+                //if (!_updated)
+                //    UpdateLocalPosition();
 
-                g.DrawLine(Stroke, LocalPosition1.X, LocalPosition1.Y, LocalPosition2.X, LocalPosition2.Y);
+                //if (Overlay != null && Overlay.Control != null)
+                //{
+                //    //.. straight line
+                //    LocalPosition1 = Overlay.Control.FromLatLngToLocalPosition(Point1);
+                //    LocalPosition = LocalPosition1;
+                //    double len = _distance * 1000.0 / Overlay.Control.MapProvider.Projection.GetGroundResolution((int)Overlay.Control.Zoom, Position.Lat);
+                //    LocalPosition2.X = LocalPosition1.X + (int)(Math.Sin(Direction * Math.PI / 180.0) * len);
+                //    LocalPosition2.Y = LocalPosition1.Y - (int)(Math.Cos(Direction * Math.PI / 180.0) * len);
+
+                //    g.DrawLine(Stroke, LocalPosition1.X, LocalPosition1.Y, LocalPosition2.X, LocalPosition2.Y);
+                //}
+
+
+
+                if (Overlay != null && Overlay.Control != null)
+                {
+                    //.. from HF manager
+                    if (_graphicsPath == null)
+                        _graphicsPath = new GraphicsPath();
+                    else
+                        _graphicsPath.Reset();
+
+
+                    LocalPosition1 = Overlay.Control.FromLatLngToLocalPosition(Point1);
+                    LocalPosition = LocalPosition1;
+                    double bearing = (Direction % 360.0) / 180.0 * Math.PI;
+                    double maxlength = Distance / 6371.0; //the radius of earth in km
+                    double dl = maxlength / 100.0;
+                    double length = dl;
+
+                    var pnts = new System.Drawing.Point[101];
+                    pnts[0] = LocalPosition1;
+
+                    double startRadLat = Point1.Lat / 180.0 * Math.PI;
+                    double startRadLon = Point1.Lng / 180.0 * Math.PI;
+                    int i = 1;
+
+                    while (length < maxlength)
+                    {
+                        double newLat = Math.Asin(Math.Sin(startRadLat) * Math.Cos(length) +
+                                               Math.Cos(startRadLat) * Math.Sin(length) * Math.Cos(bearing));
+
+                        double newLon = startRadLon + Math.Atan2(
+                                         Math.Sin(bearing) * Math.Sin(length) * Math.Cos(startRadLat),
+                                         Math.Cos(length) - Math.Sin(startRadLat) * Math.Sin(newLat));
+
+                        newLat = newLat * 180.0 / Math.PI % 90.0;
+                        newLon = (newLon * 180.0 / Math.PI + 540.0) % 360.0 - 180.0;
+
+                        Point2 = new PointLatLng(newLat, newLon);
+                        var p2 = Overlay.Control.FromLatLngToLocalPosition(Point2);
+                        pnts[i] = p2;
+                        length += dl;
+                        i++;
+                    }
+                    _graphicsPath.AddLines(pnts);
+
+                    g.DrawPath(Stroke, _graphicsPath);
+                }
+
                 g.FillEllipse(Fill, new Rectangle(LocalPosition1.X - _r, LocalPosition1.Y - _r, 2*_r, 2*_r));
             }
             catch { }

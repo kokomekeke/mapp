@@ -802,10 +802,10 @@ namespace GMap.NET.WindowsForms
         public void UpdateLabelLocalPosition(GMapLabel label)
         {
             var p = FromLatLngToLocal(label.GeoPosition);
-            if (!MobileMode)
-            {
-                p.OffsetNegative(Core.RenderOffset);
-            }
+            //if (!MobileMode)
+            //{
+            //    p.OffsetNegative(Core.RenderOffset);
+            //}
             label.LocalPosition = new Point((int)p.X, (int)p.Y);
             label.UpdateGraphicsPath();
         }
@@ -2816,6 +2816,16 @@ namespace GMap.NET.WindowsForms
             return ret;
         }
 
+        public Point FromLatLngToLocalPosition(PointLatLng point)
+        {
+            var p = FromLatLngToLocal(point);
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+            return new Point((int)p.X, (int)p.Y);
+        }
+
 
         /// <summary>
         /// Get screen coordinate from world coordinate
@@ -2824,7 +2834,12 @@ namespace GMap.NET.WindowsForms
         /// <returns></returns>
         public GPoint FromLatLngToPixel(PointLatLng point)
         {
-            return Core.FromLatLngToPixel(point);
+            var p = Core.FromLatLngToPixel(point);
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+            return p;
         }
 
 

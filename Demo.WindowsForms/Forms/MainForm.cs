@@ -898,12 +898,18 @@ namespace Demo.WindowsForms
                 if (_isMouseDown && _currentMarker.IsVisible)
                 {
                     GeoCoderStatusCode status;
-                    var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
-                    if (status == GeoCoderStatusCode.OK && pos != null)
-                        toolStripStatusLabel3.Text = pos.Value.Address;
-                    else
-                        toolStripStatusLabel3.Text = string.Empty;
-                    //_currentMarker.ToolTipText = toolStripStatusLabel3.Text;
+                    try
+                    {
+                        var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
+                        if (status == GeoCoderStatusCode.OK && pos != null)
+                            toolStripStatusLabel3.Text = pos.Value.Address;
+                        else
+                            toolStripStatusLabel3.Text = string.Empty;
+                    }
+                    catch (Exception ex)
+                    {
+                        toolStripStatusLabel3.Text = ex.Message;
+                    }
                 }
 
                 _isMouseDown = false;
@@ -939,11 +945,18 @@ namespace Demo.WindowsForms
                     statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
 
                     GeoCoderStatusCode status;
-                    var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
-                    if (status == GeoCoderStatusCode.OK && pos != null)
-                        toolStripStatusLabel3.Text = pos.Value.Address;
-                    else
-                        toolStripStatusLabel3.Text = string.Empty;
+                    try
+                    {
+                        var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
+                        if (status == GeoCoderStatusCode.OK && pos != null)
+                            toolStripStatusLabel3.Text = pos.Value.Address;
+                        else
+                            toolStripStatusLabel3.Text = string.Empty;
+                    }
+                    catch (Exception ex)
+                    {
+                        toolStripStatusLabel3.Text = ex.Message;
+                    }
                 }
 
                 foreach (var m in Objects.Markers)
@@ -1283,14 +1296,22 @@ namespace Demo.WindowsForms
                 if (item is GMapMarkerRect)
                 {
                     GeoCoderStatusCode status;
-                    var pos = MainMap.GeocodingProvider.GetPlacemark(item.Position, out status);
-                    if (status == GeoCoderStatusCode.OK && pos != null)
+                    try
                     {
-                        var v = item as GMapMarkerRect;
+                        var pos = MainMap.GeocodingProvider.GetPlacemark(item.Position, out status);
+                        if (status == GeoCoderStatusCode.OK && pos != null)
                         {
-                            v.ToolTipText = pos.Value.Address;
+                            var v = item as GMapMarkerRect;
+                            if (v != null)
+                            {
+                                v.ToolTipText = pos.Value.Address;
+                            }
+                            MainMap.Invalidate(false);
                         }
-                        MainMap.Invalidate(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("MainMap_OnMarkerClick: " + ex.ToString());
                     }
                 }
                 else
@@ -1597,10 +1618,17 @@ namespace Demo.WindowsForms
             if (checkBoxPlacemarkInfo.Checked)
             {
                 GeoCoderStatusCode status;
-                var ret = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);      // get city, street, etc info for current marker position
-                if (status == GeoCoderStatusCode.OK && ret != null)
+                try
                 {
-                    p = ret;
+                    var ret = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);      // get city, street, etc info for current marker position
+                    if (status == GeoCoderStatusCode.OK && ret != null)
+                    {
+                        p = ret;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("btnAddMarker_Click: " + ex.ToString());
                 }
             }
 
@@ -2537,6 +2565,52 @@ namespace Demo.WindowsForms
                         return true;
                     }
                     break;
+
+                case "gmarker":                      // draw google marker: "marker", name, lat,lng, color
+                    if (ls.Length > 4)
+                    {
+                        var g = GMapMarker.CreateGMarker(ls, out errorstring);
+                        if (g == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+
+                        Objects.Markers.Add(g);
+
+                        if (g is GMarkerGoogle)
+                        {
+                            var mBorders = new GMapMarkerRect(g.Position);
+                            mBorders.InnerMarker = g as GMarkerGoogle;
+                            mBorders.ToolTipMode = checkBox_Infobox.Checked ? MarkerTooltipMode.Always : MarkerTooltipMode.Never;
+                            mBorders.ToolTipText = g.Name;
+                            Objects.Markers.Add(mBorders);
+                        }
+
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
+                case "hmarker":                      // draw HFsystem marker: "marker", name, lat,lng, color
+                    if (ls.Length > 4)
+                    {
+                        var g = GMapMarker.CreateHFMarker(ls, out errorstring);
+                        if (g == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+
+                        Objects.Markers.Add(g);
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
+
 
                 case "show":
                     if (ls.Length > 1)

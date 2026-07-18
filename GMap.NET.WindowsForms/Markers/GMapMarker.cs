@@ -374,6 +374,84 @@ namespace GMap.NET.WindowsForms.Markers
         }
 
 
+        public static GMapMarker CreateHFMarker(string[] ls, out string errorstr)
+        {
+            // 0: hmarker, 1:name, 2:lat, 3:long, 4:color
+            string name = ls[1];
+            if (name == ".") name = "";
+            double lat = 0;
+            double lng = 0;
+            errorstr = null;
+
+            if (!double.TryParse(ls[2], out lat))
+            {
+                errorstr = "Invalid latitude";
+                return null;
+            }
+            if (!double.TryParse(ls[3], out lng))
+            {
+                errorstr = "Invalid longitude";
+                return null;
+            }
+            var p = new PointLatLng(lat, lng);
+
+            var t = GMarkerHFsystemType.Feketekör;
+
+            switch (ls[4])
+            {
+                case "blue": t = GMarkerHFsystemType.Kékkör; break;
+                case "red": t = GMarkerHFsystemType.Piroskör; break;
+                case "yellow": t = GMarkerHFsystemType.Sárgakör; break;
+                case "black": t = GMarkerHFsystemType.Feketekör; break;
+                case "green": t = GMarkerHFsystemType.Zöldkör; break;
+                case "pink": t = GMarkerHFsystemType.Lilakör; break;
+                case "brown": t = GMarkerHFsystemType.Bíborkör; break;
+            }
+
+            return new GMarkerHFsystem(p, t, 1, name);
+        } /* CreateHFMarker */
+
+
+        public static GMapMarker CreateGMarker(string[] ls, out string errorstr)
+        {
+            // 0: hmarker, 1:name, 2:lat, 3:long, 4:color
+            string name = ls[1];
+            if (name == ".") name = "";
+            double lat = 0;
+            double lng = 0;
+            errorstr = null;
+
+            if (!double.TryParse(ls[2], out lat))
+            {
+                errorstr = "Invalid latitude";
+                return null;
+            }
+            if (!double.TryParse(ls[3], out lng))
+            {
+                errorstr = "Invalid longitude";
+                return null;
+            }
+            var p = new PointLatLng(lat, lng);
+
+            var t = GMarkerGoogleType.blue_pushpin;
+
+            switch (ls[5])
+            {
+                case "blue": t = GMarkerGoogleType.blue_pushpin; break;
+                case "red": t = GMarkerGoogleType.red_pushpin; break;
+                case "yellow": t = GMarkerGoogleType.yellow_pushpin; break;
+                case "black": t = GMarkerGoogleType.black_small; break;
+                case "green": t = GMarkerGoogleType.green_pushpin; break;
+                case "purple": t = GMarkerGoogleType.purple_pushpin; break;
+                case "brown": t = GMarkerGoogleType.brown_small; break;
+            }
+
+            return new GMarkerGoogle(p, t, name);
+
+        } /* CreateGMarker */
+
+
+
         public virtual void OnRender(Graphics g)
         {
             //
