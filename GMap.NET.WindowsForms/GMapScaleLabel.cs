@@ -66,23 +66,24 @@ namespace GMap.NET.WindowsForms
         {
             try
             {
-                var position = LocalPosition;
+                var position = Overlay.Control.FromLatLngToLocal(GeoPosition);//LocalPosition;
+                var pos = Point.Empty;
                 switch (Anchor)
                 {
                     case AnchorType.Left:
-                        position = new Point(_offset, LocalPosition.Y);
+                        pos = new Point(_offset,(int)(position.Y) - Size.Height);
                         break;
                     case AnchorType.Right:
-                        position = new Point((int)g.VisibleClipBounds.Width - _offset, LocalPosition.Y);
+                        pos = new Point((int)g.VisibleClipBounds.Width - _offset, (int)position.Y - Size.Height);
                         break;
                     case AnchorType.Top:
-                        position = new Point(LocalPosition.X, _offset);
+                        pos = new Point((int)position.X, _offset);
                         break;
                     case AnchorType.Bottom:
-                        position = new Point(LocalPosition.X, (int)g.VisibleClipBounds.Height - _offset);
+                        pos = new Point((int)position.X, (int)g.VisibleClipBounds.Height - _offset);
                         break;
                 }
-                g.DrawString(Text, Font, Fill, position);
+                g.DrawString(Text, Font, TextColor, pos);
             }
             catch { }
             ;

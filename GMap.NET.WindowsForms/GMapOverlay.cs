@@ -311,7 +311,7 @@ namespace GMap.NET.WindowsForms
                         obj.Overlay = this;
                         if (Control != null)
                         {
-                            Control.UpdateLabelLocalPosition(obj);
+                            Control.UpdateScaleLabelLocalPosition(obj);
                         }
                     }
                 }

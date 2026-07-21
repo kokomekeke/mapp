@@ -21,6 +21,7 @@ using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
 using GMap.NET.WindowsForms.ToolTips;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static GMap.NET.Entity.OpenStreetMapRouteEntity;
 
 namespace Demo.WindowsForms
@@ -62,6 +63,31 @@ namespace Demo.WindowsForms
 
         // macro
         string _filename = string.Empty;
+
+        bool _show_address = false;
+        //bool _show_distance = false;
+        GMapLine _distance_line;
+
+        public bool ShowAddress
+        {
+            get { return _show_address; }
+            set 
+            {
+                if (_show_address != value)
+                {
+                    _show_address = value;
+                    if (value)
+                    {
+                        if (_currentMarker.IsVisible)
+                        {
+                            toolStripStatusLabel3.Text = MainMap.GetPlaceAddress(_currentMarker.Position);
+                        }
+                        else toolStripStatusLabel3.Text = string.Empty;
+                    }
+                    else toolStripStatusLabel3.Text = string.Empty;
+                }
+            }
+        }
 
 
         public MainForm()
@@ -893,23 +919,31 @@ namespace Demo.WindowsForms
 
         void MainMap_MouseUp(object sender, MouseEventArgs e)
         {
+            MainMap.ShowDistance = false;
+            if (_distance_line != null)
+            {
+                Polygons.Lines.Remove(_distance_line);
+                _distance_line = null;
+            }
+
             if (e.Button == MouseButtons.Left)
             {
-                if (_isMouseDown && _currentMarker.IsVisible)
+                if (_isMouseDown && _currentMarker.IsVisible && _show_address)
                 {
-                    GeoCoderStatusCode status;
-                    try
-                    {
-                        var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
-                        if (status == GeoCoderStatusCode.OK && pos != null)
-                            toolStripStatusLabel3.Text = pos.Value.Address;
-                        else
-                            toolStripStatusLabel3.Text = string.Empty;
-                    }
-                    catch (Exception ex)
-                    {
-                        toolStripStatusLabel3.Text = ex.Message;
-                    }
+                    //GeoCoderStatusCode status;
+                    //try
+                    //{
+                    //    var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
+                    //    if (status == GeoCoderStatusCode.OK && pos != null)
+                    //        toolStripStatusLabel3.Text = pos.Value.Address;
+                    //    else
+                    //        toolStripStatusLabel3.Text = string.Empty;
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    toolStripStatusLabel3.Text = ex.Message;
+                    //}
+                    toolStripStatusLabel3.Text = MainMap.GetPlaceAddress(_currentMarker.Position);
                 }
 
                 _isMouseDown = false;
@@ -928,11 +962,21 @@ namespace Demo.WindowsForms
             Objects.Markers.Add(cc);
         }
 
+
+
         void MainMap_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 _isMouseDown = true;
+
+                if (MainMap.ShowDistance)
+                {
+                    var p = MainMap.FromLocalToLatLng(e.X, e.Y);
+                    _distance_line = new GMapLine(p, p, Color.Red);
+                    _distance_line.ShowLength();
+                    Polygons.Lines.Add(_distance_line);
+                }
 
                 if (_currentMarker.IsVisible)
                 {
@@ -944,18 +988,23 @@ namespace Demo.WindowsForms
                     Debug.WriteLine("MouseDown: geo: " + _currentMarker.Position + " | px: " + px + " | tile: " + tile);
                     statusStrip1.Items[0].Text = _currentMarker.ToGeoString();
 
-                    GeoCoderStatusCode status;
-                    try
+                    if (_show_address)
                     {
-                        var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
-                        if (status == GeoCoderStatusCode.OK && pos != null)
-                            toolStripStatusLabel3.Text = pos.Value.Address;
-                        else
-                            toolStripStatusLabel3.Text = string.Empty;
-                    }
-                    catch (Exception ex)
-                    {
-                        toolStripStatusLabel3.Text = ex.Message;
+                        //GeoCoderStatusCode status;
+                        //try
+                        //{
+                        //    var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
+                        //    if (status == GeoCoderStatusCode.OK && pos != null)
+                        //        toolStripStatusLabel3.Text = pos.Value.Address;
+                        //    else
+                        //        toolStripStatusLabel3.Text = string.Empty;
+                        //}
+                        //catch (Exception ex)
+                        //{
+                        //    toolStripStatusLabel3.Text = ex.Message;
+                        //}
+
+                        toolStripStatusLabel3.Text = MainMap.GetPlaceAddress(_currentMarker.Position);
                     }
                 }
 
@@ -1040,14 +1089,16 @@ namespace Demo.WindowsForms
                                 MenuItem m2 = new MenuItem("Close curve");
                                 MenuItem m3 = new MenuItem("Change color");
                                 MenuItem m4 = new MenuItem("Delete");
+                                MenuItem m5 = new MenuItem("Length");
 
                                 m1.Click += M1P_Click;
                                 m2.Click += M2P_Click;
                                 m3.Click += M3P_Click;
                                 m4.Click += M4P_Click;
+                                m5.Click += M5P_Click;
                                 _tempHFmarker = _currentHFmarker;
 
-                                ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3, m4 });
+                                ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3, m5, m4 });
                                 m.Show(MainMap, new Point(e.X, e.Y));
                                 _isMouseDown = false;
                                 MainMap.ClearSelection();
@@ -1060,6 +1111,7 @@ namespace Demo.WindowsForms
             }
 
         } /* MainMap_MouseDown */
+
 
         private void MHighlight_Click(object sender, EventArgs e)
         {
@@ -1211,13 +1263,28 @@ namespace Demo.WindowsForms
             }
         }
 
+        private void M5P_Click(object sender, EventArgs e)
+        {
+            if (_currentPolyline != null)
+            {
+                _currentPolyline.ShowLength();
+                MainMap.Invalidate();
+            }
+        }
+
 
         // move current marker with left holding
         void MainMap_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && _isMouseDown)
             {
-                if (_currentRectMarker == null)
+                if (MainMap.ShowDistance && (_distance_line != null))
+                {
+                    var pos = MainMap.FromLocalToLatLng(e.X, e.Y);
+                    _distance_line.SetPosition2(pos);
+                }
+
+                else if (_currentRectMarker == null)
                 {
                     var pos = MainMap.FromLocalToLatLng(e.X, e.Y);
 
@@ -1295,23 +1362,15 @@ namespace Demo.WindowsForms
             {
                 if (item is GMapMarkerRect)
                 {
-                    GeoCoderStatusCode status;
-                    try
+                    var st = MainMap.GetPlaceAddress(item.Position);
+                    if (string.IsNullOrEmpty(st))
                     {
-                        var pos = MainMap.GeocodingProvider.GetPlacemark(item.Position, out status);
-                        if (status == GeoCoderStatusCode.OK && pos != null)
+                        var v = item as GMapMarkerRect;
+                        if (v != null)
                         {
-                            var v = item as GMapMarkerRect;
-                            if (v != null)
-                            {
-                                v.ToolTipText = pos.Value.Address;
-                            }
+                            v.ToolTipText = st;
                             MainMap.Invalidate(false);
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("MainMap_OnMarkerClick: " + ex.ToString());
                     }
                 }
                 else
@@ -1614,31 +1673,39 @@ namespace Demo.WindowsForms
                 mBorders.ToolTipMode = checkBox_Infobox.Checked?  MarkerTooltipMode.Always : MarkerTooltipMode.Never;
             }
 
-            Placemark? p = null;
+            //Placemark? p = null;
+            //if (checkBoxPlacemarkInfo.Checked)
+            //{
+            //    GeoCoderStatusCode status;
+            //    try
+            //    {
+            //        var ret = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);      // get city, street, etc info for current marker position
+            //        if (status == GeoCoderStatusCode.OK && ret != null)
+            //        {
+            //            p = ret;
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Debug.WriteLine("btnAddMarker_Click: " + ex.ToString());
+            //    }
+            //}
+
+            //if (p != null)
+            //{
+            //    mBorders.ToolTipText = p.Value.Address;
+            //}
+            //else
+            //{
+            //    mBorders.ToolTipText = _currentMarker.Position.ToString();
+            //}
+
             if (checkBoxPlacemarkInfo.Checked)
             {
-                GeoCoderStatusCode status;
-                try
-                {
-                    var ret = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);      // get city, street, etc info for current marker position
-                    if (status == GeoCoderStatusCode.OK && ret != null)
-                    {
-                        p = ret;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("btnAddMarker_Click: " + ex.ToString());
-                }
-            }
-
-            if (p != null)
-            {
-                mBorders.ToolTipText = p.Value.Address;
-            }
-            else
-            {
-                mBorders.ToolTipText = _currentMarker.Position.ToString();
+                string st = MainMap.GetPlaceAddress(_currentMarker.Position);
+                if (!string.IsNullOrEmpty(st))
+                     mBorders.ToolTipText = st;
+                else mBorders.ToolTipText = _currentMarker.Position.ToString();
             }
 
             Objects.Markers.Add(m);
@@ -2724,6 +2791,17 @@ namespace Demo.WindowsForms
             frm.Show();
             frm.BringToFront();
         }
+
+        private void checkBox_Address_CheckedChanged(object sender, EventArgs e)
+        {
+            ShowAddress = checkBox_Address.Checked;
+        }
+
+        private void btn_distance_Click(object sender, EventArgs e)
+        {
+            MainMap.ShowDistance = true;
+        }
+
 
     } /* class MainForm */
 

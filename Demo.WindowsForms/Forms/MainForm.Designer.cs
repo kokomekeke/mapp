@@ -44,6 +44,7 @@ namespace Demo.WindowsForms
             this.btnReload = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.groupBox_Show = new System.Windows.Forms.GroupBox();
+            this.checkBox_Address = new System.Windows.Forms.CheckBox();
             this.checkBox_scale = new System.Windows.Forms.CheckBox();
             this.checkBox_GeoGrid = new System.Windows.Forms.CheckBox();
             this.checkBox_CenterMarker = new System.Windows.Forms.CheckBox();
@@ -55,6 +56,7 @@ namespace Demo.WindowsForms
             this.groupBoxProgress = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btn_distance = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.txe_direction = new System.Windows.Forms.TextBox();
             this.btn_add_dfline = new System.Windows.Forms.Button();
@@ -97,6 +99,8 @@ namespace Demo.WindowsForms
             this.macroToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.angleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cacheToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.routingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.geocodingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -110,8 +114,6 @@ namespace Demo.WindowsForms
             this.licenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
-            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
-            this.angleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -270,6 +272,7 @@ namespace Demo.WindowsForms
             // 
             // groupBox_Show
             // 
+            this.groupBox_Show.Controls.Add(this.checkBox_Address);
             this.groupBox_Show.Controls.Add(this.checkBox_scale);
             this.groupBox_Show.Controls.Add(this.checkBox_GeoGrid);
             this.groupBox_Show.Controls.Add(this.checkBox_CenterMarker);
@@ -284,6 +287,17 @@ namespace Demo.WindowsForms
             this.groupBox_Show.TabIndex = 6;
             this.groupBox_Show.TabStop = false;
             this.groupBox_Show.Text = "Show";
+            // 
+            // checkBox_Address
+            // 
+            this.checkBox_Address.AutoSize = true;
+            this.checkBox_Address.Location = new System.Drawing.Point(135, 60);
+            this.checkBox_Address.Name = "checkBox_Address";
+            this.checkBox_Address.Size = new System.Drawing.Size(64, 17);
+            this.checkBox_Address.TabIndex = 10;
+            this.checkBox_Address.Text = "Address";
+            this.checkBox_Address.UseVisualStyleBackColor = true;
+            this.checkBox_Address.CheckedChanged += new System.EventHandler(this.checkBox_Address_CheckedChanged);
             // 
             // checkBox_scale
             // 
@@ -403,6 +417,7 @@ namespace Demo.WindowsForms
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.btn_distance);
             this.groupBox4.Controls.Add(this.label6);
             this.groupBox4.Controls.Add(this.txe_direction);
             this.groupBox4.Controls.Add(this.btn_add_dfline);
@@ -417,6 +432,16 @@ namespace Demo.WindowsForms
             this.groupBox4.TabIndex = 2;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Routes";
+            // 
+            // btn_distance
+            // 
+            this.btn_distance.Location = new System.Drawing.Point(12, 125);
+            this.btn_distance.Name = "btn_distance";
+            this.btn_distance.Size = new System.Drawing.Size(75, 23);
+            this.btn_distance.TabIndex = 12;
+            this.btn_distance.Text = "Distance";
+            this.btn_distance.UseVisualStyleBackColor = true;
+            this.btn_distance.Click += new System.EventHandler(this.btn_distance_Click);
             // 
             // label6
             // 
@@ -800,16 +825,28 @@ namespace Demo.WindowsForms
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.openFileToolStripMenuItem.Text = "&Open and Run";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.macroToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem1
             // 
             this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            this.editToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.editToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
             this.editToolStripMenuItem1.Text = "&Edit";
             this.editToolStripMenuItem1.Click += new System.EventHandler(this.editToolStripMenuItem1_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(147, 6);
+            // 
+            // angleToolStripMenuItem
+            // 
+            this.angleToolStripMenuItem.Name = "angleToolStripMenuItem";
+            this.angleToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
+            this.angleToolStripMenuItem.Text = "Angle";
+            this.angleToolStripMenuItem.Click += new System.EventHandler(this.angleToolStripMenuItem_Click);
             // 
             // cacheToolStripMenuItem
             // 
@@ -930,18 +967,6 @@ namespace Demo.WindowsForms
             this.MainMap.Size = new System.Drawing.Size(922, 732);
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
-            // 
-            // toolStripMenuItem1
-            // 
-            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
-            // 
-            // angleToolStripMenuItem
-            // 
-            this.angleToolStripMenuItem.Name = "angleToolStripMenuItem";
-            this.angleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.angleToolStripMenuItem.Text = "Angle";
-            this.angleToolStripMenuItem.Click += new System.EventHandler(this.angleToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -1069,6 +1094,8 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel3;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem angleToolStripMenuItem;
+        private System.Windows.Forms.CheckBox checkBox_Address;
+        private System.Windows.Forms.Button btn_distance;
     }
 }
 

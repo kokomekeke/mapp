@@ -19,19 +19,13 @@ namespace GMap.NET.WindowsForms
         public PointLatLng GeoPosition;     // position in geo coordinates
         public Point LocalPosition;        // position of label in screen buffer
 
-        public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(155, Color.Black));
+
+        public static readonly Brush DefaultTextColor = new SolidBrush(Color.Black); //FromArgb(155, Color.Black));
 
         /// <summary>
-        ///     specifies how the outline is painted
+        ///     foreground color
         /// </summary>
-        [NonSerialized] public Pen Stroke = DefaultStroke;
-
-        public static readonly Brush DefaultFill = new SolidBrush(Color.FromArgb(155, Color.Black));
-
-        /// <summary>
-        ///     background color
-        /// </summary>
-        [NonSerialized] public Brush Fill = DefaultFill;
+        [NonSerialized] public Brush TextColor = DefaultTextColor;
 
         public Size Size { get; set; }
 
@@ -95,8 +89,7 @@ namespace GMap.NET.WindowsForms
 
         public void Dispose()
         {
-            Stroke.Dispose();
-            Fill.Dispose();
+            TextColor.Dispose();
             Font.Dispose();
         }
 
@@ -131,7 +124,8 @@ namespace GMap.NET.WindowsForms
         {
             try
             {
-                g.DrawString(Text, Font, Fill, LocalPosition);
+                var drawpoint = new PointF(LocalPosition.X, LocalPosition.Y);
+                g.DrawString(Text, Font, TextColor, drawpoint);
             }
             catch { }
             ;

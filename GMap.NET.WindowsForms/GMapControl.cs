@@ -109,6 +109,15 @@ namespace GMap.NET.WindowsForms
         public readonly ObservableCollectionThreadSafe<GMapOverlay> Overlays =
             new ObservableCollectionThreadSafe<GMapOverlay>();
 
+        bool _show_distance = false;
+
+        public bool ShowDistance
+        {
+            get { return _show_distance; }
+            set { _show_distance = value; }
+        }
+
+
         /// <summary>
         ///     max zoom
         /// </summary>
@@ -735,7 +744,7 @@ namespace GMap.NET.WindowsForms
         }
 
         /// <summary>
-        ///     updates polygons local position
+        ///     updates polyline local position
         /// </summary>
         /// <param name="polygon"></param>
         public void UpdatePolygonLocalPosition(GMapPolyLine polygon)
@@ -753,12 +762,13 @@ namespace GMap.NET.WindowsForms
                 polygon.LocalPoints.Add(p);
             }
 
+            polygon.UpdateLabel();
             polygon.UpdateGraphicsPath();
         }
 
 
         /// <summary>
-        ///     updates polygons local position
+        ///     updates line's local position
         /// </summary>
         /// <param name="line"></param>
         public void UpdateLineLocalPosition(GMapLine line)
@@ -778,6 +788,7 @@ namespace GMap.NET.WindowsForms
             line.LocalPosition2 = new Point((int)p.X, (int)p.Y);
 
             line.UpdateGraphicsPath();
+            line.UpdateLabel();
         }
 
         /// <summary>
@@ -802,10 +813,10 @@ namespace GMap.NET.WindowsForms
         public void UpdateLabelLocalPosition(GMapLabel label)
         {
             var p = FromLatLngToLocal(label.GeoPosition);
-            //if (!MobileMode)
-            //{
-            //    p.OffsetNegative(Core.RenderOffset);
-            //}
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
             label.LocalPosition = new Point((int)p.X, (int)p.Y);
             label.UpdateGraphicsPath();
         }
@@ -2333,6 +2344,9 @@ namespace GMap.NET.WindowsForms
         {
             base.OnMouseMove(e);
 
+            if (_show_distance)
+                return;
+
             if (!Core.IsDragging && !Core.MouseDown.IsEmpty)
             {
                 var p = ApplyRotationInversion(e.X, e.Y);
@@ -2840,6 +2854,68 @@ namespace GMap.NET.WindowsForms
                 p.OffsetNegative(Core.RenderOffset);
             }
             return p;
+        }
+
+
+        public static string GetGeoCoderStatusString(GeoCoderStatusCode status)
+        {
+            switch (status)
+            {
+                case GeoCoderStatusCode.UNKNOWN_ERROR: return "Unknown error";
+                case GeoCoderStatusCode.ZERO_RESULTS: return "No result";
+                case GeoCoderStatusCode.OVER_QUERY_LIMIT: return "Query limit is exceed";
+                case GeoCoderStatusCode.REQUEST_DENIED:  return "Request is denied";
+                case GeoCoderStatusCode.INVALID_REQUEST: return "Invalid request";
+                case GeoCoderStatusCode.ERROR: return "Error";
+                case GeoCoderStatusCode.EXCEPTION_IN_CODE: return "Exception in code";
+                case GeoCoderStatusCode.NOT_IMPLEMENTED: return "Function is not implemented";
+            }
+
+            return status.ToString();
+        }
+
+        public string GetPlaceAddress(PointLatLng point, bool showerror = false)
+        {
+            try
+            {
+                var pos = GeocodingProvider.GetPlacemark(point, out GeoCoderStatusCode status);
+                if (status == GeoCoderStatusCode.OK && pos != null)
+                {
+                    return pos.Value.Address;
+                }
+                else if (showerror)
+                    return GetGeoCoderStatusString(status);
+            }
+            catch (Exception ex)
+            {
+                if (showerror)
+                    return ex.Message;
+            }
+
+            return string.Empty;
+        }
+
+
+        /// <summary>
+        /// Get distance of two geo point in km
+        /// </summary>
+        /// <param name="point1"></param>
+        /// <param name="point2"></param>
+        /// <returns></returns>
+        public double GetDistance(PointLatLng point1, PointLatLng point2)
+        {
+            return MapProvider.Projection.GetDistance(point1, point2);
+        }
+
+        /// <summary>
+        /// Get bearing of two geo point in degree
+        /// </summary>
+        /// <param name="point1"></param>
+        /// <param name="point2"></param>
+        /// <returns></returns>
+        public double GetBearing2(PointLatLng point1, PointLatLng point2)
+        {
+            return MapProvider.Projection.GetBearing(point1, point2);
         }
 
 
@@ -3431,7 +3507,8 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-        #endregion
+        #endregion IGControl Members
+
 
         #region IGControl event Members
 

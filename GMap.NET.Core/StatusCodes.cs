@@ -13,6 +13,7 @@
         INVALID_REQUEST,
         ERROR,
         EXCEPTION_IN_CODE,
+        NOT_IMPLEMENTED,
     }
 
     /// <summary>

@@ -714,7 +714,9 @@ namespace GMap.NET.MapProviders
         public Placemark? GetPlacemark(PointLatLng location, out GeoCoderStatusCode status)
         {
             // http://msdn.microsoft.com/en-us/library/ff701713.aspx
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            status = GeoCoderStatusCode.NOT_IMPLEMENTED; 
+            return null;
         }
 
         string MakeGeocoderUrl(string keywords)

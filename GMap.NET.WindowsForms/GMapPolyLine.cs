@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Windows.Forms;
+using GMap.NET.WindowsForms.ToolTips;
 using static GMap.NET.Entity.OpenStreetMapGraphHopperGeocodeEntity;
 
 namespace GMap.NET.WindowsForms
@@ -15,6 +17,31 @@ namespace GMap.NET.WindowsForms
     [Serializable]
     public class GMapPolyLine : MapRoute, ISerializable, IDeserializationCallback, IDisposable
     {
+        static GMapPolyLine()
+        {
+            DefaultStroke.LineJoin = LineJoin.Round;
+            DefaultStroke.Width = 5;
+        }
+
+        public GMapPolyLine(List<PointLatLng> points, string name)
+            : base(points, name)
+        {
+            LocalPoints.Capacity = Points.Count;
+            Stroke.EndCap = LineCap.ArrowAnchor;
+        }
+
+        public GMapPolyLine(List<PointLatLng> points, Color color, string name)
+            : base(points, name)
+        {
+            LocalPoints.Capacity = Points.Count;
+            Stroke = new Pen(color, DefaultStroke.Width)
+            {
+                LineJoin = DefaultStroke.LineJoin
+            };
+            Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
+        }
+
+
         private bool _visible = true;
 
         /// <summary>
@@ -156,6 +183,7 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+
         /// <summary>
         ///     Indicates whether the specified point is contained within this System.Drawing.Drawing2D.GraphicsPath
         /// </summary>
@@ -199,6 +227,15 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+
+        public void UpdateLabel()
+        {
+            int len = LocalPoints.Count;
+            if ((label != null) && !string.IsNullOrEmpty(label.Text) && (len > 0))
+                //label.LocalPosition = new System.Drawing.Point( (int)LocalPoints[len - 1].X, (int)LocalPoints[len - 1].Y);
+                label.UpdateLocalPosition();
+        }
+
         public virtual void OnRender(Graphics g)
         {
             if (IsVisible)
@@ -210,6 +247,10 @@ namespace GMap.NET.WindowsForms
                     if (Points.Count > 2)
                          g.DrawPath(Stroke, _graphicsPath);
                     else g.DrawLine(Stroke, LocalPoints[0].X, LocalPoints[0].Y, LocalPoints[1].X, LocalPoints[1].Y);
+
+
+                    if ((label != null) && !string.IsNullOrEmpty(label.Text)) 
+                        label.OnRender(g);
 
                 }
             }
@@ -242,29 +283,6 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         public readonly List<GPoint> LocalPoints = new List<GPoint>();
 
-        static GMapPolyLine()
-        {
-            DefaultStroke.LineJoin = LineJoin.Round;
-            DefaultStroke.Width = 5;
-        }
-
-        public GMapPolyLine(List<PointLatLng> points, string name)
-            : base(points, name)
-        {
-            LocalPoints.Capacity = Points.Count;
-            Stroke.EndCap = LineCap.ArrowAnchor;
-        }
-
-        public GMapPolyLine(List<PointLatLng> points, Color color, string name)
-            : base(points, name)
-        {
-            LocalPoints.Capacity = Points.Count;
-            Stroke = new Pen(color, DefaultStroke.Width)
-            {
-                LineJoin = DefaultStroke.LineJoin
-            };
-            Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
-        }
 
 
         public Color LineColor
@@ -287,6 +305,9 @@ namespace GMap.NET.WindowsForms
                 }
             }
         }
+
+        private GMapTextBox label;
+
 
         /// <summary>
         ///     checks if point is inside the polygon,
@@ -445,6 +466,7 @@ namespace GMap.NET.WindowsForms
         {
             Points.Add(point);
             LocalPoints.Capacity = Points.Count;
+            label = null;
 
             if (IsSelected)
             {
@@ -467,6 +489,7 @@ namespace GMap.NET.WindowsForms
         {
             Points.Insert(index, point);
             LocalPoints.Capacity = Points.Count;
+            label = null;
             if (IsSelected)
             {
                 var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, point);
@@ -487,6 +510,7 @@ namespace GMap.NET.WindowsForms
         {
             if (index >= 0 && index < Points.Count)
             {
+                label = null;
                 Points[index] = point;
                 if (IsSelected)
                 {
@@ -514,6 +538,7 @@ namespace GMap.NET.WindowsForms
             int index = Points.IndexOf(oldpoint);
             if (index != -1)
             {
+                label = null;
                 Points[index] = newpoint;
 
                 if (Overlay != null && Overlay.Control != null)
@@ -532,6 +557,8 @@ namespace GMap.NET.WindowsForms
         {
             Points.Clear();
             LocalPoints.Clear();
+            label = null;
+
             if (IsSelected)
             {
                 for (int i = Overlay.Markers.Count - 1; i >= 0; i--)
@@ -556,6 +583,7 @@ namespace GMap.NET.WindowsForms
             int index = Points.IndexOf(point);
             if (index != -1)
             {
+                label = null;
                 Points.RemoveAt(index);
                 LocalPoints.RemoveAt(index);
                 if (IsSelected)
@@ -577,6 +605,21 @@ namespace GMap.NET.WindowsForms
                     }
                 }
             }
+        }
+
+        public void ShowLength()
+        {
+            if (Points.Count == 0)
+                return;
+
+            if (label == null)
+            {
+                label = new GMapTextBox(Points[Points.Count - 1], Distance.ToString("F1") + " km ");
+                label.Overlay = this.Overlay;
+                label.Font = new Font("Arial", 8); 
+            }
+            else label.Text = Distance.ToString("F1") + " km ";
+            label.UpdateLocalPosition();
         }
 
 

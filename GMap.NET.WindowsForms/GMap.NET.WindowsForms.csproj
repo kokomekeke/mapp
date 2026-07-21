@@ -30,6 +30,7 @@ https://github.com/judero01col/GMap.NET/blob/master/README.md#release-notes
     </PropertyGroup>
     <ItemGroup>
       <Compile Remove="GMapDFToolTip.cs" />
+      <Compile Remove="ToolTips\GMapTextBox.cs" />
     </ItemGroup>
     
   <ItemGroup>

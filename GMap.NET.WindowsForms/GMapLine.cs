@@ -6,7 +6,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms.Markers;
+using GMap.NET.WindowsForms.ToolTips;
 
 namespace GMap.NET.WindowsForms
 {
@@ -32,7 +34,10 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         [NonSerialized] public Brush Fill = DefaultFill;
 
-        public string Name
+        private GMapTextBox label;
+
+
+        public new string Name
         {
             get { return _name; }
             set
@@ -45,8 +50,30 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        public double Length
+        {
+            get 
+            { 
+                if ((Point1 == null) || (Point2 == null) || (Point1 == Point2))
+                    return 0;
+
+                return Overlay.Control.GetDistance(Point1, Point2);
+            }
+        }
+
+        public double Bearing
+        {
+            get
+            {
+                if ((Point1 == null) || (Point2 == null) || (Point1 == Point2))
+                    return 0;
+
+                return Overlay.Control.GetBearing2(Point1, Point2);
+            }
+        }
 
 
+        // Constructors
         public GMapLine()
         {
         }
@@ -143,15 +170,55 @@ namespace GMap.NET.WindowsForms
         }
 
 
+        public void UpdateLabel()
+        {
+            if ((label != null) && !string.IsNullOrEmpty(label.Text))
+                label.UpdateLocalPosition();
+        }
+
+
+        public void UpdateLocalPosition()
+        {
+            if (Overlay != null && Overlay.Control != null)
+            {
+                Overlay.Control.UpdateLineLocalPosition(this);
+                UpdateGraphicsPath();
+            }
+        }
+
+
         public virtual void OnRender(Graphics g)
         {
             try
             {
                 g.DrawLine(Stroke, LocalPosition1.X, LocalPosition1.Y, LocalPosition2.X, LocalPosition2.Y);
+                label?.OnRender(g);
             }
             catch { };
         }
 
+        public void SetPosition2(PointLatLng point)
+        {
+            if ((point == null) || point.IsEmpty || (point == Point2))
+                return;
+
+            Point2 = point;
+            if (label != null) 
+                label.Text = Length.ToString("F1") + " km";
+            UpdateLocalPosition();
+        }
+
+        public void ShowLength()
+        {
+            if (label == null)
+            {
+                label = new GMapTextBox(Point2, Length.ToString("F1") + " km ");
+                label.Overlay = this.Overlay;
+                label.Font = new Font("Arial", 8);
+            }
+            else label.Text = Length.ToString("F1") + " km";
+            label.UpdateLocalPosition();
+        }
 
     } /* class GMapLine */
 
