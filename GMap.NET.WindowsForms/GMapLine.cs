@@ -203,8 +203,15 @@ namespace GMap.NET.WindowsForms
                 return;
 
             Point2 = point;
-            if (label != null) 
+            if (label != null)
+            {
+                if (label.Overlay == null)
+                    label.Overlay = this.Overlay;
+
+                label.GeoPosition = point;
+                label.UpdateLocalPosition();
                 label.Text = Length.ToString("F1") + " km";
+            }
             UpdateLocalPosition();
         }
 
@@ -217,6 +224,10 @@ namespace GMap.NET.WindowsForms
                 label.Font = new Font("Arial", 8);
             }
             else label.Text = Length.ToString("F1") + " km";
+
+            if (label.Overlay == null)
+                label.Overlay = this.Overlay;
+
             label.UpdateLocalPosition();
         }
 

@@ -2563,6 +2563,23 @@ namespace Demo.WindowsForms
                     }
                     break;
 
+                case "circle":                       // draw circle "circle name lat, long, radius, color
+                    if (ls.Length > 5)
+                    {
+                        var p = GMapCircle.CreateCircle(ls, out errorstring);
+                        if (p == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Polygons.Polygons.Add(p);
+                        RegeneratePolygon();
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
+
                 case "image": 
                     break;
 
