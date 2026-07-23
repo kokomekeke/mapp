@@ -62,7 +62,7 @@ namespace Demo.WindowsForms
         GMarkerCross _endMarker;
 
         // macro
-        string _filename = string.Empty;
+        string _macroFilename = string.Empty;
 
         bool _show_address = false;
         //bool _show_distance = false;
@@ -2727,7 +2727,8 @@ namespace Demo.WindowsForms
             } /* switch */
 
 
-            return true;
+            errorstring = "Invalid or missing parameter(s): " + st;
+            return false;
         } /* ProcessMacroCommand */
 
 
@@ -2780,13 +2781,16 @@ namespace Demo.WindowsForms
                 } /* using */
 
                 MacroEditor.MacroText = new StreamReader(dlg.FileName).ReadToEnd();
+                _macroFilename = dlg.FileName;
             }
         } /* macroToolStripMenuItem_Click */
 
         private void editToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            var frm = new MacroEditor();
+            var frm = MacroEditor.GetInstance();
             frm.Show();
+            frm.BringToFront();
+            frm.TopLevel = true;
         }
 
         private void licenceToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2819,7 +2823,45 @@ namespace Demo.WindowsForms
             MainMap.ShowDistance = true;
         }
 
+        private void clearAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearAll();
+        }
 
+        private void newToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MacroEditor.MacroText = "";
+            _macroFilename = string.Empty;
+            var frm = MacroEditor.GetInstance();
+            frm.Clear();
+            frm.Show();
+            frm.BringToFront();
+            frm.TopLevel = true;
+        }
+
+        private void openToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.CheckFileExists = true;
+            dlg.CheckPathExists = true;
+            dlg.DefaultExt = "gmc";
+            dlg.Filter = "GMap macro file (*.gmc)|*.gmc|All file (*.*)|*.*";
+            dlg.Title = "Select GMAP Macro file";
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                MacroEditor.MacroText = new StreamReader(dlg.FileName).ReadToEnd();
+                _macroFilename = dlg.FileName;
+            }
+
+            var frm = MacroEditor.GetInstance();
+            frm.MacroFilename = _macroFilename;
+            frm.LoadText();
+            frm.Show();
+            frm.BringToFront();
+            frm.TopLevel = true;
+
+        }
     } /* class MainForm */
 
 } /* namespace Demo.WindowsForms */
