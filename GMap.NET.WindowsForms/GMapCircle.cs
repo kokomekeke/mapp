@@ -51,6 +51,7 @@ namespace GMap.NET.WindowsForms
             };
 
             BuildCircle();
+            _editable = false;
         }
 
         private void BuildCircle()

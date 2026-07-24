@@ -77,6 +77,13 @@ namespace GMap.NET
             }
         }
 
+        protected bool _editable = true;            // if true, then use can add, remove, move, rename, change color of route points.
+
+        public bool IsEditable
+        { 
+            get { return _editable; } 
+        }
+
         public MapRoute(string name)
         {
             Name = name;

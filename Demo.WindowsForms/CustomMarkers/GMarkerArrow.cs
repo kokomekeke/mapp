@@ -11,7 +11,7 @@ namespace Demo.WindowsForms.CustomMarkers
    public class GMarkerArrow : GMapMarker, ISerializable
    {
       [NonSerialized]
-      public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.Blue));
+      //public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.Blue));
 
       //[NonSerialized]
       //public Pen Pen = new Pen(Brushes.Blue, 5);

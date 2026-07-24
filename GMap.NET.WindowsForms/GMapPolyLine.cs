@@ -464,6 +464,9 @@ namespace GMap.NET.WindowsForms
 
         public void Append(PointLatLng point)
         {
+            if (!_editable || (point == null))
+                return;
+
             Points.Add(point);
             LocalPoints.Capacity = Points.Count;
             label = null;
@@ -487,6 +490,9 @@ namespace GMap.NET.WindowsForms
 
         public void Insert(int index, PointLatLng point)
         {
+            if (!_editable || (point == null))
+                return;
+
             Points.Insert(index, point);
             LocalPoints.Capacity = Points.Count;
             label = null;
@@ -508,6 +514,9 @@ namespace GMap.NET.WindowsForms
 
         public void MovePoint(int index, PointLatLng point)
         {
+            if (!_editable || (point == null))
+                return;
+
             if (index >= 0 && index < Points.Count)
             {
                 label = null;
@@ -535,6 +544,9 @@ namespace GMap.NET.WindowsForms
 
         public void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
         {
+            if (!_editable || (newpoint == null))
+                return;
+
             int index = Points.IndexOf(oldpoint);
             if (index != -1)
             {
@@ -580,6 +592,9 @@ namespace GMap.NET.WindowsForms
 
         public void RemovePoint(PointLatLng point)
         {
+            if (!_editable || (point == null))
+                return;
+
             int index = Points.IndexOf(point);
             if (index != -1)
             {
@@ -692,19 +707,8 @@ namespace GMap.NET.WindowsForms
             {
                 _disposed = true;
 
+                ClearPoints();
                 LocalPoints.Clear();
-
-                if (Overlay != null)
-                {
-                    for (int i = Overlay.Markers.Count - 1; i >= 0; i--)
-                    {
-                        if (Overlay.Markers[i].Parent == this)
-                        {
-                            Overlay.Markers.RemoveAt(i);
-                        }
-                    }
-                }
-
 
                 if (_graphicsPath != null)
                 {

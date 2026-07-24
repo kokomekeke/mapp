@@ -20,19 +20,19 @@ namespace GMap.NET.WindowsForms
 
         protected string _name;
 
-        public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(155, Color.Gray));
+        //public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(155, Color.Gray));
 
-        /// <summary>
-        ///     specifies how the outline is painted
-        /// </summary>
-        [NonSerialized] public Pen Stroke = DefaultStroke;
+        ///// <summary>
+        /////     specifies how the outline is painted
+        ///// </summary>
+        //[NonSerialized] public Pen Stroke = DefaultStroke;
 
-        public static readonly Brush DefaultFill = new SolidBrush(Color.FromArgb(155, Color.LightGray));
+        //public static readonly Brush DefaultFill = new SolidBrush(Color.FromArgb(155, Color.LightGray));
 
-        /// <summary>
-        ///     background color
-        /// </summary>
-        [NonSerialized] public Brush Fill = DefaultFill;
+        ///// <summary>
+        /////     background color
+        ///// </summary>
+        //[NonSerialized] public Brush Fill = DefaultFill;
 
         private GMapTextBox label;
 
@@ -177,7 +177,7 @@ namespace GMap.NET.WindowsForms
         }
 
 
-        public void UpdateLocalPosition()
+        public virtual void UpdateLocalPosition()
         {
             if (Overlay != null && Overlay.Control != null)
             {
@@ -187,7 +187,7 @@ namespace GMap.NET.WindowsForms
         }
 
 
-        public virtual void OnRender(Graphics g)
+        public override void OnRender(Graphics g)
         {
             try
             {

@@ -13,6 +13,16 @@ namespace GMap.NET.WindowsForms
     [Serializable]
     public class GMapRoute : MapRoute, ISerializable, IDeserializationCallback, IDisposable
     {
+
+        public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(144, Color.MidnightBlue));
+
+        /// <summary>
+        ///     specifies how the outline is painted
+        /// </summary>
+        [NonSerialized] public Pen Stroke = DefaultStroke;
+
+        public readonly List<GPoint> LocalPoints = new List<GPoint>();
+
         GMapOverlay _overlay;
 
         public GMapOverlay Overlay
@@ -149,14 +159,6 @@ namespace GMap.NET.WindowsForms
             }
         }
 
-        public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(144, Color.MidnightBlue));
-
-        /// <summary>
-        ///     specifies how the outline is painted
-        /// </summary>
-        [NonSerialized] public Pen Stroke = DefaultStroke;
-
-        public readonly List<GPoint> LocalPoints = new List<GPoint>();
 
         static GMapRoute()
         {

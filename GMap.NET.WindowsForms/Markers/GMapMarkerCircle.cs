@@ -16,18 +16,6 @@ namespace Demo.WindowsForms.CustomMarkers
       public int Radius;
 
       /// <summary>
-      /// specifies how the outline is painted
-      /// </summary>
-      [NonSerialized]
-      public Pen Stroke = new Pen(Color.FromArgb(155, Color.MidnightBlue));
-
-      /// <summary>
-      /// background color
-      /// </summary>
-      [NonSerialized]
-      public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
-
-      /// <summary>
       /// is filled
       /// </summary>
       public bool IsFilled = true;
@@ -36,12 +24,34 @@ namespace Demo.WindowsForms.CustomMarkers
          : base(p, name)
       {
          Radius = 888; // 888m
-         IsHitTestVisible = false;
+         //IsHitTestVisible = false;
       }
 
-      public override void OnRender(Graphics g)
+        public GMapMarkerCircle(PointLatLng p, Color color, string name = null)
+           : base(p, name)
+        {
+            Radius = 888; // 888m
+            //IsHitTestVisible = false;
+            Stroke = new Pen(Color.FromArgb(155, color));
+            Fill= new SolidBrush(Color.FromArgb(155, color));
+            if (Overlay != null)
+            {
+                int r = (int)((Radius) / Overlay.Control.MapProvider.Projection.GetGroundResolution((int)Overlay.Control.Zoom, Position.Lat)) * 2;
+                Size = new Size(2 * r, 2 * r);
+            }
+        }
+
+        public override void ChangeColor(Color color)
+        {
+            Stroke = new Pen(color, Stroke.Width);
+            Fill = new SolidBrush(color);
+        }
+
+
+        public override void OnRender(Graphics g)
       {
          int r = (int)((Radius) / Overlay.Control.MapProvider.Projection.GetGroundResolution((int)Overlay.Control.Zoom, Position.Lat)) * 2;
+         Size = new Size(2 * r, 2 * r);
 
          if(IsFilled)
          {

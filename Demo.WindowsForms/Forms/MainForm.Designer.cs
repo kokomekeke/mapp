@@ -100,6 +100,7 @@ namespace Demo.WindowsForms
             this.clearAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.macroToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.openFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
@@ -117,7 +118,7 @@ namespace Demo.WindowsForms
             this.licenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
-            this.openToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.btn_clear_coordinates = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -131,6 +132,7 @@ namespace Demo.WindowsForms
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btn_clear_coordinates);
             this.groupBox1.Controls.Add(this.btn_setEnd);
             this.groupBox1.Controls.Add(this.btn_setStart);
             this.groupBox1.Controls.Add(this.btnCursor);
@@ -845,33 +847,40 @@ namespace Demo.WindowsForms
             // newToolStripMenuItem1
             // 
             this.newToolStripMenuItem1.Name = "newToolStripMenuItem1";
-            this.newToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.newToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
             this.newToolStripMenuItem1.Text = "New";
             this.newToolStripMenuItem1.Click += new System.EventHandler(this.newToolStripMenuItem1_Click);
+            // 
+            // openToolStripMenuItem1
+            // 
+            this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
+            this.openToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
+            this.openToolStripMenuItem1.Text = "Open";
+            this.openToolStripMenuItem1.Click += new System.EventHandler(this.openToolStripMenuItem1_Click);
             // 
             // openFileToolStripMenuItem
             // 
             this.openFileToolStripMenuItem.Name = "openFileToolStripMenuItem";
-            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openFileToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.openFileToolStripMenuItem.Text = "&Open and Run";
             this.openFileToolStripMenuItem.Click += new System.EventHandler(this.macroToolStripMenuItem_Click);
             // 
             // editToolStripMenuItem1
             // 
             this.editToolStripMenuItem1.Name = "editToolStripMenuItem1";
-            this.editToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.editToolStripMenuItem1.Size = new System.Drawing.Size(150, 22);
             this.editToolStripMenuItem1.Text = "&Edit";
             this.editToolStripMenuItem1.Click += new System.EventHandler(this.editToolStripMenuItem1_Click);
             // 
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(147, 6);
             // 
             // angleToolStripMenuItem
             // 
             this.angleToolStripMenuItem.Name = "angleToolStripMenuItem";
-            this.angleToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.angleToolStripMenuItem.Size = new System.Drawing.Size(150, 22);
             this.angleToolStripMenuItem.Text = "Angle";
             this.angleToolStripMenuItem.Click += new System.EventHandler(this.angleToolStripMenuItem_Click);
             // 
@@ -996,12 +1005,15 @@ namespace Demo.WindowsForms
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
             // 
-            // openToolStripMenuItem1
+            // btn_clear_coordinates
             // 
-            this.openToolStripMenuItem1.Name = "openToolStripMenuItem1";
-            this.openToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
-            this.openToolStripMenuItem1.Text = "Open";
-            this.openToolStripMenuItem1.Click += new System.EventHandler(this.openToolStripMenuItem1_Click);
+            this.btn_clear_coordinates.Location = new System.Drawing.Point(176, 97);
+            this.btn_clear_coordinates.Name = "btn_clear_coordinates";
+            this.btn_clear_coordinates.Size = new System.Drawing.Size(23, 22);
+            this.btn_clear_coordinates.TabIndex = 11;
+            this.btn_clear_coordinates.Text = "X";
+            this.btn_clear_coordinates.UseVisualStyleBackColor = true;
+            this.btn_clear_coordinates.Click += new System.EventHandler(this.btn_clear_coordinates_Click);
             // 
             // MainForm
             // 
@@ -1135,6 +1147,7 @@ namespace Demo.WindowsForms
         private System.Windows.Forms.ToolStripMenuItem clearAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem1;
+        private System.Windows.Forms.Button btn_clear_coordinates;
     }
 }
 

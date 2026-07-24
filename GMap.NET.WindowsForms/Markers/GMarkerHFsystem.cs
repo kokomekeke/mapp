@@ -212,7 +212,7 @@ namespace GMap.NET.WindowsForms.Markers
         }
 
 
-        public void CopyToClipboard()
+        public override void CopyToClipboard()
         {
             if (_ballonstate == GeoBallonState.geoDisplayNone)
             {

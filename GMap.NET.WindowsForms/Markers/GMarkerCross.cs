@@ -1,21 +1,30 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.Serialization;
+using System.Windows.Forms;
 
 namespace GMap.NET.WindowsForms.Markers
 {
     [Serializable]
     public class GMarkerCross : GMapMarker, ISerializable
     {
-        public static readonly Pen DefaultPen = new Pen(Brushes.Red, 1);
-
-        [NonSerialized] public Pen Pen = DefaultPen;
 
         public GMarkerCross(PointLatLng p, string name = null)
             : base(p, name)
         {
-            IsHitTestVisible = false;
+            //IsHitTestVisible = false;
+            Size = new Size(20, 20);
         }
+
+        public GMarkerCross(PointLatLng p, Color color, string name = null)
+            : base(p, name)
+        {
+            //IsHitTestVisible = false;
+            Stroke = new Pen(color, 2);
+            IsHitTestVisible = true;
+            Size = new Size(20, 20);
+        }
+
 
         public override void OnRender(Graphics g)
         {
@@ -29,8 +38,8 @@ namespace GMap.NET.WindowsForms.Markers
             var p4 = new Point(LocalPosition.X, LocalPosition.Y);
             p4.Offset(10, 0);
 
-            g.DrawLine(Pen, p1.X, p1.Y, p2.X, p2.Y);
-            g.DrawLine(Pen, p3.X, p3.Y, p4.X, p4.Y);
+            g.DrawLine(Stroke, p1.X, p1.Y, p2.X, p2.Y);
+            g.DrawLine(Stroke, p3.X, p3.Y, p4.X, p4.Y);
         }
 
         public override void Dispose()

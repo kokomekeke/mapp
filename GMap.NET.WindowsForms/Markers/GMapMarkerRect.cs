@@ -22,16 +22,24 @@ namespace Demo.WindowsForms.CustomMarkers
          Pen = new Pen(Brushes.Blue, 2);
 
          // do not forget set Size of the marker
-         // if so, you shall have no event on it ;}
+         // if so, you shall have no event on it ;
          Size = new Size(11, 11);
          Offset = new Point(-Size.Width / 2, -Size.Height / 2);
          ToolTipText = "";
       }
 
-        public void CopyToClipboard()
+        public GMapMarkerRect(PointLatLng p, Color color, string name = null)
+           : base(p, name)
         {
-            System.Windows.Forms.Clipboard.SetText(Position.ToGeoString());
+            Pen = new Pen(color, 2);
+
+            // do not forget set Size of the marker
+            // if so, you shall have no event on it ;
+            Size = new Size(11, 11);
+            Offset = new Point(-Size.Width / 2, -Size.Height / 2);
+            ToolTipText = "";
         }
+
 
         public void UpdateToolTip()
         {

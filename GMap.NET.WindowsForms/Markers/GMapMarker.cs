@@ -14,6 +14,21 @@ namespace GMap.NET.WindowsForms.Markers
     [Serializable]
     public abstract class GMapMarker : ISerializable, IDisposable
     {
+
+        public static readonly Pen DefaultStroke = new Pen(Brushes.Red, 2);
+
+        /// <summary>
+        /// specifies how the outline is painted
+        /// </summary>
+        [NonSerialized] public Pen Stroke = DefaultStroke;
+
+        /// <summary>
+        /// background color
+        /// </summary>
+        [NonSerialized]
+        public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
+
+
         object _parent = null;
         public object Parent
         {
@@ -294,6 +309,19 @@ namespace GMap.NET.WindowsForms.Markers
             Name = name;
         }
 
+        public virtual void CopyToClipboard()
+        {
+            System.Windows.Forms.Clipboard.SetText(Position.ToGeoString());
+        }
+
+
+        public virtual void ChangeColor(Color color)
+        {
+            Stroke = new Pen(color, Stroke.Width);
+        }
+
+
+
         public static GMapMarker CreateMarker(string[] ls, out string errorstr)
         {
             // 0: marker, 1:type, 2:name, 3:lat, 4:long, 5:color
@@ -329,45 +357,58 @@ namespace GMap.NET.WindowsForms.Markers
 
                 switch (ls[5])
                 {
-                    case "blue"  : t = GMarkerHFsystemType.Kékkör; break;
-                    case "red"   : t = GMarkerHFsystemType.Piroskör; break;
+                    case "blue": t = GMarkerHFsystemType.Kékkör; break;
+                    case "red": t = GMarkerHFsystemType.Piroskör; break;
                     case "yellow": t = GMarkerHFsystemType.Sárgakör; break;
-                    case "black" : t = GMarkerHFsystemType.Feketekör; break;
-                    case "green" : t = GMarkerHFsystemType.Zöldkör; break;
-                    case "pink"   : t = GMarkerHFsystemType.Lilakör; break;
-                    case "brown" : t = GMarkerHFsystemType.Bíborkör; break;
+                    case "black": t = GMarkerHFsystemType.Feketekör; break;
+                    case "green": t = GMarkerHFsystemType.Zöldkör; break;
+                    case "pink": t = GMarkerHFsystemType.Lilakör; break;
+                    case "brown": t = GMarkerHFsystemType.Bíborkör; break;
                 }
 
                 return new GMarkerHFsystem(p, t, 1, name);
 
             }
-
-            if ((ls[1] == "google") && ls.Length > 5)
+            else if ((ls[1] == "google") && ls.Length > 5)
             {
                 var t = GMarkerGoogleType.blue_pushpin;
 
                 switch (ls[5])
                 {
-                    case "blue"  : t = GMarkerGoogleType.blue_pushpin; break;
-                    case "red"   : t = GMarkerGoogleType.red_pushpin; break;
+                    case "blue": t = GMarkerGoogleType.blue_pushpin; break;
+                    case "red": t = GMarkerGoogleType.red_pushpin; break;
                     case "yellow": t = GMarkerGoogleType.yellow_pushpin; break;
-                    case "black" : t = GMarkerGoogleType.black_small; break;
-                    case "green" : t = GMarkerGoogleType.green_pushpin; break;
+                    case "black": t = GMarkerGoogleType.black_small; break;
+                    case "green": t = GMarkerGoogleType.green_pushpin; break;
                     case "purple": t = GMarkerGoogleType.purple_pushpin; break;
-                    case "brown" : t = GMarkerGoogleType.brown_small; break;
+                    case "brown": t = GMarkerGoogleType.brown_small; break;
                 }
 
                 return new GMarkerGoogle(p, t, name);
             }
-
-            switch (ls[1])
+            else
             {
-                case "circle": return new GMapMarkerCircle(p, name); 
-                case "cross" : return new GMarkerCross(p, name);
-                case "rectangle": return new GMapMarkerRect(p, name);
-                default:
-                    errorstr = "Invalid marker";
-                    return null;
+                var color = Color.Black;
+                switch (ls[5])
+                {
+                    case "blue": color = Color.Blue; break;
+                    case "red": color = Color.Red; break;
+                    case "yellow": color = Color.Yellow; break;
+                    case "black": color = Color.Black; break;
+                    case "green": color = Color.Green; break;
+                    case "pink": color = Color.Pink; break;
+                    case "brown": color = Color.Brown; break;
+                }
+
+                switch (ls[1])
+                {
+                    case "circle": return new GMapMarkerCircle(p, color, name);
+                    case "cross": return new GMarkerCross(p, color, name);
+                    case "rectangle": return new GMapMarkerRect(p, color, name);
+                    default:
+                        errorstr = "Invalid marker";
+                        return null;
+                }
             }
 
             return null;

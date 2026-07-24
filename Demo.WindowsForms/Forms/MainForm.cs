@@ -42,6 +42,9 @@ namespace Demo.WindowsForms
         GMapMarker _currentMarker;
         GMapMarkerRect _currentRectMarker;
         GMarkerHFsystem _currentHFmarker;
+        GMarkerCross _currentCrossMarker;
+        GMapMarkerCircle _currentCircleMarker;
+
         GMarkerHFsystem _tempHFmarker;
         GMarkerLinePoint _currentLinePoint;
         GMapPolyLine _currentPolyline;
@@ -853,6 +856,10 @@ namespace Demo.WindowsForms
             {
                 _currentLinePoint = null;
             }
+            else if (item is GMarkerCross)
+                _currentCrossMarker = null;
+            else if (item is GMapMarkerCircle)
+                _currentCircleMarker = null;
         }
 
         void MainMap_OnMarkerEnter(GMapMarker item)
@@ -876,7 +883,15 @@ namespace Demo.WindowsForms
                     _currentPolyline = polygon;
                 }
             }
-            Debug.WriteLine("OnMarkerEnter: " + item.Position);
+            else if (item is GMarkerCross)
+            {
+                _currentCrossMarker = item as GMarkerCross;
+            }
+            else if (item is GMapMarkerCircle)
+            {
+                _currentCircleMarker = item as GMapMarkerCircle;
+            }
+                
         }
 
         void MainMap_OnPolygonLeave(GMapPolyLine item)
@@ -990,20 +1005,6 @@ namespace Demo.WindowsForms
 
                     if (_show_address)
                     {
-                        //GeoCoderStatusCode status;
-                        //try
-                        //{
-                        //    var pos = MainMap.GeocodingProvider.GetPlacemark(_currentMarker.Position, out status);
-                        //    if (status == GeoCoderStatusCode.OK && pos != null)
-                        //        toolStripStatusLabel3.Text = pos.Value.Address;
-                        //    else
-                        //        toolStripStatusLabel3.Text = string.Empty;
-                        //}
-                        //catch (Exception ex)
-                        //{
-                        //    toolStripStatusLabel3.Text = ex.Message;
-                        //}
-
                         toolStripStatusLabel3.Text = MainMap.GetPlaceAddress(_currentMarker.Position);
                     }
                 }
@@ -1051,18 +1052,56 @@ namespace Demo.WindowsForms
                     {
                         MenuItem mCenter = new MenuItem("Center");
                         MenuItem mCopy = new MenuItem("Copy");
+                        MenuItem mColor = new MenuItem("Change color");
                         MenuItem mDelete = new MenuItem("Delete");
 
                         mCenter.Click += MRecCenter_Click;
                         mDelete.Click += MRecDelete_Click;
                         mCopy.Click += MRecCopy_Click;
+                        mColor.Click += MRecColor_Click;
                         _tempHFmarker = _currentHFmarker;
 
-                        ContextMenu m = new ContextMenu(new MenuItem[] { mCenter, mCopy, mDelete });
+                        ContextMenu m = new ContextMenu(new MenuItem[] { mCenter, mCopy, mColor, mDelete });
                         m.Show(MainMap, new Point(e.X, e.Y));
                         _isMouseDown = false;
                         _currentHFmarker = null;
 
+                    }
+                    if (_currentCircleMarker != null)
+                    {
+                        MenuItem mCenter = new MenuItem("Center");
+                        MenuItem mCopy = new MenuItem("Copy");
+                        MenuItem mDelete = new MenuItem("Delete");
+                        MenuItem mColor = new MenuItem("Change color");
+
+                        mCenter.Click += MCircleCenter_Click;
+                        mDelete.Click += MCircleDelete_Click;
+                        mCopy.Click   += MCircleCopy_Click;
+                        mColor.Click   += MCircleColor_Click;
+                        _tempHFmarker = _currentHFmarker;
+
+                        ContextMenu m = new ContextMenu(new MenuItem[] { mCenter, mCopy, mColor, mDelete });
+                        m.Show(MainMap, new Point(e.X, e.Y));
+                        _isMouseDown = false;
+                        _currentHFmarker = null;
+                    }
+                    if (_currentCrossMarker != null)
+                    {
+                        MenuItem mCenter = new MenuItem("Center");
+                        MenuItem mCopy = new MenuItem("Copy");
+                        MenuItem mDelete = new MenuItem("Delete");
+                        MenuItem mColor = new MenuItem("Change color");
+
+                        mCenter.Click += MCrossCenter_Click;
+                        mDelete.Click += MCrossDelete_Click;
+                        mCopy.Click   += MCrossCopy_Click;
+                        mColor.Click   += MCrossColor_Click;
+                        _tempHFmarker = _currentHFmarker;
+
+                        ContextMenu m = new ContextMenu(new MenuItem[] { mCenter, mCopy, mColor, mDelete });
+                        m.Show(MainMap, new Point(e.X, e.Y));
+                        _isMouseDown = false;
+                        _currentHFmarker = null;
                     }
                     else
                     { 
@@ -1098,7 +1137,8 @@ namespace Demo.WindowsForms
                                 m5.Click += M5P_Click;
                                 _tempHFmarker = _currentHFmarker;
 
-                                ContextMenu m = new ContextMenu(new MenuItem[] { m1, m2, m3, m5, m4 });
+                                ContextMenu m = _currentPolyline.IsEditable?  new ContextMenu(new MenuItem[] { m1, m2, m3, m5, m4 })
+                                                   : new ContextMenu(new MenuItem[] {  m3, m5, m4 });
                                 m.Show(MainMap, new Point(e.X, e.Y));
                                 _isMouseDown = false;
                                 MainMap.ClearSelection();
@@ -1210,6 +1250,108 @@ namespace Demo.WindowsForms
         }
 
 
+        private void MRecColor_Click(object sender, EventArgs e)
+        {
+            if (_currentRectMarker != null)
+            {
+                var cd = new ColorDialog();
+                if (cd.ShowDialog() == DialogResult.OK)
+                {
+                    _currentRectMarker.ChangeColor(cd.Color);
+                }
+            }
+            _isMouseDown = false;
+        }
+
+        private void MCircleCenter_Click(object sender, EventArgs e)
+        {
+            if (_currentCircleMarker != null)
+                MainMap.Position = _currentCircleMarker.Position;
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+
+        private void MCircleDelete_Click(object sender, EventArgs e)
+        {
+            if ((_currentCircleMarker != null) && _currentCircleMarker.IsVisible)
+            {
+                Objects.Markers.Remove(_currentCircleMarker);
+                _currentCircleMarker = null;
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+
+        private void MCircleCopy_Click(object sender, EventArgs e)
+        {
+            if (_currentCircleMarker != null)
+            {
+                _currentCircleMarker.CopyToClipboard();
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+        private void MCircleColor_Click(object sender, EventArgs e)
+        {
+            if (_currentCircleMarker != null)
+            {
+                var cd = new ColorDialog();
+                if (cd.ShowDialog() == DialogResult.OK)
+                {
+                    _currentCircleMarker.ChangeColor(cd.Color);
+                }
+            }
+            _isMouseDown = false;
+        }
+
+
+        private void MCrossCenter_Click(object sender, EventArgs e)
+        {
+            if (_currentCrossMarker != null)
+                MainMap.Position = _currentCrossMarker.Position;
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+
+        private void MCrossDelete_Click(object sender, EventArgs e)
+        {
+            if ((_currentCrossMarker != null) && _currentCrossMarker.IsVisible)
+            {
+                Objects.Markers.Remove(_currentCrossMarker);
+                _currentCrossMarker = null;
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+
+        private void MCrossCopy_Click(object sender, EventArgs e)
+        {
+            if (_currentCrossMarker != null)
+            {
+                _currentCrossMarker.CopyToClipboard();
+            }
+            _isMouseDown = false;
+            MainMap.ClearSelection();
+        }
+
+        private void MCrossColor_Click(object sender, EventArgs e)
+        {
+            if (_currentCrossMarker != null)
+            {
+                var cd = new ColorDialog();
+                if (cd.ShowDialog() == DialogResult.OK)
+                {
+                    _currentCrossMarker.ChangeColor(cd.Color);
+                }
+            }
+            _isMouseDown = false;
+        }
+
 
 
         private void M1P_Click(object sender, EventArgs e)
@@ -1258,8 +1400,13 @@ namespace Demo.WindowsForms
             // delete polygon
             if (_currentPolyline != null)
             {
-                Polygons.Polygons.Remove(_currentPolyline);
-                _currentPolyline = null;
+                _currentPolyline.ClearPoints();
+                int index = Polygons.Polygons.IndexOf(_currentPolyline);
+                if (index >= 0)
+                {
+                    Polygons.Polygons.RemoveAt(index);
+                    _currentPolyline = null;
+                }
             }
         }
 
@@ -1507,8 +1654,8 @@ namespace Demo.WindowsForms
             }
             else
             {
-                textBoxLat.Text = MainMap.Position.Lat.ToString(CultureInfo.InvariantCulture);
-                textBoxLng.Text = MainMap.Position.Lng.ToString(CultureInfo.InvariantCulture);
+                textBoxLat.Text = string.Empty; //MainMap.Position.Lat.ToString(CultureInfo.InvariantCulture);
+                textBoxLng.Text = string.Empty; // MainMap.Position.Lng.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -2788,9 +2935,12 @@ namespace Demo.WindowsForms
         private void editToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             var frm = MacroEditor.GetInstance();
-            frm.Show();
-            frm.BringToFront();
-            frm.TopLevel = true;
+            if (frm != null)
+            {
+                frm.Show();
+                frm.BringToFront();
+                frm.TopLevel = true;
+            }
         }
 
         private void licenceToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2862,6 +3012,14 @@ namespace Demo.WindowsForms
             frm.TopLevel = true;
 
         }
+
+        private void btn_clear_coordinates_Click(object sender, EventArgs e)
+        {
+            textBoxGeo.Text = string.Empty;
+            textBoxLat.Text = string.Empty;
+            textBoxLng.Text = string.Empty;
+        }
+
     } /* class MainForm */
 
 } /* namespace Demo.WindowsForms */

@@ -88,7 +88,7 @@ namespace GMap.NET.WindowsForms
             Stroke.CustomEndCap = endCap;
         }
 
-        public void UpdateLocalPosition()
+        public override void UpdateLocalPosition()
         {
             if (Overlay != null && Overlay.Control != null)
             {
@@ -130,7 +130,7 @@ namespace GMap.NET.WindowsForms
         }
 
 
-        GraphicsPath _graphicsPath;
+        new GraphicsPath _graphicsPath;
 
 
         public override void OnRender(Graphics g)

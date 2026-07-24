@@ -317,7 +317,7 @@ namespace GMap.NET
 
     class GMapMarkerTile : GMapMarker
     {
-        static Brush Fill = new SolidBrush(Color.FromArgb(155, Color.Blue));
+        //static Brush Fill = new SolidBrush(Color.FromArgb(155, Color.Blue));
 
         public GMapMarkerTile(PointLatLng p, int size) : base(p)
         {
