@@ -57,6 +57,7 @@ namespace GMap.NET.WindowsForms.Markers
         protected GMarkerLinePoint(SerializationInfo info, StreamingContext context)
            : base(info, context)
         {
+            Pen = new Pen(Brushes.Black, 3);
         }
 
         #endregion

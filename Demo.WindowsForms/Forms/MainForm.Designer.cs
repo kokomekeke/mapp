@@ -30,6 +30,7 @@ namespace Demo.WindowsForms
       private void InitializeComponent()
       {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btn_clear_coordinates = new System.Windows.Forms.Button();
             this.btn_setEnd = new System.Windows.Forms.Button();
             this.btn_setStart = new System.Windows.Forms.Button();
             this.btnCursor = new System.Windows.Forms.Button();
@@ -118,7 +119,6 @@ namespace Demo.WindowsForms
             this.licenceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainMap = new GMap.NET.WindowsForms.GMapControl();
-            this.btn_clear_coordinates = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.groupBox_Show.SuspendLayout();
@@ -150,6 +150,16 @@ namespace Demo.WindowsForms
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Coordinates";
+            // 
+            // btn_clear_coordinates
+            // 
+            this.btn_clear_coordinates.Location = new System.Drawing.Point(176, 97);
+            this.btn_clear_coordinates.Name = "btn_clear_coordinates";
+            this.btn_clear_coordinates.Size = new System.Drawing.Size(23, 22);
+            this.btn_clear_coordinates.TabIndex = 11;
+            this.btn_clear_coordinates.Text = "X";
+            this.btn_clear_coordinates.UseVisualStyleBackColor = true;
+            this.btn_clear_coordinates.Click += new System.EventHandler(this.btn_clear_coordinates_Click);
             // 
             // btn_setEnd
             // 
@@ -759,38 +769,40 @@ namespace Demo.WindowsForms
             // newToolStripMenuItem
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "&Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save &as";
+            this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(112, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "&Exit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -1004,16 +1016,6 @@ namespace Demo.WindowsForms
             this.MainMap.Size = new System.Drawing.Size(922, 732);
             this.MainMap.TabIndex = 4;
             this.MainMap.Zoom = 0D;
-            // 
-            // btn_clear_coordinates
-            // 
-            this.btn_clear_coordinates.Location = new System.Drawing.Point(176, 97);
-            this.btn_clear_coordinates.Name = "btn_clear_coordinates";
-            this.btn_clear_coordinates.Size = new System.Drawing.Size(23, 22);
-            this.btn_clear_coordinates.TabIndex = 11;
-            this.btn_clear_coordinates.Text = "X";
-            this.btn_clear_coordinates.UseVisualStyleBackColor = true;
-            this.btn_clear_coordinates.Click += new System.EventHandler(this.btn_clear_coordinates_Click);
             // 
             // MainForm
             // 

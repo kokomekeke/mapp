@@ -476,7 +476,7 @@ namespace GMap.NET.WindowsForms.Markers
 
             var t = GMarkerGoogleType.blue_pushpin;
 
-            switch (ls[5])
+            switch (ls[4])
             {
                 case "blue": t = GMarkerGoogleType.blue_pushpin; break;
                 case "red": t = GMarkerGoogleType.red_pushpin; break;

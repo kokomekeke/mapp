@@ -13,7 +13,7 @@ namespace Demo.WindowsForms.CustomMarkers
       [NonSerialized]
       public Pen Pen;
 
-      [NonSerialized]
+      //[NonSerialized]
       public GMarkerGoogle InnerMarker;
 
       public GMapMarkerRect(PointLatLng p, string name = null)
@@ -78,6 +78,7 @@ namespace Demo.WindowsForms.CustomMarkers
       protected GMapMarkerRect(SerializationInfo info, StreamingContext context)
          : base(info, context)
       {
+         Pen = new Pen(Brushes.Blue, 2);
       }
 
       #endregion

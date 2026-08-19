@@ -13,6 +13,9 @@
         <Prefer32Bit>false</Prefer32Bit>
         <RuntimeIdentifier>win-x64</RuntimeIdentifier>
         <ApplicationIcon>GMap.ico</ApplicationIcon>
+        <PackageProjectUrl />
+        <AssemblyVersion>2.1.26.819</AssemblyVersion>
+        <FileVersion>$(PackageVersion).1</FileVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">

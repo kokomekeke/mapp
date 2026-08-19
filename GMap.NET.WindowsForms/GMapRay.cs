@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -17,7 +18,7 @@ using GMap.NET.Internals;
 
 namespace GMap.NET.WindowsForms
 {
-    public class GMapRay : GMapLine
+    public class GMapRay : GMapLine, ISerializable, IDeserializationCallback, IDisposable
     {
         private static int _r = 6;
         private double _direction = 0;          // direction from North in degree
@@ -225,6 +226,32 @@ namespace GMap.NET.WindowsForms
                 return null;
             }
         }
+
+        #region serialization
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Direction", Direction);
+            info.AddValue("Distance", Distance);
+        }
+
+
+        protected GMapRay(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            Direction = info.GetDouble("Direction");
+            Distance = info.GetDouble("Distance");
+        }
+
+
+
+        //public void OnDeserialization(object sender)
+        //{
+        //    base.OnDeserialization(sender);
+        //}
+
+        #endregion serialization
 
     } /* class GMapRay */
 } /* namespace GMap.NET.WindowsForms */

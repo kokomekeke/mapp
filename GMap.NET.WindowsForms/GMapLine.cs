@@ -94,7 +94,6 @@ namespace GMap.NET.WindowsForms
         {
             Point2 = Extensions.GetStruct(info, "Position2", PointLatLng.Empty);
             Point1 = Position;
-
         }
 
 

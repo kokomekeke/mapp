@@ -197,6 +197,37 @@ namespace GMap.NET.WindowsForms
         }
 
 
+        public void AddFrom(GMapOverlay overlay)
+        {
+            if (overlay != null)
+            {
+                foreach (var m in overlay.Markers)
+                {
+                    Markers.Add(m);
+                }
+                foreach (var r in overlay.Routes)
+                {
+                    Routes.Add(r);
+                }
+                foreach (var p in overlay.Polygons)
+                {
+                    Polygons.Add(p);
+                }
+                foreach (var l in overlay.Lines)
+                {
+                    Lines.Add(l);
+                }
+                foreach (var l in overlay.Rays)
+                {
+                    Rays.Add(l);
+                }
+                foreach (var l in overlay.Labels)
+                {
+                    Labels.Add(l);
+                }
+            }
+        }
+
         void Lines_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)

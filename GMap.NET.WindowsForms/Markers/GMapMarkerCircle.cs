@@ -83,13 +83,15 @@ namespace Demo.WindowsForms.CustomMarkers
       {
          base.GetObjectData(info, context);
 
-         // TODO: Radius, IsFilled
+         info.AddValue("Radius", Radius);
+         info.AddValue("IsFilled", IsFilled);
       }
 
       protected GMapMarkerCircle(SerializationInfo info, StreamingContext context)
          : base(info, context)
       {
-         // TODO: Radius, IsFilled
+         Radius = info.GetInt32("Radius");
+         IsFilled = info.GetBoolean("IsFilled");
       }
 
       #endregion

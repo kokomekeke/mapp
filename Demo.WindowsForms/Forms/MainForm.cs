@@ -31,7 +31,7 @@ namespace Demo.WindowsForms
         public static MainForm Instance = null;
 
         // layers
-        readonly GMapOverlay _top = new GMapOverlay();
+        readonly GMapOverlay _top = new GMapOverlay();                          // for cursor marker and other stuff
         internal readonly GMapOverlay Objects = new GMapOverlay("objects");
         internal readonly GMapOverlay Routes = new GMapOverlay("routes");
         internal readonly GMapOverlay Polygons = new GMapOverlay("polygons");
@@ -91,6 +91,10 @@ namespace Demo.WindowsForms
                 }
             }
         }
+
+
+        // file
+        private string _lastFileName = string.Empty;
 
 
         public MainForm()
@@ -755,10 +759,46 @@ namespace Demo.WindowsForms
             return true;
         }
 
-        #endregion
+        private void SaveToFile(string filename)
+        {
+            try
+            {
+                using (var fs = new FileStream(filename, FileMode.Create))
+                {
+                    var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    formatter.Serialize(fs, Objects);
+                }
+                _lastFileName = filename;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("SaveToFile: " + ex);
+            }
+        }
 
 
-        #region -- cache events --
+        private void LoadFromFile(string filename)
+        {
+            try
+            {
+                using (var fs = new FileStream(filename, FileMode.Open))
+                {
+                    var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    Objects.Clear();
+                    var objects = (GMapOverlay)formatter.Deserialize(fs);
+                    Objects.AddFrom(objects);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("LoadFromFile: " + ex);
+            }
+        }
+
+            #endregion
+
+
+            #region -- cache events --
 
         void OnTileCacheComplete()
         {
@@ -2471,8 +2511,47 @@ namespace Demo.WindowsForms
             Objects.Markers.Clear();
             Routes.Routes.Clear();
             Polygons.Polygons.Clear();
-
+            foreach (var m in MainMap.Overlays)
+                m.Clear();
         }
+
+        private void openToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.CheckPathExists = true;
+            dlg.CheckFileExists = true;
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                LoadFromFile(dlg.FileName);
+            }
+        } /* openToolStripMenuItem_Click */
+
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(_lastFileName))
+            {
+                saveAsToolStripMenuItem_Click(sender, e);
+            }
+            else
+            {
+                SaveToFile(_lastFileName);
+            }
+        }
+
+        private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dlg = new SaveFileDialog();
+            dlg.CheckPathExists = true;
+            dlg.DefaultExt = "";
+            dlg.ValidateNames = true;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                SaveToFile(dlg.FileName);
+            }   
+        }
+
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2484,6 +2563,8 @@ namespace Demo.WindowsForms
             MainMap.Copy();
         }
 
+
+        // save map to image file
         private void saveToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             using (FileDialog dlg = new SaveFileDialog())
@@ -2506,6 +2587,8 @@ namespace Demo.WindowsForms
             }
 
         } /* saveToolStripMenuItem1_Click */
+
+
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -2659,7 +2742,7 @@ namespace Demo.WindowsForms
 
             string[] ls = st.Split(separator);
 
-            switch (ls[0])
+            switch (ls[0].ToLower())
             {
                 case "line":                        // draw line: "line", name, lat1, lng1, lat2, lng2, color
                     if (ls.Length > 6)
@@ -2879,10 +2962,6 @@ namespace Demo.WindowsForms
         } /* ProcessMacroCommand */
 
 
-        private void openToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-        } /* openToolStripMenuItem_Click */
-
 
         /// <summary>
         /// Load macro file and process commands
@@ -2989,6 +3068,12 @@ namespace Demo.WindowsForms
             frm.TopLevel = true;
         }
 
+
+        /// <summary>
+        /// Open Gmap macro file and load it into the MacroEditor form
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void openToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             var dlg = new OpenFileDialog();

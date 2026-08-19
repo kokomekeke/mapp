@@ -118,6 +118,27 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        #region ISerializable Members
+
+        void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+            info.AddValue("Radius", Radius);
+            info.AddValue("Center", Center);
+            info.AddValue("Step", Step);
+        }
+
+        protected GMapCircle(SerializationInfo info, StreamingContext context)
+           : base(info, context)
+        {
+            Radius = info.GetDouble("Radius");
+            Center = (PointLatLng)info.GetValue("Center", typeof(PointLatLng));
+            Step = info.GetDouble("Step");  
+        }
+
+        #endregion
+
+
 
     } /* class GMapCircle */
 } /* namespace GMap.NET.WindowsForms */
