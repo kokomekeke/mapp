@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using System.Xml;
 using Demo.WindowsForms.CustomMarkers;
 using Demo.WindowsForms.Forms;
+using Demo.WindowsForms.Source;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using GMap.NET.WindowsForms;
@@ -766,13 +767,21 @@ namespace Demo.WindowsForms
                 using (var fs = new FileStream(filename, FileMode.Create))
                 {
                     var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    formatter.Serialize(fs, Objects);
+                    var layers = new LayerGroup();
+                    layers.Objects = Objects;
+                    layers.Routes = Routes; 
+                    layers.Polygons = Polygons;
+                    layers.MapProvider = MainMap.MapProvider.ToString();
+                    layers.Center = MainMap.Position;
+                    layers.Zoom = MainMap.Zoom;
+                    formatter.Serialize(fs, layers);
+                    _lastFileName = filename;
                 }
-                _lastFileName = filename;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("SaveToFile: " + ex);
+                MessageBox.Show("Error  in SaveToFile: " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -781,18 +790,51 @@ namespace Demo.WindowsForms
         {
             try
             {
+                Cursor.Current = Cursors.WaitCursor;
                 using (var fs = new FileStream(filename, FileMode.Open))
                 {
                     var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                     Objects.Clear();
-                    var objects = (GMapOverlay)formatter.Deserialize(fs);
-                    Objects.AddFrom(objects);
+                    Routes.Clear();
+                    Polygons.Clear();
+                    var layers = (LayerGroup)formatter.Deserialize(fs);
+                    Objects.AddFrom(layers.Objects);
+                    foreach (var o in Objects.Markers)
+                    {
+                        if (o is GMapMarkerRect)
+                        {
+                            var rc = o as GMapMarkerRect;
+                            if (rc.InnerMarker == null)
+                            {
+                                foreach (var m in Objects.Markers)
+                                {
+                                    if (m.Position == rc.Position && m != rc)
+                                    {
+                                        rc.InnerMarker = (GMarkerGoogle)m;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Routes.AddFrom(layers.Routes);
+                    Polygons.AddFrom(layers.Polygons);
+                    var provider = GMapProviders.TryGetProvider(layers.MapProvider);
+                    if (provider != null)
+                    {
+                        MainMap.MapProvider = provider;
+                    }
+                    MainMap.Position = layers.Center;
+                    MainMap.Zoom = layers.Zoom;
+                    _lastFileName = filename;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("LoadFromFile: " + ex);
+                //Debug.WriteLine("LoadFromFile: " + ex);
+                MessageBox.Show("Error  in LoadFromFile: " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            Cursor.Current = Cursors.Default;
         }
 
             #endregion
@@ -1501,7 +1543,7 @@ namespace Demo.WindowsForms
                     var pnew = MainMap.FromLocalToLatLng(e.X, e.Y);
 
                     int? pIndex = (int?)_currentRectMarker.Tag;
-                    if (pIndex.HasValue)
+                    if (pIndex.HasValue && _polygon != null)
                     {
                         if (pIndex < _polygon.Points.Count)
                         {
@@ -2513,6 +2555,7 @@ namespace Demo.WindowsForms
             Polygons.Polygons.Clear();
             foreach (var m in MainMap.Overlays)
                 m.Clear();
+            _lastFileName = string.Empty;
         }
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2663,15 +2706,19 @@ namespace Demo.WindowsForms
 
         private void ClearAll()
         {
+            var cur = MainMap.Position;
+            if (_top.Markers.Count > 0)
+                cur = _top.Markers[0].Position;
             Objects.Clear();
             Routes.Clear();
             Polygons.Clear();
             foreach (var m in MainMap.Overlays)
                 m.Clear();
             // set current marker
-            _currentMarker = new GMarkerGoogle(MainMap.Position, GMarkerGoogleType.arrow);
+            _currentMarker = new GMarkerGoogle(cur, GMarkerGoogleType.arrow);
             _currentMarker.IsHitTestVisible = false;
             _top.Markers.Add(_currentMarker);
+            _lastFileName = string.Empty;
         }
 
 
@@ -2814,7 +2861,19 @@ namespace Demo.WindowsForms
                     break;
 
                 case "label":                       // draw label: "label", name, lat,lng, text
-                    if (ls.Length > 4)
+                    if (ls.Length > 8)
+                    {
+                        var g = GMapLabel.CreateLabelExt(ls, out errorstring);
+                        if (g == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Objects.Labels.Add(g);
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    else if (ls.Length > 4)
                     {
                         var g = GMapLabel.CreateLabel(ls, out errorstring);
                         if (g == null)

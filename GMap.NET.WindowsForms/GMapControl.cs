@@ -2499,10 +2499,10 @@ namespace GMap.NET.WindowsForms
 
                                     var rp = new GPoint(e.X, e.Y);
 
-                                    //if (!MobileMode)
-                                    //{
-                                    //    rp.OffsetNegative(Core.RenderOffset);
-                                    //}
+                                    if (!MobileMode)
+                                    {
+                                        rp.OffsetNegative(Core.RenderOffset);
+                                    }
 
                                     if (m.IsInsideLocal((int)rp.X, (int)rp.Y))
                                     {

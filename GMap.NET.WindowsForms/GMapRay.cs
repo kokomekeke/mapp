@@ -18,6 +18,7 @@ using GMap.NET.Internals;
 
 namespace GMap.NET.WindowsForms
 {
+    [Serializable]
     public class GMapRay : GMapLine, ISerializable, IDeserializationCallback, IDisposable
     {
         private static int _r = 6;

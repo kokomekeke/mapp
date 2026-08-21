@@ -530,6 +530,7 @@ namespace GMap.NET.WindowsForms.Markers
             info.AddValue("Visible", IsVisible);
             info.AddValue("DisableregionCheck", DisableRegionCheck);
             info.AddValue("IsHitTestVisible", IsHitTestVisible);
+            info.AddValue("Color", Stroke.Color.ToArgb());
         }
 
         /// <summary>
@@ -553,6 +554,7 @@ namespace GMap.NET.WindowsForms.Markers
             IsVisible = info.GetBoolean("Visible");
             DisableRegionCheck = info.GetBoolean("DisableregionCheck");
             IsHitTestVisible = info.GetBoolean("IsHitTestVisible");
+            ChangeColor(Color.FromArgb(Extensions.GetStruct(info, "Color", Color.MidnightBlue.ToArgb())));
         }
 
         #endregion

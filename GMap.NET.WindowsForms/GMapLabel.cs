@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace GMap.NET.WindowsForms
 {
-        
+    [Serializable]
     public class GMapLabel : ISerializable, IDeserializationCallback, IDisposable
     {
 
@@ -25,7 +25,7 @@ namespace GMap.NET.WindowsForms
         /// <summary>
         ///     foreground color
         /// </summary>
-        [NonSerialized] public Brush TextColor = DefaultTextColor;
+        public Brush TextColor = DefaultTextColor;
 
         public Size Size { get; set; }
 
@@ -77,10 +77,20 @@ namespace GMap.NET.WindowsForms
 
         protected GMapLabel(SerializationInfo info, StreamingContext context)
         {
+            _text = info.GetString("text");
+            GeoPosition = (PointLatLng)info.GetValue("GeoPosition", typeof(PointLatLng));
+            Font = (Font)info.GetValue("font", typeof(Font));
+            DrawBorder = info.GetBoolean("drawborder");
+            TextColor = (Brush)info.GetValue("textcolor", typeof(Brush));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            info.AddValue("GeoPosition", GeoPosition);
+            info.AddValue("text", Text);
+            info.AddValue("font", Font);
+            info.AddValue("drawborder", DrawBorder);
+            info.AddValue("textcolor", TextColor);
         }   
 
         public void OnDeserialization(object sender)

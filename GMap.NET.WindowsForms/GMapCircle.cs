@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace GMap.NET.WindowsForms
 {
+    [Serializable]
+
     public class GMapCircle : GMapPolyLine, ISerializable, IDeserializationCallback, IDisposable
     {
         private double _radius;

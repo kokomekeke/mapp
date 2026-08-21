@@ -695,6 +695,8 @@ namespace GMap.NET.WindowsForms
             var polygonArray = new GMapPolyLine[Polygons.Count];
             Polygons.CopyTo(polygonArray, 0);
             info.AddValue("Polygons", polygonArray);
+
+            // TODO: lines, rays, labels
         }
 
         private GMapMarker[] deserializedMarkerArray;

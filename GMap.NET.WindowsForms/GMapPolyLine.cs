@@ -658,6 +658,7 @@ namespace GMap.NET.WindowsForms
 
             info.AddValue("LocalPoints", LocalPoints.ToArray());
             info.AddValue("Visible", IsVisible);
+            info.AddValue("LineColor", LineColor.ToArgb());
         }
 
         // Temp store for de-serialization.
@@ -673,6 +674,7 @@ namespace GMap.NET.WindowsForms
         {
             deserializedLocalPoints = Extensions.GetValue<GPoint[]>(info, "LocalPoints");
             IsVisible = Extensions.GetStruct(info, "Visible", true);
+            LineColor = Color.FromArgb(Extensions.GetStruct(info, "LineColor", Color.MidnightBlue.ToArgb()));
         }
 
         #endregion
