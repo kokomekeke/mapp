@@ -28,7 +28,7 @@ namespace GMap.NET.WindowsForms.ToolTips
             : base(marker)
         {
             Stroke = DefaultStroke;
-            Fill = Brushes.Yellow;
+            Fill = new SolidBrush(Color.Yellow);
         }
 
         public override void OnRender(Graphics g)
@@ -81,9 +81,8 @@ namespace GMap.NET.WindowsForms.ToolTips
 
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("Radius", Radius);
-
             base.GetObjectData(info, context);
+            info.AddValue("Radius", Radius);
         }
 
         protected GMapBaloonToolTip(SerializationInfo info, StreamingContext context)

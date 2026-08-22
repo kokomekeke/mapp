@@ -200,9 +200,9 @@ namespace GMap.NET.WindowsForms
                     _graphicsPath.AddLines(pnts);
 
                     g.DrawPath(Stroke, _graphicsPath);
+                    g.FillEllipse(Fill, new Rectangle(LocalPosition1.X - _r, LocalPosition1.Y - _r, 2 * _r, 2 * _r));
                 }
 
-                g.FillEllipse(Fill, new Rectangle(LocalPosition1.X - _r, LocalPosition1.Y - _r, 2*_r, 2*_r));
             }
             catch { }
             ;
@@ -243,6 +243,7 @@ namespace GMap.NET.WindowsForms
         {
             Direction = info.GetDouble("Direction");
             Distance = info.GetDouble("Distance");
+            CreateCap();
         }
 
 

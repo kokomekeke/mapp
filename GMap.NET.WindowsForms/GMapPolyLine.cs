@@ -39,6 +39,7 @@ namespace GMap.NET.WindowsForms
                 LineJoin = DefaultStroke.LineJoin
             };
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
+            LastColor = Stroke.Color;
         }
 
 
@@ -272,6 +273,13 @@ namespace GMap.NET.WindowsForms
         [NonSerialized] public Pen Stroke = DefaultStroke;
 
         public static readonly Brush DefaultFill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
+
+        private Color _lastcolor = DefaultStroke.Color;
+        public Color LastColor
+        {
+            get { return _lastcolor; }
+            private set { _lastcolor = value; }
+        }
         
         /// <summary>
         ///     background color
@@ -293,6 +301,7 @@ namespace GMap.NET.WindowsForms
                 if (Stroke.Color.ToArgb() != value.ToArgb())
                 {
                     Stroke.Color = value;
+                    LastColor = value;
 
                     if (Overlay != null && Overlay.Control != null)
                     {

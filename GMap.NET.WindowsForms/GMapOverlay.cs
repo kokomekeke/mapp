@@ -696,12 +696,27 @@ namespace GMap.NET.WindowsForms
             Polygons.CopyTo(polygonArray, 0);
             info.AddValue("Polygons", polygonArray);
 
+            var linesArray = new GMapLine[Lines.Count];
+            Lines.CopyTo(linesArray, 0);
+            info.AddValue("Lines", linesArray);
+
+            var rayArray = new GMapRay[Rays.Count];
+            Rays.CopyTo(rayArray, 0);
+            info.AddValue("Rays", rayArray);
+
+            var labelArray = new GMapLabel[Labels.Count];
+            Labels.CopyTo(labelArray, 0);
+            info.AddValue("Labels", labelArray);
+
             // TODO: lines, rays, labels
         }
 
         private GMapMarker[] deserializedMarkerArray;
         private GMapRoute[] deserializedRouteArray;
         private GMapPolyLine[] deserializedPolygonArray;
+        private GMapLine[] deserializedLineArray;
+        private GMapRay[] deserializedRayArray;
+        private GMapLabel[] deserializedLabelArray;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="GMapOverlay" /> class.
@@ -716,6 +731,10 @@ namespace GMap.NET.WindowsForms
             deserializedMarkerArray = Extensions.GetValue(info, "Markers", new GMapMarker[0]);
             deserializedRouteArray = Extensions.GetValue(info, "Routes", new GMapRoute[0]);
             deserializedPolygonArray = Extensions.GetValue(info, "Polygons", new GMapPolyLine[0]);
+            deserializedLineArray = Extensions.GetValue(info, "Lines", new GMapLine[0]);
+            deserializedRayArray = Extensions.GetValue(info, "Rays", new GMapRay[0]);
+            deserializedLabelArray = Extensions.GetValue(info, "Labels", new GMapLabel[0]);
+
 
             CreateEvents();
         }
@@ -752,6 +771,27 @@ namespace GMap.NET.WindowsForms
             {
                 polygon.Overlay = this;
                 Polygons.Add(polygon);
+            }
+
+            // Populate Lines
+            foreach (var line in deserializedLineArray)
+            {
+                line.Overlay = this;
+                Lines.Add(line);
+            }
+
+            // Populate Rays
+            foreach (var ray in deserializedRayArray)
+            {
+                ray.Overlay = this;
+                Rays.Add(ray);
+            }
+
+            // Populate Labels
+            foreach (var label in deserializedLabelArray)
+            {
+                label.Overlay = this;
+                Labels.Add(label);
             }
         }
 
@@ -790,6 +830,11 @@ namespace GMap.NET.WindowsForms
                 }
 
                 foreach (var p in Rays)
+                {
+                    p.Dispose();
+                }
+
+                foreach (var p in Labels)
                 {
                     p.Dispose();
                 }

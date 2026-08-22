@@ -252,10 +252,9 @@ namespace GMap.NET.WindowsForms.Markers
 
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            base.GetObjectData(info, context);
             info.AddValue("type", Type);
             //info.AddValue("Bearing", this.Bearing);
-
-            base.GetObjectData(info, context);
         }
 
         protected GMarkerGoogle(SerializationInfo info, StreamingContext context)

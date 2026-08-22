@@ -52,12 +52,14 @@ namespace GMap.NET.WindowsForms.Markers
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
+            info.AddValue("color", Pen.Color.ToArgb());
         }
 
         protected GMarkerLinePoint(SerializationInfo info, StreamingContext context)
            : base(info, context)
         {
-            Pen = new Pen(Brushes.Black, 3);
+            var color = Color.FromArgb(info.GetInt32("color"));
+            Pen = new Pen(color, 3);
         }
 
         #endregion

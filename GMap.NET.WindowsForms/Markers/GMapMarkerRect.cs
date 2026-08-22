@@ -73,12 +73,14 @@ namespace Demo.WindowsForms.CustomMarkers
       void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
       {
          base.GetObjectData(info, context);
+         info.AddValue("PenColor", Pen.Color.ToArgb());
       }
 
       protected GMapMarkerRect(SerializationInfo info, StreamingContext context)
          : base(info, context)
       {
-         Pen = new Pen(Brushes.Blue, 2);
+        int argb = info.GetInt32("PenColor");
+        Pen = new Pen(Color.FromArgb(argb), 2);
       }
 
       #endregion

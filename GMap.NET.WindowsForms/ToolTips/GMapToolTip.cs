@@ -44,28 +44,28 @@ namespace GMap.NET.WindowsForms.ToolTips
         /// <summary>
         ///     font
         /// </summary>
-        [NonSerialized] public Font Font = DefaultFont;
+        public Font Font = DefaultFont;
 
         public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(140, Color.Black));
 
         /// <summary>
         ///     specifies how the outline is painted
         /// </summary>
-        [NonSerialized] public Pen Stroke = DefaultStroke;
+        public Pen Stroke = DefaultStroke;
 
-        public static readonly Brush DefaultFill = new SolidBrush(Color.FromArgb(222, Color.White));
+        public static readonly SolidBrush DefaultFill = new SolidBrush(Color.FromArgb(222, Color.White));
 
         /// <summary>
         ///     background color
         /// </summary>
-        [NonSerialized] public Brush Fill = DefaultFill;
+        public SolidBrush Fill = DefaultFill;
 
-        public static readonly Brush DefaultForeground = new SolidBrush(Color.DimGray);
+        public static readonly SolidBrush DefaultForeground = new SolidBrush(Color.DimGray);
 
         /// <summary>
         ///     text foreground
         /// </summary>
-        [NonSerialized] public Brush Foreground = DefaultForeground;
+        public SolidBrush Foreground = DefaultForeground;
 
         /// <summary>
         ///     text padding
@@ -126,6 +126,10 @@ namespace GMap.NET.WindowsForms.ToolTips
         {
             Offset = Extensions.GetStruct(info, "Offset", Point.Empty);
             TextPadding = Extensions.GetStruct(info, "TextPadding", new Size(10, 10));
+            Stroke = new Pen(Color.FromArgb(info.GetInt32("Stroke")));
+            Fill = new SolidBrush(Color.FromArgb(info.GetInt32("Fill")));
+            Foreground = new SolidBrush(Color.FromArgb(info.GetInt32("Foreground")));
+            this.Font = (Font)Extensions.GetValue(info, "Font", DefaultFont);
         }
 
         /// <summary>
@@ -144,6 +148,10 @@ namespace GMap.NET.WindowsForms.ToolTips
         {
             info.AddValue("Offset", Offset);
             info.AddValue("TextPadding", TextPadding);
+            info.AddValue("Stroke", Stroke.Color.ToArgb());
+            info.AddValue("Fill", Fill.Color.ToArgb());
+            info.AddValue("Foreground", Foreground.Color.ToArgb());
+            info.AddValue("Font", Font);
         }
 
         #endregion

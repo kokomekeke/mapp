@@ -133,14 +133,21 @@ namespace GMap.NET.WindowsForms
         protected GMapCircle(SerializationInfo info, StreamingContext context)
            : base(info, context)
         {
-            Radius = info.GetDouble("Radius");
-            Center = (PointLatLng)info.GetValue("Center", typeof(PointLatLng));
-            Step = info.GetDouble("Step");  
+            _center = (PointLatLng)info.GetValue("Center", typeof(PointLatLng));
+            Step = info.GetDouble("Step");
+            _radius = info.GetDouble("Radius");
+            Stroke.LineJoin = System.Drawing.Drawing2D.LineJoin.Round;
+            _editable = false;
+            //Points.Remove(Points[Points.Count - 1]);
+            //Points.Remove(Points[0]);
         }
 
-        #endregion
+        public override void OnDeserialization(object sender)
+        {
+            base.OnDeserialization(sender);
+        }
 
+         #endregion
 
-
-    } /* class GMapCircle */
-} /* namespace GMap.NET.WindowsForms */
+        } /* class GMapCircle */
+    } /* namespace GMap.NET.WindowsForms */

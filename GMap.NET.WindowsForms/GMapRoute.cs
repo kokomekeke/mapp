@@ -21,6 +21,14 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         [NonSerialized] public Pen Stroke = DefaultStroke;
 
+        private Color _lastColor = DefaultStroke.Color;
+
+        public Color LastColor
+        {
+            get { return _lastColor; }
+            private set { _lastColor = value; }
+        }
+
         public readonly List<GPoint> LocalPoints = new List<GPoint>();
 
         GMapOverlay _overlay;

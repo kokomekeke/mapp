@@ -13,7 +13,7 @@ namespace GMap.NET.WindowsForms.ToolTips
     public class GMapHFBaloonToolTip : GMapToolTip, ISerializable
     {
         //public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(140, Color.Navy));
-        [NonSerialized] public Brush HeaderFill = new SolidBrush(Color.LightGray);
+        [NonSerialized] public SolidBrush HeaderFill = new SolidBrush(Color.LightGray);
 
         static GMapHFBaloonToolTip()
         {
@@ -27,7 +27,7 @@ namespace GMap.NET.WindowsForms.ToolTips
             : base(marker)
         {
             Stroke = new Pen(Color.Black);
-            Fill = Brushes.White;
+            Fill = new SolidBrush(Color.White);
             TextPadding = new Size(3, 3);
             Foreground = new SolidBrush(Color.Black);
         }
@@ -118,11 +118,14 @@ namespace GMap.NET.WindowsForms.ToolTips
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
+            info.AddValue("HeaderFill", HeaderFill.Color.ToArgb());
         }
 
         protected GMapHFBaloonToolTip(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+            int argb = info.GetInt32("HeaderFill");
+            HeaderFill = new SolidBrush(Color.FromArgb(argb));
         }
 
         #endregion

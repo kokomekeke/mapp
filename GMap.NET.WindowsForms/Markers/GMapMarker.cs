@@ -26,7 +26,7 @@ namespace GMap.NET.WindowsForms.Markers
         /// background color
         /// </summary>
         [NonSerialized]
-        public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
+        public SolidBrush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
 
 
         object _parent = null;
@@ -411,7 +411,7 @@ namespace GMap.NET.WindowsForms.Markers
                 }
             }
 
-            return null;
+            //return null;
         }
 
 
@@ -447,6 +447,28 @@ namespace GMap.NET.WindowsForms.Markers
                 case "green": t = GMarkerHFsystemType.Zöldkör; break;
                 case "pink": t = GMarkerHFsystemType.Lilakör; break;
                 case "brown": t = GMarkerHFsystemType.Bíborkör; break;
+            }
+
+            if (ls.Length > 5)
+            {
+                string infotext = ls[5];
+                int ind = 6;
+                while (ind < ls.Length)
+                    infotext += " " + ls[ind++];
+
+                if (!string.IsNullOrWhiteSpace(infotext))
+                {
+                    infotext = infotext.Replace("\\n", "\n").Replace("{date}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+
+                    var o = new GMarkerHFsystem(p, t, 1, name);
+                    if (infotext == "auto")
+                         o.SetDefaultNote();
+                    else o.Note = infotext.Replace("{geo}", o.ToGeoString()); ;
+                    o.Name = name;
+                    o.BallonState = GeoBallonState.geoDisplayBalloon;
+                    return o;
+                }
             }
 
             return new GMarkerHFsystem(p, t, 1, name);
@@ -531,6 +553,7 @@ namespace GMap.NET.WindowsForms.Markers
             info.AddValue("DisableregionCheck", DisableRegionCheck);
             info.AddValue("IsHitTestVisible", IsHitTestVisible);
             info.AddValue("Color", Stroke.Color.ToArgb());
+            info.AddValue("FillColor", Fill.Color.ToArgb());
         }
 
         /// <summary>
@@ -555,6 +578,7 @@ namespace GMap.NET.WindowsForms.Markers
             DisableRegionCheck = info.GetBoolean("DisableregionCheck");
             IsHitTestVisible = info.GetBoolean("IsHitTestVisible");
             ChangeColor(Color.FromArgb(Extensions.GetStruct(info, "Color", Color.MidnightBlue.ToArgb())));
+            Fill = new SolidBrush(Color.FromArgb(Extensions.GetStruct(info, "FillColor", Color.FromArgb(155, Color.AliceBlue).ToArgb())));
         }
 
         #endregion

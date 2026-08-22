@@ -95,9 +95,8 @@ namespace GMap.NET.WindowsForms.ToolTips
 
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            info.AddValue("Radius", Radius);
-
             base.GetObjectData(info, context);
+            info.AddValue("Radius", Radius);
         }
 
         protected GMapRoundedToolTip(SerializationInfo info, StreamingContext context)

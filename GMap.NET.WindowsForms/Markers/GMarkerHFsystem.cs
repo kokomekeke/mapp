@@ -204,6 +204,13 @@ namespace GMap.NET.WindowsForms.Markers
             BallonState = GeoBallonState.geoDisplayBalloon;
         }
 
+        public void SetDefaultNote()
+        {
+            Note = $",, 21 000 000 Hz\r\n{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\r\n{Position.ToGeoString()},";
+            BallonState = GeoBallonState.geoDisplayBalloon;
+        }
+
+
         public void UpdateDefaultInfo()
         {
             Name = $"[ {ID}] DF";
@@ -266,13 +273,12 @@ namespace GMap.NET.WindowsForms.Markers
 
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            base.GetObjectData(info, context);
             info.AddValue("type", Symbol);
             info.AddValue("ballonstate", BallonState);  
             info.AddValue("Name", Name);
             info.AddValue("Note", Note);
             //info.AddValue("Bearing", this.Bearing);
-
-            base.GetObjectData(info, context);
         }
 
 

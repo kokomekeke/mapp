@@ -979,7 +979,7 @@ namespace Demo.WindowsForms
         void MainMap_OnPolygonLeave(GMapPolyLine item)
         {
             _currentPolyline = null;
-            item.Stroke.Color = Color.MidnightBlue;
+            item.Stroke.Color = item.LastColor;
             Debug.WriteLine("OnPolygonLeave: " + item.Name);
         }
 
@@ -994,7 +994,7 @@ namespace Demo.WindowsForms
         void MainMap_OnRouteLeave(GMapRoute item)
         {
             _currentRoute = null;
-            item.Stroke.Color = Color.MidnightBlue;
+            item.Stroke.Color = item.LastColor; //Color.MidnightBlue;
             Debug.WriteLine("OnRouteLeave: " + item.Name);
         }
 
@@ -3007,8 +3007,26 @@ namespace Demo.WindowsForms
                                 errorstring = "Invalid parameter : " + st;
                                 return false;
                         }
+                        return true;
                     }
                     break;
+
+                case "center":
+                    if ((ls.Length > 2) && double.TryParse(ls[1], out double lat) && double.TryParse(ls[2], out double lng))
+                    {
+                        MainMap.Position = new PointLatLng(lat, lng);
+                        return true;
+                    }
+                    break;
+
+                case "zoom":
+                    if ((ls.Length > 1) && double.TryParse(ls[1], out double z))
+                    {
+                        MainMap.Zoom = z;
+                        return true;
+                    }
+                    break;
+
                 default:
                     //MessageBox.Show("Invalid command : " + st, "ERROR");
                     errorstring = "Invalid command : " + st;
