@@ -53,7 +53,7 @@ namespace GMap.NET.WindowsForms
             };
 
             BuildCircle();
-            _editable = false;
+            //_editable = false;
         }
 
         private void BuildCircle()
@@ -100,6 +100,27 @@ namespace GMap.NET.WindowsForms
         }
 
 
+        public void ChangeRadius(PointLatLng newpoint)
+        {
+            if (!_editable || (newpoint == null))
+                return;
+
+            //int index = Points.IndexOf(oldpoint);
+            //if (index != -1)
+            //{
+                Radius = Overlay.Control.GetDistance(Center, newpoint);
+
+                if (Overlay != null && Overlay.Control != null)
+                {
+                    Overlay.Control.UpdatePolygonLocalPosition(this);
+                    if (!Overlay.Control.HoldInvalidation)
+                    {
+                        Overlay.Control.Invalidate();
+                    }
+                }
+            //}
+        }
+
 
         public static GMapCircle CreateCircle(string[] ls, out string errorstring)
         {
@@ -137,7 +158,7 @@ namespace GMap.NET.WindowsForms
             Step = info.GetDouble("Step");
             _radius = info.GetDouble("Radius");
             Stroke.LineJoin = System.Drawing.Drawing2D.LineJoin.Round;
-            _editable = false;
+            //_editable = false;
             //Points.Remove(Points[Points.Count - 1]);
             //Points.Remove(Points[0]);
         }

@@ -76,7 +76,11 @@ namespace GMap.NET.WindowsForms.Markers
 
                         if (Parent != null)
                         {
-                            if (Parent is GMapPolyLine)
+                            if (Parent is GMapCircle)
+                            {
+                                ((GMapCircle)Parent).ChangeRadius(_position);
+                            }
+                            else if (Parent is GMapPolyLine)
                             {
                                 ((GMapPolyLine)Parent).MovePoint(oldPosition, _position);
                             }

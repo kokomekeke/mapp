@@ -82,6 +82,7 @@ namespace GMap.NET
         public bool IsEditable
         { 
             get { return _editable; } 
+            set { _editable = value; }
         }
 
         public MapRoute(string name)

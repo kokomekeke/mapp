@@ -1219,7 +1219,8 @@ namespace Demo.WindowsForms
                                 m5.Click += M5P_Click;
                                 _tempHFmarker = _currentHFmarker;
 
-                                ContextMenu m = _currentPolyline.IsEditable?  new ContextMenu(new MenuItem[] { m1, m2, m3, m5, m4 })
+                                ContextMenu m = (_currentPolyline is GMapCircle) ? new ContextMenu(new MenuItem[] { m3, m4 }) : 
+                                                 _currentPolyline.IsEditable?  new ContextMenu(new MenuItem[] { m1, m2, m3, m5, m4 })
                                                    : new ContextMenu(new MenuItem[] {  m3, m5, m4 });
                                 m.Show(MainMap, new Point(e.X, e.Y));
                                 _isMouseDown = false;
@@ -1473,6 +1474,18 @@ namespace Demo.WindowsForms
             if (cd.ShowDialog() == DialogResult.OK)
             {
                 _currentPolyline.LineColor = cd.Color;
+                if (_currentPolyline is GMapCircle)
+                {
+                    for (int i = Objects.Markers.Count - 1; i >= 0; i--)
+                    {
+                        if (Objects.Markers[i].Position == ((GMapCircle)_currentPolyline).Center)
+                        {
+                            Objects.Markers[i].ChangeColor(_currentPolyline.LineColor);
+                            break;
+                        }
+                    }
+
+                }
             }
         }
 
@@ -1486,6 +1499,17 @@ namespace Demo.WindowsForms
                 int index = Polygons.Polygons.IndexOf(_currentPolyline);
                 if (index >= 0)
                 {
+                    if (_currentPolyline is GMapCircle)
+                    {
+                        for (int i = Objects.Markers.Count-1; i >= 0; i--)
+                        {
+                            if (Objects.Markers[i].Position == ((GMapCircle)_currentPolyline).Center)
+                            {
+                                Objects.Markers.RemoveAt(i);
+                                break;
+                            }
+                        }
+                    }
                     Polygons.Polygons.RemoveAt(index);
                     _currentPolyline = null;
                 }
@@ -2851,6 +2875,8 @@ namespace Demo.WindowsForms
                         }
                         Polygons.Polygons.Add(p);
                         RegeneratePolygon();
+                        var m = new GMarkerCross(p.Center, p.Stroke.Color, p.Name + " center");
+                        Objects.Markers.Add(m);
                         MainMap.Invalidate();
                         return true;
                     }
@@ -3083,7 +3109,9 @@ namespace Demo.WindowsForms
 
                 } /* using */
 
-                MacroEditor.MacroText = new StreamReader(dlg.FileName).ReadToEnd();
+                var r = new StreamReader(dlg.FileName);
+                MacroEditor.MacroText = r.ReadToEnd();
+                r.Close();
                 _macroFilename = dlg.FileName;
             }
         } /* macroToolStripMenuItem_Click */
@@ -3162,7 +3190,9 @@ namespace Demo.WindowsForms
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-                MacroEditor.MacroText = new StreamReader(dlg.FileName).ReadToEnd();
+                var r = new StreamReader(dlg.FileName);
+                MacroEditor.MacroText = r.ReadToEnd();
+                r.Close();
                 _macroFilename = dlg.FileName;
             }
 
