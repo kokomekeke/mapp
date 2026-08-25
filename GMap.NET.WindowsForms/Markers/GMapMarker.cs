@@ -15,6 +15,17 @@ namespace GMap.NET.WindowsForms.Markers
     public abstract class GMapMarker : ISerializable, IDisposable
     {
 
+        public enum MovementType
+        {
+            None,
+            Horizontal,
+            Vertical,
+            Both
+        }
+
+        public MovementType Movement = MovementType.Both;
+
+
         public static readonly Pen DefaultStroke = new Pen(Brushes.Red, 2);
 
         /// <summary>

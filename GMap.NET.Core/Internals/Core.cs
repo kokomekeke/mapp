@@ -314,6 +314,12 @@ namespace GMap.NET.Internals
         public bool MarkersEnabled = true;
 
         /// <summary>
+        ///     is ellipses enabled
+        /// </summary>
+        public bool EllipsesEnabled = true;
+
+
+        /// <summary>
         ///     can user drag map
         /// </summary>
         public bool CanDragMap = true;
@@ -1319,6 +1325,25 @@ namespace GMap.NET.Internals
             PxRes1000Km = (int)(1000000.0 / rez); // 1000km
             PxRes5000Km = (int)(5000000.0 / rez); // 5000km
         }
+
+
+        public double GetGroundResolution(PointLatLng p)
+        {
+            return Provider.Projection.GetGroundResolution(Zoom, p.Lat);
+        }
+
+        public double GetLocalDistance(PointLatLng p, double distancekm)
+        {
+            double rez = Provider.Projection.GetGroundResolution(Zoom, p.Lat);
+            return distancekm * 1000 / rez; // in pixels
+        }
+
+        public float GetLocalDistance(PointLatLng p, float distancekm)
+        {
+            double rez = Provider.Projection.GetGroundResolution(Zoom, p.Lat);
+            return (float)(distancekm * 1000.0 / rez); // in pixels
+        }
+
 
         #region IDisposable Members
 

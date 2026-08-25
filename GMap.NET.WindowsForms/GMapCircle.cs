@@ -47,6 +47,7 @@ namespace GMap.NET.WindowsForms
         {
             _center = center;
             _radius = radius;
+            DefaultStroke.Width = 5;
             Stroke = new Pen(color, DefaultStroke.Width)
             {
                 LineJoin = System.Drawing.Drawing2D.LineJoin.Round

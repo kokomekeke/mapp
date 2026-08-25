@@ -12,6 +12,7 @@ namespace GMap.NET.WindowsForms.Markers
     [Serializable]
     public class GMarkerLinePoint: GMapMarker, ISerializable
     {
+
         [NonSerialized]
         public Pen Pen;
 
@@ -21,13 +22,17 @@ namespace GMap.NET.WindowsForms.Markers
         {
             Parent = parent;
             Pen = new Pen(Brushes.Black, 3);
-
-            // do not forget set Size of the marker
-            // if so, you shall have no event on it ;}
             Size = new Size(8, 8);
-            //Offset = new Point(Size.Width / 2, Size.Height / 2);
         }
 
+        public GMarkerLinePoint(Object parent, PointLatLng p, MovementType movement)
+           : base(p)
+        {
+            Parent = parent;
+            Pen = new Pen(Brushes.Black, 3);
+            Size = new Size(8, 8);
+            Movement = movement;    
+        }
 
         public override void OnRender(Graphics g)
         {

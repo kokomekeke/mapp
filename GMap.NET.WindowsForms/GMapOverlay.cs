@@ -138,6 +138,12 @@ namespace GMap.NET.WindowsForms
         public readonly ObservableCollectionThreadSafe<GMapScaleLabel> ScaleLabels =
             new ObservableCollectionThreadSafe<GMapScaleLabel>();
 
+        /// <summary>
+        ///     list of ellipses, should be thread safe
+        /// </summary>
+        public readonly ObservableCollectionThreadSafe<GMapEllipse> Ellipses =
+            new ObservableCollectionThreadSafe<GMapEllipse>();
+
 
         GMapControl _control;
 
@@ -173,6 +179,7 @@ namespace GMap.NET.WindowsForms
             Rays.CollectionChanged += DFLines_CollectionChanged;   
             Labels.CollectionChanged += Labels_CollectionChanged;
             ScaleLabels.CollectionChanged += ScaleLabels_CollectionChanged; 
+            Ellipses.CollectionChanged += Ellipses_CollectionChanged;
         }
 
         void ClearEvents()
@@ -184,6 +191,7 @@ namespace GMap.NET.WindowsForms
             Rays.CollectionChanged -= DFLines_CollectionChanged;
             Labels.CollectionChanged -= Labels_CollectionChanged;
             ScaleLabels.CollectionChanged -= ScaleLabels_CollectionChanged;
+            Ellipses.CollectionChanged -= Ellipses_CollectionChanged;
         }
 
         public void Clear()
@@ -194,6 +202,7 @@ namespace GMap.NET.WindowsForms
             Lines.Clear();
             Rays.Clear();
             Labels.Clear();
+            Ellipses.Clear();
         }
 
 
@@ -224,6 +233,10 @@ namespace GMap.NET.WindowsForms
                 foreach (var l in overlay.Labels)
                 {
                     Labels.Add(l);
+                }
+                foreach (var l in overlay.Ellipses)
+                {
+                    Ellipses.Add(l);
                 }
             }
         }
@@ -465,6 +478,42 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        void Ellipses_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (GMapEllipse obj in e.NewItems)
+                {
+                    if (obj != null)
+                    {
+                        obj.Overlay = this;
+                        obj.UpdateLocalPosition();
+                        if ((Control != null) && !Control.HoldInvalidation)
+                        {
+                            Control.Invalidate();
+                        }
+                    }
+                }
+            }
+
+            if (Control != null)
+            {
+                if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    if (Control.IsMouseOverEllipse)
+                    {
+                        Control.IsMouseOverEllipse = false;
+                        Control.RestoreCursorOnLeave();
+                    }
+                }
+
+                if (!Control.HoldInvalidation)
+                {
+                    Control.Invalidate();
+                }
+            }
+        }
+
         /// <summary>
         ///     updates local positions of objects
         /// </summary>
@@ -512,6 +561,11 @@ namespace GMap.NET.WindowsForms
                     Control.UpdateLabelLocalPosition(obj);
                 }
 
+                foreach (var obj in Ellipses)
+                {
+                    obj.UpdateLocalPosition();
+                    //Control.UpdateEllipseLocalPosition(obj);
+                }
             }
         }
 
@@ -569,6 +623,17 @@ namespace GMap.NET.WindowsForms
                 }
 
 
+                if (Control.EllipsesEnabled)
+                {
+                    // ellipses
+                    foreach (var e in Ellipses)
+                    {
+                        if (e.IsVisible)
+                        {
+                            e.OnRender(g);
+                        }
+                    }
+                }
 
                 if (Control.MarkersEnabled)
                 {

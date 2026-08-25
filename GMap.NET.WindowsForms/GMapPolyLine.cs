@@ -757,11 +757,13 @@ namespace GMap.NET.WindowsForms
     } /* class GMapPolyLine */
 
     public delegate void PolygonClick(GMapPolyLine item, MouseEventArgs e);
-
     public delegate void PolygonDoubleClick(GMapPolyLine item, MouseEventArgs e);
-
     public delegate void PolygonEnter(GMapPolyLine item);
-
     public delegate void PolygonLeave(GMapPolyLine item);
+
+    public delegate void EllipseEnter(GMapEllipse item);
+    public delegate void EllipseLeave(GMapEllipse item);
+    public delegate void EllipseClick(GMapEllipse item, MouseEventArgs e);
+
 
 } /* namespace GMap.NET.WindowsForms */

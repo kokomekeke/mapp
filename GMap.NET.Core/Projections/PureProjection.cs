@@ -469,6 +469,20 @@ namespace GMap.NET.Projections
             return (RadiansToDegrees(Atan2(y, x)) + 360) % 360;
         }
 
+        public PointLatLng GetPositionFromPoint(PointLatLng point, double distanceInKm, double bearing)
+        {
+            //double distanceInKm = distance / 1000.0;
+            double radius = Axis / 1000.0;
+            double bearingInRad = DegreesToRadians(bearing);
+            double lat1 = DegreesToRadians(point.Lat);
+            double lon1 = DegreesToRadians(point.Lng);
+            double lat2 = Asin(Sin(lat1) * Cos(distanceInKm / radius) +
+                               Cos(lat1) * Sin(distanceInKm / radius) * Cos(bearingInRad));
+            double lon2 = lon1 + Atan2(Sin(bearingInRad) * Sin(distanceInKm / radius) * Cos(lat1),
+                Cos(distanceInKm / radius) - Sin(lat1) * Sin(lat2));
+            return new PointLatLng(RadiansToDegrees(lat2), RadiansToDegrees(lon2));
+        }
+
         /// <summary>
         ///     Conversion from cartesian earth-centered coordinates to geodetic coordinates in the given datum
         /// </summary>

@@ -186,6 +186,10 @@ namespace Demo.WindowsForms
                 MainMap.OnRouteEnter += MainMap_OnRouteEnter;
                 MainMap.OnRouteLeave += MainMap_OnRouteLeave;
 
+                MainMap.OnEllipseEnter += MainMap_OnEllipseEnter;
+                MainMap.OnEllipseLeave += MainMap_OnEllipseLeave;
+                MainMap.OnEllipseClick += MainMap_OnEllipseClick;
+
                 MainMap.OnRouteClick += MainMap_OnRouteClick;
                 MainMap.OnRouteDoubleClick += MainMap_OnRouteDoubleClick;
 
@@ -1005,6 +1009,27 @@ namespace Demo.WindowsForms
             Debug.WriteLine("OnRouteEnter: " + item.Name);
         }
 
+        GMapEllipse _currentEllipse;
+        void MainMap_OnEllipseLeave(GMapEllipse item)
+        {
+            _currentEllipse = null;
+            item.Stroke.Color = item.LastColor;
+            Debug.WriteLine("OnEllipseLeave: " + item.Name);
+        }
+
+        void MainMap_OnEllipseEnter(GMapEllipse item)
+        {
+            _currentEllipse = item;
+            item.Stroke.Color = Color.Red;
+            Debug.WriteLine("OnEllipseEnter: " + item.Name);
+        }
+
+        private void MainMap_OnEllipseClick(GMapEllipse item, MouseEventArgs e)
+        {
+
+        }
+
+
         void MainMap_OnMapTypeChanged(GMapProvider type)
         {
             comboBoxMapType.SelectedItem = type;
@@ -1559,12 +1584,20 @@ namespace Demo.WindowsForms
 
                     if (_currentLinePoint != null)
                     {
+                        if (_currentLinePoint.Movement == GMapMarker.MovementType.Vertical)
+                            pos.Lat = _currentLinePoint.Position.Lat;
+                        else if (_currentLinePoint.Movement == GMapMarker.MovementType.Horizontal)
+                            pos.Lng = _currentLinePoint.Position.Lng;
                         _currentLinePoint.Position = pos;
                     }
                 }
                 else // move rect marker
                 {
                     var pnew = MainMap.FromLocalToLatLng(e.X, e.Y);
+                    if (_currentRectMarker.Movement == GMapMarker.MovementType.Vertical)
+                        pnew.Lat = _currentMarker.Position.Lat;
+                    else if (_currentRectMarker.Movement == GMapMarker.MovementType.Horizontal)
+                        pnew.Lng = _currentMarker.Position.Lng;
 
                     int? pIndex = (int?)_currentRectMarker.Tag;
                     if (pIndex.HasValue && _polygon != null)
@@ -2882,6 +2915,20 @@ namespace Demo.WindowsForms
                     }
                     break;
 
+                case "ellipse":                       // draw ellipse "ellipse name lat, long, radius1, radius2, color
+                    if (ls.Length > 6)
+                    {
+                        var p = GMapEllipse.CreateEllipse(ls, out errorstring);
+                        if (p == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Objects.Ellipses.Add(p);
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
 
                 case "image": 
                     break;

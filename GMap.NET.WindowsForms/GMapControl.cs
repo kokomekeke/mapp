@@ -49,6 +49,12 @@ namespace GMap.NET.WindowsForms
         public event PolygonClick OnPolygonClick;
 
         /// <summary>
+        ///     occurs when clicked on ellipse
+        /// </summary>
+        public event EllipseClick OnEllipseClick;
+
+
+        /// <summary>
         ///     occurs when double clicked on polygon
         /// </summary>
         public event PolygonDoubleClick OnPolygonDoubleClick;
@@ -97,6 +103,17 @@ namespace GMap.NET.WindowsForms
         ///     occurs on mouse leaves Polygon area
         /// </summary>
         public event PolygonLeave OnPolygonLeave;
+
+        /// <summary>
+        ///     occurs on mouse enters Ellipse area
+        /// </summary>
+        public event EllipseEnter OnEllipseEnter;
+
+        /// <summary>
+        ///     occurs on mouse leaves Ellipse area
+        /// </summary>
+        public event EllipseLeave OnEllipseLeave;
+
 
         /// <summary>
         ///     occurs when an exception is thrown inside the map control
@@ -719,6 +736,20 @@ namespace GMap.NET.WindowsForms
                 marker.LocalPosition = new Point((int)(p.X + marker.Offset.X), (int)(p.Y + marker.Offset.Y));
             }
         }
+
+        public void UpdateEllipseLocalPosition(GMapEllipse ellipse)
+        {
+            var p = FromLatLngToLocal(ellipse.Center);
+
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+
+            ellipse.LocalPosition = new Point((int)p.X, (int)p.Y);
+            ellipse.UpdateGraphicsPath();
+        }
+
 
         /// <summary>
         ///     updates routes local position
@@ -2004,7 +2035,7 @@ namespace GMap.NET.WindowsForms
         {
             base.OnMouseDown(e);
 
-            if (!IsMouseOverMarker && !IsMouseOverPolygon)
+            if (!IsMouseOverMarker && !IsMouseOverPolygon && !IsMouseOverEllipse)
             {
                 if (e.Button == DragButton && CanDragMap)
                 {
@@ -2023,6 +2054,8 @@ namespace GMap.NET.WindowsForms
             }
             else if (IsMouseOverPolygon)
                 IsMouseOverPolygon = false;
+            else if (IsMouseOverEllipse)
+                IsMouseOverEllipse = false;
         } /* OnMouseDown */
 
 
@@ -2161,6 +2194,26 @@ namespace GMap.NET.WindowsForms
                                 #endregion
                             }
                         }
+
+                        foreach (var m in o.Ellipses)
+                        {
+                            m.IsSelected = false;
+
+                            if (m.IsVisible && m.IsHitTestVisible)
+                            {
+                                #region -- check --
+
+                                if (m.IsInside(FromLocalToLatLng(e.X, e.Y)))
+                                {
+                                    m.IsSelected = true;
+                                    OnEllipseClick?.Invoke(m, e);
+                                    overlayObjet = true;
+                                }
+
+                                #endregion
+                            }
+                        }
+
                     }
                 }
 
@@ -2533,6 +2586,49 @@ namespace GMap.NET.WindowsForms
                                     #endregion
                                 }
                             }
+
+                            foreach (var m in o.Ellipses)
+                            {
+                                if (m.IsVisible && m.IsHitTestVisible)
+                                {
+                                    #region -- check --
+
+                                    var rp = new GPoint(e.X, e.Y);
+
+                                    if (!MobileMode)
+                                    {
+                                        rp.OffsetNegative(Core.RenderOffset);
+                                    }
+
+                                    if (m.IsInsideLocal((int)rp.X, (int)rp.Y))
+                                    {
+                                        if (!m.IsMouseOver)
+                                        {
+                                            SetCursorHandOnEnter();
+                                            m.IsMouseOver = true;
+                                            IsMouseOverEllipse = true;
+
+                                            OnEllipseEnter?.Invoke(m);
+
+                                            Invalidate();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (m.IsMouseOver)
+                                        {
+                                            m.IsMouseOver = false;
+                                            IsMouseOverEllipse = false;
+                                            RestoreCursorOnLeave();
+                                            OnEllipseLeave?.Invoke(m);
+
+                                            Invalidate();
+                                        }
+                                    }
+
+                                    #endregion
+                                }
+                            }
                         }
                     }
                 }
@@ -2748,6 +2844,12 @@ namespace GMap.NET.WindowsForms
             return status;
         }
 
+
+        public PointLatLng GetPositionFromPoint(PointLatLng point, double distance, double bearing)
+        {
+            return MapProvider.Projection.GetPositionFromPoint(point, distance, bearing);
+        }
+
         /// <summary>
         ///     gets world coordinate from local control coordinate
         /// </summary>
@@ -2906,6 +3008,7 @@ namespace GMap.NET.WindowsForms
         {
             return MapProvider.Projection.GetDistance(point1, point2);
         }
+
 
         /// <summary>
         /// Get bearing of two geo point in degree
@@ -3238,6 +3341,28 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+
+        bool _isMouseOverEllipse;
+
+        /// <summary>
+        ///     is mouse over ellipse
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
+        public bool IsMouseOverEllipse
+        {
+            get
+            {
+                return _isMouseOverEllipse;
+            }
+            set
+            {
+                _isMouseOverEllipse = value;
+                OverObjectCount += value ? 1 : -1;
+            }
+        }
+
+
         /// <summary>
         ///     gets current map view top/left coordinate, width in Lng, height in Lat
         /// </summary>
@@ -3444,6 +3569,21 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        /// <summary>
+        ///     is ellipses enabled
+        /// </summary>
+        [Category("GMap.NET")]
+        public bool EllipsesEnabled
+        {
+            get
+            {
+                return Core.EllipsesEnabled;
+            }
+            set
+            {
+                Core.EllipsesEnabled = value;
+            }
+        }
 
 
         /// <summary>
