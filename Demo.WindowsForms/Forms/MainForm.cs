@@ -190,6 +190,10 @@ namespace Demo.WindowsForms
                 MainMap.OnEllipseLeave += MainMap_OnEllipseLeave;
                 MainMap.OnEllipseClick += MainMap_OnEllipseClick;
 
+                MainMap.OnRectangleEnter += MainMap_OnRectangleEnter;
+                MainMap.OnRectangleLeave += MainMap_OnRectangleLeave;
+                MainMap.OnRectangleClick += MainMap_OnRectangleClick;   
+
                 MainMap.OnRouteClick += MainMap_OnRouteClick;
                 MainMap.OnRouteDoubleClick += MainMap_OnRouteDoubleClick;
 
@@ -1029,6 +1033,25 @@ namespace Demo.WindowsForms
 
         }
 
+        GMapRectangle _currentRectangle;
+
+        void MainMap_OnRectangleLeave(GMapRectangle item)
+        {
+            _currentRectangle = null;
+            item.Stroke.Color = item.LastColor;
+            Debug.WriteLine("OnRectangleLeave: " + item.Name);
+        }
+
+        void MainMap_OnRectangleEnter(GMapRectangle item)
+        {
+            _currentRectangle = item;
+            item.Stroke.Color = Color.Red;
+            Debug.WriteLine("OnRectangleEnter: " + item.Name);
+        }
+
+        private void MainMap_OnRectangleClick(GMapRectangle item, MouseEventArgs e)
+        {
+        }
 
         void MainMap_OnMapTypeChanged(GMapProvider type)
         {
@@ -1584,11 +1607,14 @@ namespace Demo.WindowsForms
 
                     if (_currentLinePoint != null)
                     {
-                        if (_currentLinePoint.Movement == GMapMarker.MovementType.Vertical)
+                        var npos = pos;
+                        if (_currentLinePoint.Movement == GMapMarker.MovementType.Horizontal)
                             pos.Lat = _currentLinePoint.Position.Lat;
-                        else if (_currentLinePoint.Movement == GMapMarker.MovementType.Horizontal)
+                        else if (_currentLinePoint.Movement == GMapMarker.MovementType.Vertical)
                             pos.Lng = _currentLinePoint.Position.Lng;
-                        _currentLinePoint.Position = pos;
+                        if (_currentEllipse != null)
+                            _currentEllipse.MovePoint(_currentLinePoint, pos);
+                        _currentLinePoint.Position = npos;
                     }
                 }
                 else // move rect marker
@@ -1630,7 +1656,8 @@ namespace Demo.WindowsForms
 
                 MainMap.Refresh(); // force instant invalidation
             }
-        }
+        } /* MainMap_MouseMove */
+
 
         // MapZoomChanged
         void MainMap_OnMapZoomChanged()
@@ -2929,6 +2956,22 @@ namespace Demo.WindowsForms
                         return true;
                     }
                     break;
+
+                case "rectangle":                       // draw rectangle "rectangle name lat, long, width, height, color
+                    if (ls.Length > 6)
+                    {
+                        var p = GMapRectangle.CreateRectangle(ls, out errorstring);
+                        if (p == null)
+                        {
+                            errorstring += ": " + st;
+                            return false;
+                        }
+                        Objects.Rectangles.Add(p);
+                        MainMap.Invalidate();
+                        return true;
+                    }
+                    break;
+
 
                 case "image": 
                     break;

@@ -53,6 +53,11 @@ namespace GMap.NET.WindowsForms
         /// </summary>
         public event EllipseClick OnEllipseClick;
 
+        /// <summary>
+        ///     occurs when clicked on ellipse
+        /// </summary>
+        public event RectangleClick OnRectangleClick;
+
 
         /// <summary>
         ///     occurs when double clicked on polygon
@@ -113,6 +118,9 @@ namespace GMap.NET.WindowsForms
         ///     occurs on mouse leaves Ellipse area
         /// </summary>
         public event EllipseLeave OnEllipseLeave;
+
+        public event RectangleEnter OnRectangleEnter;
+        public event RectangleLeave OnRectangleLeave;
 
 
         /// <summary>
@@ -748,6 +756,19 @@ namespace GMap.NET.WindowsForms
 
             ellipse.LocalPosition = new Point((int)p.X, (int)p.Y);
             ellipse.UpdateGraphicsPath();
+        }
+
+        public void UpdateRectangleLocalPosition(GMapRectangle rectangle)
+        {
+            var p = FromLatLngToLocal(rectangle.Center);
+
+            if (!MobileMode)
+            {
+                p.OffsetNegative(Core.RenderOffset);
+            }
+
+            rectangle.LocalPosition = new Point((int)p.X, (int)p.Y);
+            rectangle.UpdateGraphicsPath();
         }
 
 
@@ -2214,6 +2235,26 @@ namespace GMap.NET.WindowsForms
                             }
                         }
 
+                        foreach (var m in o.Rectangles)
+                        {
+                            m.IsSelected = false;
+
+                            if (m.IsVisible && m.IsHitTestVisible)
+                            {
+                                #region -- check --
+
+                                if (m.IsInside(FromLocalToLatLng(e.X, e.Y)))
+                                {
+                                    m.IsSelected = true;
+                                    OnRectangleClick?.Invoke(m, e);
+                                    overlayObjet = true;
+                                }
+
+                                #endregion
+                            }
+                        }
+
+
                     }
                 }
 
@@ -2587,6 +2628,46 @@ namespace GMap.NET.WindowsForms
                                 }
                             }
 
+                            foreach (var m in o.Rectangles)
+                            {
+                                if (m.IsVisible && m.IsHitTestVisible)
+                                {
+                                    #region -- check --
+
+                                    var rp = new GPoint(e.X, e.Y);
+
+                                    if (!MobileMode)
+                                    {
+                                        rp.OffsetNegative(Core.RenderOffset);
+                                    }
+
+                                    if (m.IsInsideLocal((int)rp.X, (int)rp.Y))
+                                    {
+                                        if (!m.IsMouseOver)
+                                        {
+                                            SetCursorHandOnEnter();
+                                            m.IsMouseOver = true;
+                                            IsMouseOverRectangle = true;
+                                            OnRectangleEnter?.Invoke(m);
+                                            Invalidate();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (m.IsMouseOver && (e.Button == MouseButtons.None))
+                                        {
+                                            m.IsMouseOver = false;
+                                            IsMouseOverRectangle = false;
+                                            RestoreCursorOnLeave();
+                                            OnRectangleLeave?.Invoke(m);
+                                            Invalidate();
+                                        }
+                                    }
+
+                                    #endregion
+                                }
+                            }
+
                             foreach (var m in o.Ellipses)
                             {
                                 if (m.IsVisible && m.IsHitTestVisible)
@@ -2615,7 +2696,7 @@ namespace GMap.NET.WindowsForms
                                     }
                                     else
                                     {
-                                        if (m.IsMouseOver)
+                                        if (m.IsMouseOver && (e.Button == MouseButtons.None))
                                         {
                                             m.IsMouseOver = false;
                                             IsMouseOverEllipse = false;
@@ -2629,6 +2710,7 @@ namespace GMap.NET.WindowsForms
                                     #endregion
                                 }
                             }
+
                         }
                     }
                 }
@@ -3363,6 +3445,27 @@ namespace GMap.NET.WindowsForms
         }
 
 
+        bool _isMouseOverRectangle;
+
+        /// <summary>
+        ///     is mouse over ellipse
+        /// </summary>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [Browsable(false)]
+        public bool IsMouseOverRectangle
+        {
+            get
+            {
+                return _isMouseOverRectangle;
+            }
+            set
+            {
+                _isMouseOverRectangle = value;
+                OverObjectCount += value ? 1 : -1;
+            }
+        }
+
+
         /// <summary>
         ///     gets current map view top/left coordinate, width in Lng, height in Lat
         /// </summary>
@@ -3582,6 +3685,22 @@ namespace GMap.NET.WindowsForms
             set
             {
                 Core.EllipsesEnabled = value;
+            }
+        }
+
+        /// <summary>
+        ///     is ellipses enabled
+        /// </summary>
+        [Category("GMap.NET")]
+        public bool RectanglesEnabled
+        {
+            get
+            {
+                return Core.RectanglesEnabled;
+            }
+            set
+            {
+                Core.RectanglesEnabled = value;
             }
         }
 

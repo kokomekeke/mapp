@@ -765,5 +765,9 @@ namespace GMap.NET.WindowsForms
     public delegate void EllipseLeave(GMapEllipse item);
     public delegate void EllipseClick(GMapEllipse item, MouseEventArgs e);
 
+    public delegate void RectangleEnter(GMapRectangle item);
+    public delegate void RectangleLeave(GMapRectangle item);
+    public delegate void RectangleClick(GMapRectangle item, MouseEventArgs e);
+
 
 } /* namespace GMap.NET.WindowsForms */

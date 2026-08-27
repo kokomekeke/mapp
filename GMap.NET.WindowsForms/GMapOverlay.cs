@@ -144,6 +144,12 @@ namespace GMap.NET.WindowsForms
         public readonly ObservableCollectionThreadSafe<GMapEllipse> Ellipses =
             new ObservableCollectionThreadSafe<GMapEllipse>();
 
+        /// <summary>
+        ///     list of rectangle, should be thread safe
+        /// </summary>
+        public readonly ObservableCollectionThreadSafe<GMapRectangle> Rectangles =
+            new ObservableCollectionThreadSafe<GMapRectangle>();
+
 
         GMapControl _control;
 
@@ -180,6 +186,7 @@ namespace GMap.NET.WindowsForms
             Labels.CollectionChanged += Labels_CollectionChanged;
             ScaleLabels.CollectionChanged += ScaleLabels_CollectionChanged; 
             Ellipses.CollectionChanged += Ellipses_CollectionChanged;
+            Rectangles.CollectionChanged += Rectangles_CollectionChanged;
         }
 
         void ClearEvents()
@@ -192,6 +199,7 @@ namespace GMap.NET.WindowsForms
             Labels.CollectionChanged -= Labels_CollectionChanged;
             ScaleLabels.CollectionChanged -= ScaleLabels_CollectionChanged;
             Ellipses.CollectionChanged -= Ellipses_CollectionChanged;
+            Rectangles.CollectionChanged -= Rectangles_CollectionChanged;
         }
 
         public void Clear()
@@ -203,6 +211,7 @@ namespace GMap.NET.WindowsForms
             Rays.Clear();
             Labels.Clear();
             Ellipses.Clear();
+            Rectangles.Clear();
         }
 
 
@@ -237,6 +246,10 @@ namespace GMap.NET.WindowsForms
                 foreach (var l in overlay.Ellipses)
                 {
                     Ellipses.Add(l);
+                }
+                foreach (var l in overlay.Rectangles)
+                {
+                    Rectangles.Add(l);
                 }
             }
         }
@@ -514,6 +527,42 @@ namespace GMap.NET.WindowsForms
             }
         }
 
+        void Rectangles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+            {
+                foreach (GMapRectangle obj in e.NewItems)
+                {
+                    if (obj != null)
+                    {
+                        obj.Overlay = this;
+                        obj.UpdateLocalPosition();
+                        if ((Control != null) && !Control.HoldInvalidation)
+                        {
+                            Control.Invalidate();
+                        }
+                    }
+                }
+            }
+
+            if (Control != null)
+            {
+                if (e.Action == NotifyCollectionChangedAction.Remove || e.Action == NotifyCollectionChangedAction.Reset)
+                {
+                    if (Control.IsMouseOverRectangle)
+                    {
+                        Control.IsMouseOverRectangle = false;
+                        Control.RestoreCursorOnLeave();
+                    }
+                }
+
+                if (!Control.HoldInvalidation)
+                {
+                    Control.Invalidate();
+                }
+            }
+        }
+
         /// <summary>
         ///     updates local positions of objects
         /// </summary>
@@ -634,6 +683,20 @@ namespace GMap.NET.WindowsForms
                         }
                     }
                 }
+
+                if (Control.RectanglesEnabled)
+                {
+                    // ellipses
+                    foreach (var e in Rectangles)
+                    {
+                        if (e.IsVisible)
+                        {
+                            e.OnRender(g);
+                        }
+                    }
+                }
+
+
 
                 if (Control.MarkersEnabled)
                 {

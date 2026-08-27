@@ -318,6 +318,11 @@ namespace GMap.NET.Internals
         /// </summary>
         public bool EllipsesEnabled = true;
 
+        /// <summary>
+        ///     is rectangles enabled
+        /// </summary>
+        public bool RectanglesEnabled = true;
+
 
         /// <summary>
         ///     can user drag map
