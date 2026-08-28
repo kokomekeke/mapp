@@ -1614,6 +1614,8 @@ namespace Demo.WindowsForms
                             pos.Lng = _currentLinePoint.Position.Lng;
                         if (_currentEllipse != null)
                             _currentEllipse.MovePoint(_currentLinePoint, pos);
+                        else if (_currentRectangle != null)
+                            _currentRectangle.MovePoint(_currentLinePoint, pos);
                         _currentLinePoint.Position = npos;
                     }
                 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -167,21 +168,41 @@ namespace GMap.NET.WindowsForms
 
                     if (_isselected)
                     {
-                        var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _width, 90), GMapMarker.MovementType.Horizontal);
+                        var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _height/2, 0), GMapMarker.MovementType.Vertical);
                         Overlay.Control.UpdateMarkerLocalPosition(m);
                         Overlay?.Markers.Add(m);
 
-                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _width, 270), GMapMarker.MovementType.Horizontal);
+                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(m.Position, _width/2, 90), GMapMarker.MovementType.Both);
                         Overlay.Control.UpdateMarkerLocalPosition(m);
                         Overlay?.Markers.Add(m);
 
-                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _height, 0), GMapMarker.MovementType.Vertical);
+                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _width/2, 90), GMapMarker.MovementType.Horizontal);
                         Overlay.Control.UpdateMarkerLocalPosition(m);
                         Overlay?.Markers.Add(m);
 
-                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _height, 180), GMapMarker.MovementType.Vertical);
+                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(m.Position, _height / 2, 180), GMapMarker.MovementType.Both);
                         Overlay.Control.UpdateMarkerLocalPosition(m);
                         Overlay?.Markers.Add(m);
+
+
+                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _height/2, 180), GMapMarker.MovementType.Vertical);
+                        Overlay.Control.UpdateMarkerLocalPosition(m);
+                        Overlay?.Markers.Add(m);
+
+
+                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(m.Position, _width / 2, 270), GMapMarker.MovementType.Both);
+                        Overlay.Control.UpdateMarkerLocalPosition(m);
+                        Overlay?.Markers.Add(m);
+
+
+                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(Center, _width/2, 270), GMapMarker.MovementType.Horizontal);
+                        Overlay.Control.UpdateMarkerLocalPosition(m);
+                        Overlay?.Markers.Add(m);
+
+                        m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Overlay.Control.GetPositionFromPoint(m.Position, _height / 2, 360), GMapMarker.MovementType.Both);
+                        Overlay.Control.UpdateMarkerLocalPosition(m);
+                        Overlay?.Markers.Add(m);
+
                     }
                     else
                     {
@@ -226,17 +247,19 @@ namespace GMap.NET.WindowsForms
 
 
         /// <summary>
-        ///     checks if point is inside the ellipse,
+        ///     checks if point is inside the rectangle boder,
         ///     info.: http://greatmaps.codeplex.com/discussions/279437#post700449
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
         public bool IsInside(PointLatLng p)
         {
+            const float res = 5f;
             var d = Overlay.Control.FromLatLngToLocalPosition(p);
-            float dx = d.X - LocalPosition.X;
-            float dy = d.Y - LocalPosition.Y;
-            return Math.Abs(((dx * dx) / (_localWidth * _localWidth) + (dy * dy) / (_localHeight * _localHeight)) - 1.0) <= 0.05;
+            float dx = Math.Abs(d.X - LocalPosition.X);
+            float dy = Math.Abs(d.Y - LocalPosition.Y);
+            return (dx <= (_localWidth/2 + res)) && (dy <= (_localHeight/2 + res)) &&
+                         !((dx <= (_localWidth/2 - res)) && (dy <= (_localHeight/2 - res)));
         }
 
 
@@ -246,10 +269,42 @@ namespace GMap.NET.WindowsForms
                 return;
 
             if (oldpoint.Movement == GMapMarker.MovementType.Horizontal)
-                Width = (float)Overlay.Control.GetDistance(Center, newpoint);
+            {
+                float dx = (float)Overlay.Control.GetDistance(Center, newpoint);
+                if (oldpoint.Position.Lng > Center.Lng)
+                    Center = Overlay.Control.GetPositionFromPoint(Center, dx/2 - Width / 4, 90);
+                else
+                    Center = Overlay.Control.GetPositionFromPoint(Center, -dx / 2 + Width / 4, 90);
+                Width = Width / 2 + dx;
+            }
             else if (oldpoint.Movement == GMapMarker.MovementType.Vertical)
-                Height = (float)Overlay.Control.GetDistance(Center, newpoint);
+            {
+                float dy = (float)Overlay.Control.GetDistance(Center, newpoint);
+                if (oldpoint.Position.Lat > Center.Lat)
+                    Center = Overlay.Control.GetPositionFromPoint(Center, dy/2 - Height / 4, 0);
+                else
+                    Center = Overlay.Control.GetPositionFromPoint(Center, -dy / 2 + Height / 4, 0);
+                Height = Height / 2 + dy;
+            }
+            else if (oldpoint.Movement == GMapMarker.MovementType.Both)
+            {
+                float dx = (float)Overlay.Control.GetDistance(Center, new PointLatLng(Center.Lat, newpoint.Lng));
+                if (oldpoint.Position.Lng > Center.Lng)
+                    Center = Overlay.Control.GetPositionFromPoint(Center, dx / 2 - Width / 4, 90);
+                else
+                    Center = Overlay.Control.GetPositionFromPoint(Center, -dx / 2 + Width / 4, 90);
+                Width = Width / 2 + dx;
+
+                float dy = (float)Overlay.Control.GetDistance(Center, new PointLatLng(newpoint.Lat, Center.Lng));
+                if (oldpoint.Position.Lat > Center.Lat)
+                    Center = Overlay.Control.GetPositionFromPoint(Center, dy/2 - Height / 4, 0);
+                else
+                    Center = Overlay.Control.GetPositionFromPoint(Center, -dy / 2 + Height / 4, 0);
+                Height = Height / 2 + dy;
+            }
             else return;
+
+
 
             if (Overlay != null && Overlay.Control != null)
             {
@@ -275,8 +330,8 @@ namespace GMap.NET.WindowsForms
             }
 
             {
-                _graphicsPath.AddRectangle(new RectangleF((float)(LocalPosition.X - _localWidth), (float)(LocalPosition.Y - _localHeight),
-                                            (float)(_localWidth * 2), (float)(_localHeight * 2)));
+                _graphicsPath.AddRectangle(new RectangleF((float)(LocalPosition.X - _localWidth/2), (float)(LocalPosition.Y - _localHeight/2),
+                                                          _localWidth, _localHeight));
             }
         }
 

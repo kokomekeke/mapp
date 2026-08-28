@@ -613,8 +613,13 @@ namespace GMap.NET.WindowsForms
                 foreach (var obj in Ellipses)
                 {
                     obj.UpdateLocalPosition();
-                    //Control.UpdateEllipseLocalPosition(obj);
                 }
+
+                foreach (var obj in Rectangles)
+                {
+                    obj.UpdateLocalPosition();
+                }
+
             }
         }
 
