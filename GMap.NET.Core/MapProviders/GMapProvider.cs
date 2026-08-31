@@ -314,7 +314,7 @@ namespace GMap.NET.MapProviders
         /// <summary>
         ///     internal proxy for image management
         /// </summary>
-        internal static PureImageProxy TileImageProxy = DefaultImageProxy.Instance;
+        public static PureImageProxy TileImageProxy = DefaultImageProxy.Instance;
 
         static readonly string requestAccept = "*/*";
         static readonly string responseContentType = "image";

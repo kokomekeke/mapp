@@ -10,7 +10,7 @@ namespace GMap.NET.Internals
     /// <summary>
     ///     etc functions...
     /// </summary>
-    internal class Stuff
+    public class Stuff
     {
         public static string EnumToString(Enum value)
         {

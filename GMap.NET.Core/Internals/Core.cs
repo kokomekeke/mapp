@@ -14,23 +14,23 @@ using System.Collections.Concurrent;
 namespace GMap.NET.Internals
 {
     /// <summary>
-    ///     internal map control core
+    ///     public map control core
     /// </summary>
-    internal sealed class Core : IDisposable
+    public sealed class Core : IDisposable
     {
-        internal PointLatLng _position;
+        public PointLatLng _position;
         private GPoint _positionPixel;
 
-        internal GPoint RenderOffset;
-        internal GPoint CenterTileXYLocation;
+        public GPoint RenderOffset;
+        public GPoint CenterTileXYLocation;
         private GPoint _centerTileXYLocationLast;
         private GPoint _dragPoint;
-        internal GPoint CompensationOffset;
+        public GPoint CompensationOffset;
 
-        internal GPoint MouseDown;
-        internal GPoint MouseCurrent;
-        internal GPoint MouseLastZoom;
-        internal GPoint touchCurrent;
+        public GPoint MouseDown;
+        public GPoint MouseCurrent;
+        public GPoint MouseLastZoom;
+        public GPoint touchCurrent;
 
         public MouseWheelZoomType MouseWheelZoomType = MouseWheelZoomType.MousePositionAndCenter;
         public bool MouseWheelZoomEnabled = true;
@@ -42,20 +42,20 @@ namespace GMap.NET.Internals
         private GSize _minOfTiles;
         private GSize _maxOfTiles;
 
-        internal GRect TileRect;
+        public GRect TileRect;
 
-        internal GRect TileRectBearing;
+        public GRect TileRectBearing;
 
         //private GRect _currentRegion;
-        internal float Bearing = 0;
+        public float Bearing = 0;
         public bool IsRotated = false;
 
-        internal bool FillEmptyTiles = true;
+        public bool FillEmptyTiles = true;
 
         public TileMatrix Matrix = new TileMatrix();
 
-        internal List<DrawTile> TileDrawingList = new List<DrawTile>();
-        internal FastReaderWriterLock TileDrawingListLock = new FastReaderWriterLock();
+        public List<DrawTile> TileDrawingList = new List<DrawTile>();
+        public FastReaderWriterLock TileDrawingListLock = new FastReaderWriterLock();
 
 #if !NETFRAMEWORK
         public readonly Stack<LoadTask> TileLoadQueue = new Stack<LoadTask>();
@@ -65,23 +65,23 @@ namespace GMap.NET.Internals
 
         DateTime _lastTileLoadStart = DateTime.Now;
         DateTime _lastTileLoadEnd = DateTime.Now;
-        internal volatile bool IsStarted;
+        public volatile bool IsStarted;
         int _zoom;
 
-        internal double ScaleX = 1;
-        internal double ScaleY = 1;
+        public double ScaleX = 1;
+        public double ScaleY = 1;
 
-        internal int MaxZoom = 2;
-        internal int MinZoom = 2;
-        internal int Width;
-        internal int Height;
+        public int MaxZoom = 2;
+        public int MinZoom = 2;
+        public int Width;
+        public int Height;
 
-        internal int PxRes100M; // 100 meters
-        internal int PxRes1000M; // 1km  
-        internal int PxRes10Km; // 10km
-        internal int PxRes100Km; // 100km
-        internal int PxRes1000Km; // 1000km
-        internal int PxRes5000Km; // 5000km
+        public int PxRes100M; // 100 meters
+        public int PxRes1000M; // 1km  
+        public int PxRes10Km; // 10km
+        public int PxRes100Km; // 100km
+        public int PxRes1000Km; // 1000km
+        public int PxRes5000Km; // 5000km
 
         /// <summary>
         ///     is user dragging map
@@ -257,7 +257,7 @@ namespace GMap.NET.Internals
             }
         }
 
-        internal bool ZoomToArea = true;
+        public bool ZoomToArea = true;
 
         /// <summary>
         ///     sets zoom to max to fit rect
@@ -384,9 +384,9 @@ namespace GMap.NET.Internals
         // should be only one pool for multiply controls, any ideas how to fix?
         //static readonly List<Thread> GThreadPool = new List<Thread>();
         // windows forms or wpf
-        internal string SystemType;
+        public string SystemType;
 
-        internal static int Instances;
+        public static int Instances;
 
         BackgroundWorker _invalidator;
 
@@ -426,8 +426,8 @@ namespace GMap.NET.Internals
             Dispose();
         }
 
-        internal readonly object InvalidationLock = new object();
-        internal DateTime LastInvalidation = DateTime.Now;
+        public readonly object InvalidationLock = new object();
+        public DateTime LastInvalidation = DateTime.Now;
 
         void InvalidatorWatch(object sender, DoWorkEventArgs e)
         {
@@ -476,8 +476,8 @@ namespace GMap.NET.Internals
             CenterTileXYLocation = Provider.Projection.FromPixelToTileXY(centerPixel);
         }
 
-        internal int VWidth = 800;
-        internal int VHeight = 400;
+        public int VWidth = 800;
+        public int VHeight = 400;
 
         public void OnMapSizeChanged(int width, int height)
         {
@@ -698,7 +698,7 @@ namespace GMap.NET.Internals
         /// <summary>
         ///     moves current position into map center
         /// </summary>
-        internal void GoToCurrentPositionOnZoom()
+        public void GoToCurrentPositionOnZoom()
         {
             CompensationOffset = _positionPixel; // TODO: fix
 
@@ -821,10 +821,10 @@ namespace GMap.NET.Internals
 
         bool _raiseEmptyTileError;
 
-        internal Dictionary<LoadTask, Exception> FailedLoads =
+        public Dictionary<LoadTask, Exception> FailedLoads =
             new Dictionary<LoadTask, Exception>(new LoadTaskComparer());
 
-        internal static readonly int WaitForTileLoadThreadTimeout = 5 * 1000 * 60; // 5 min.
+        public static readonly int WaitForTileLoadThreadTimeout = 5 * 1000 * 60; // 5 min.
 
         volatile int _okZoom;
         volatile int _skipOverZoom;

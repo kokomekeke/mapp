@@ -6,7 +6,7 @@ namespace GMap.NET.Internals
     /// <summary>
     ///     matrix for tiles
     /// </summary>
-    internal class TileMatrix : IDisposable
+    public class TileMatrix : IDisposable
     {
         List<Dictionary<GPoint, Tile>> _levels = new List<Dictionary<GPoint, Tile>>(33);
         FastReaderWriterLock _lock = new FastReaderWriterLock();

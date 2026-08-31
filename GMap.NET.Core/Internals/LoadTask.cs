@@ -6,12 +6,12 @@ namespace GMap.NET.Internals
     /// <summary>
     ///     tile load task
     /// </summary>
-    internal struct LoadTask : IEquatable<LoadTask>
+    public struct LoadTask : IEquatable<LoadTask>
     {
         public GPoint Pos;
         public int Zoom;
 
-        internal Core Core;
+        public Core Core;
 
         public LoadTask(GPoint pos, int zoom, Core core = null)
         {

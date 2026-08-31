@@ -33,10 +33,10 @@ namespace GMap.NET
     {
         public MemoryStream Data;
 
-        internal bool IsParent;
-        internal long Ix;
-        internal long Xoff;
-        internal long Yoff;
+        public bool IsParent;
+        public long Ix;
+        public long Xoff;
+        public long Yoff;
 
         #region IDisposable Members
 

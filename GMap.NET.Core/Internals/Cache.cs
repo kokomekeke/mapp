@@ -7,7 +7,7 @@ using GMap.NET.CacheProviders;
 
 namespace GMap.NET.Internals
 {
-    internal class CacheLocator
+    public class CacheLocator
     {
         private static string _location;
 
