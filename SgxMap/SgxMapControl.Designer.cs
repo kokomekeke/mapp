@@ -41,7 +41,7 @@
             SearchPanel = new Panel();
             comboBoxMapType = new ComboBox();
             btn_zoomMap = new Button();
-            trackBar1 = new TrackBar();
+            trackBar_Zoom = new TrackBar();
             btn_shrinkMap = new Button();
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
@@ -51,7 +51,7 @@
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar_Zoom).BeginInit();
             DrawPanel.SuspendLayout();
             SuspendLayout();
             // 
@@ -153,7 +153,7 @@
             SearchPanel.BorderStyle = BorderStyle.Fixed3D;
             SearchPanel.Controls.Add(comboBoxMapType);
             SearchPanel.Controls.Add(btn_zoomMap);
-            SearchPanel.Controls.Add(trackBar1);
+            SearchPanel.Controls.Add(trackBar_Zoom);
             SearchPanel.Controls.Add(btn_shrinkMap);
             SearchPanel.Controls.Add(btn_findAddress);
             SearchPanel.Controls.Add(controlBox_address);
@@ -182,13 +182,15 @@
             btn_zoomMap.Size = new Size(28, 23);
             btn_zoomMap.TabIndex = 8;
             btn_zoomMap.UseVisualStyleBackColor = true;
+            btn_zoomMap.Click += btn_zoomMap_Click;
             // 
-            // trackBar1
+            // trackBar_Zoom
             // 
-            trackBar1.Location = new Point(286, 3);
-            trackBar1.Name = "trackBar1";
-            trackBar1.Size = new Size(116, 45);
-            trackBar1.TabIndex = 7;
+            trackBar_Zoom.Location = new Point(286, 3);
+            trackBar_Zoom.Name = "trackBar_Zoom";
+            trackBar_Zoom.Size = new Size(116, 45);
+            trackBar_Zoom.TabIndex = 7;
+            trackBar_Zoom.Scroll += trackBar_Zoom_Scroll;
             // 
             // btn_shrinkMap
             // 
@@ -198,6 +200,7 @@
             btn_shrinkMap.Size = new Size(28, 23);
             btn_shrinkMap.TabIndex = 6;
             btn_shrinkMap.UseVisualStyleBackColor = true;
+            btn_shrinkMap.Click += btn_shrinkMap_Click;
             // 
             // btn_findAddress
             // 
@@ -207,6 +210,7 @@
             btn_findAddress.Size = new Size(28, 23);
             btn_findAddress.TabIndex = 5;
             btn_findAddress.UseVisualStyleBackColor = true;
+            btn_findAddress.Click += btn_findAddress_Click;
             // 
             // controlBox_address
             // 
@@ -287,7 +291,7 @@
             BottomPanel.PerformLayout();
             SearchPanel.ResumeLayout(false);
             SearchPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)trackBar_Zoom).EndInit();
             DrawPanel.ResumeLayout(false);
             ResumeLayout(false);
         }
@@ -309,7 +313,7 @@
         private Button btn_findAddress;
         private ComboBox controlBox_address;
         private Button btn_zoomMap;
-        private TrackBar trackBar1;
+        private TrackBar trackBar_Zoom;
         private Button btn_shrinkMap;
         private ComboBox comboBoxMapType;
         public SgxMapPanel MainMap;

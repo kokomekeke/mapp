@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace GMap.NET.ObjectModel
+namespace SgxMap.ObjectModel
 {
     public delegate void NotifyCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e);
 
@@ -33,9 +33,9 @@ namespace GMap.NET.ObjectModel
     {
         // Fields
         private NotifyCollectionChangedAction _action;
-        private IList _newItems;
+        private IList? _newItems;
         private int _newStartingIndex;
-        private IList _oldItems;
+        private IList? _oldItems;
         private int _oldStartingIndex;
 
         // Methods

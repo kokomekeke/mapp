@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyVersion>1.0.26.831</AssemblyVersion>
+    <FileVersion>1.0.26.831</FileVersion>
+    <Title>SGXMap - Maps For Windows</Title>
+    <Version>1.0.26.831</Version>
+    <Authors>Endre Kótai</Authors>
+    <Company>SAGAX Communications Ltd.</Company>
+    <Copyright>Copyright (c) SAGAX 2026</Copyright>
+    <PackageProjectUrl />
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SgxMap\SgxMap.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>

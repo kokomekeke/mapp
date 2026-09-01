@@ -8,10 +8,11 @@
     <ApplicationIcon>sgx.ico</ApplicationIcon>
     <Authors>Endre Kótai</Authors>
     <Company>SAGAX Comunication Ltd.</Company>
-    <Copyright>Copyright (c) Sagaxy 2026</Copyright>
+    <Copyright>Copyright (c) Sagax 2026</Copyright>
     <PackageProjectUrl />
-    <AssemblyVersion>1.0.26.831</AssemblyVersion>
-    <FileVersion>1.0.26.831</FileVersion>
+    <AssemblyVersion>1.0.26.901</AssemblyVersion>
+    <FileVersion>1.0.26.901</FileVersion>
+    <Version>1.0.26.901</Version>
   </PropertyGroup>
 
   <ItemGroup>

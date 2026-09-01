@@ -1,10 +1,10 @@
 ﻿using System;
 
-namespace GMap.NET.ObjectModel
+namespace SgxMap.ObjectModel
 {
     public class ObservableCollectionThreadSafe<T> : ObservableCollection<T>
     {
-        NotifyCollectionChangedEventHandler _collectionChanged;
+        NotifyCollectionChangedEventHandler? _collectionChanged;
 
         public override event NotifyCollectionChangedEventHandler CollectionChanged
         {

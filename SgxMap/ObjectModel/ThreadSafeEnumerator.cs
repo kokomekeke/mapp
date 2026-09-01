@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace GMap.NET.ObjectModel
+namespace SgxMap.ObjectModel
 {
     public class ThreadSafeEnumerator<T> : IEnumerator<T>
     {

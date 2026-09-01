@@ -17,17 +17,30 @@ using GMap.NET;
 
 namespace SgxMap.Objects
 {
-    internal class BasePoint: ISerializable, IDeserializationCallback, IDisposable
+    public class BasePoint: ISerializable, IDeserializationCallback, IDisposable
     {
-        public static int LastID = 0;
+        #region static members
+        public static long LastID = 0;
 
-        protected int m_id;
+        public long GetNextID()
+        {
+            return ++LastID;
+        }
+
+        public void ResetIDCounter()
+        {
+            LastID = 0;
+        }
+        #endregion
+
+        protected long m_id;
         protected PointLatLng m_position;
         protected string m_name = string.Empty;
         protected bool m_isSelected = false;
         protected bool m_isVisible = true;
         protected bool m_isMouseOver = false;
         protected GraphicsPath? m_graphicsPath;
+        protected Layer? m_layer;
 
         public Point LocalPosition;
 
@@ -36,7 +49,7 @@ namespace SgxMap.Objects
         /// </summary>
         [NonSerialized] public Pen Stroke = new Pen(Brushes.Red, 2);
 
-        public int ID
+        public long ID
         {
             get { return m_id; }
             private set { m_id = value; }
@@ -106,6 +119,18 @@ namespace SgxMap.Objects
         }
 
 
+        public Layer? Layer
+        {
+            get { return m_layer; }
+            internal set
+            {
+                if (m_layer != value)
+                {
+                    m_layer = value;
+                }
+            }
+        }
+
         /// <summary>
         ///     is mouse over marker
         /// </summary>
@@ -130,6 +155,15 @@ namespace SgxMap.Objects
             m_name = name;
             Stroke.Color = color;
         }
+
+        public BasePoint(PointLatLng position, Color color)
+        {
+            m_id = ++LastID;
+            m_position = position;
+            m_name = "name-" + m_id;
+            Stroke.Color = color;
+        }
+
 
         public static BasePoint? CreatePoint(string[] ls, out string errorstring)
         {
@@ -202,11 +236,38 @@ namespace SgxMap.Objects
 
         public virtual void UpdateLocalPosition()
         {
-            //if (Overlay != null && Overlay.Control != null)
-            //{
-            //    Overlay.Control.UpdateLineLocalPosition(this);
-            //    UpdateGraphicsPath();
-            //}
+            if (Layer != null && Layer.Control != null)
+            {
+                LocalPosition = Layer.Control.PositiontoLocal(Position);
+            }
+        }
+
+        /// <summary>
+        ///     Indicates whether the specified point is contained within this System.Drawing.Drawing2D.GraphicsPath
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public virtual bool IsInside(int x, int y)
+        {
+            if (m_graphicsPath != null)
+            {
+                return m_graphicsPath.IsOutlineVisible(x, y, Stroke);
+            }
+
+            return false;
+        }
+
+        public virtual bool IsInside(PointLatLng p)
+        {
+            if (m_graphicsPath != null)
+            {
+                var d = m_layer?.FromLatLngToLocalPosition(p);
+                if (d != null)
+                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, Stroke);
+            }
+
+            return false;
         }
 
 

@@ -1,4 +1,11 @@
-﻿using System.ComponentModel;
+﻿/*=============================================================================
+*  SgxMapPanel: drawing panel for SgxMap. (Main class of SgxMap)
+*
+* (c) Kótai 2026.
+*
+* ver 1.00                                                         01-Sep-2026.
+=============================================================================*/
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
@@ -6,8 +13,9 @@ using System.Drawing.Text;
 using GMap.NET;
 using GMap.NET.Internals;
 using GMap.NET.MapProviders;
-using GMap.NET.ObjectModel;
+using SgxMap.ObjectModel;
 using GMap.NET.Projections;
+using SgxMap.Objects;
 
 namespace SgxMap
 {
@@ -48,15 +56,16 @@ namespace SgxMap
         /// <summary>
         ///     list of overlays, should be thread safe
         /// </summary>
-        //public readonly ObservableCollectionThreadSafe<GMapOverlay> Overlays =
-        //    new ObservableCollectionThreadSafe<GMapOverlay>();
+        public readonly ObservableCollectionThreadSafe<Layer> Layers =
+            new ObservableCollectionThreadSafe<Layer>();
 
-        bool _show_distance = false;
+        bool m_show_distance = false;
+        BasePoint? m_selected_object = null;
 
         public bool ShowDistance
         {
-            get { return _show_distance; }
-            set { _show_distance = value; }
+            get { return m_show_distance; }
+            set { m_show_distance = value; }
         }
 
 
@@ -298,8 +307,8 @@ namespace SgxMap
             }
         }
 
-        Brush _emptyTileBrush = new SolidBrush(Color.Navy);
-        Color _emptyTileColor = Color.Navy;
+        Brush _emptyTileBrush = new SolidBrush(Color.White);
+        Color _emptyTileColor = Color.White;
 
         /// <summary>
         ///     color of empty tile background
@@ -1033,6 +1042,19 @@ namespace SgxMap
             return n * (180 / Math.PI);
         }
 
+
+        public Point PositiontoLocal(PointLatLng point)
+        {
+            var p = FromLatLngToLocal(point);
+            {
+                if (!MobileMode)
+                {
+                    p.OffsetNegative(Core.RenderOffset);
+                }
+                return new Point((int)(p.X), (int)(p.Y));
+            }
+        }
+
         #region UserControl Events
 
         public static readonly bool IsDesignerHosted = LicenseManager.UsageMode == LicenseUsageMode.Designtime;
@@ -1216,7 +1238,7 @@ namespace SgxMap
                     g.ResetTransform();
                 }
 
-                OnPaintOverlays(g);
+                OnPaintLayers(g);
 
                 #endregion
             }
@@ -1240,7 +1262,7 @@ namespace SgxMap
                     g.ResetTransform();
                     g.TranslateTransform(Core.RenderOffset.X, Core.RenderOffset.Y);
 
-                    OnPaintOverlays(g);
+                    OnPaintLayers(g);
 
                     #endregion
                 }
@@ -1252,7 +1274,7 @@ namespace SgxMap
                     }
 
                     DrawMap(g);
-                    OnPaintOverlays(g);
+                    OnPaintLayers(g);
                 }
             }
         }
@@ -1490,18 +1512,19 @@ namespace SgxMap
         ///     override, to render something more
         /// </summary>
         /// <param name="g"></param>
-        protected virtual void OnPaintOverlays(Graphics g)
+        protected virtual void OnPaintLayers(Graphics g)
         {
             try
             {
                 g.SmoothingMode = SmoothingMode.HighQuality;
-                //foreach (var o in Overlays)
-                //{
-                //    if (o.IsVisibile)
-                //    {
-                //        o.OnRender(g);
-                //    }
-                //}
+
+                foreach (var o in Layers)
+                {
+                    if (o.IsVisible)
+                    {
+                        o.OnRender(g);
+                    }
+                }
 
                 //// separate tooltip drawing
                 //foreach (var o in Overlays)
@@ -1518,7 +1541,7 @@ namespace SgxMap
                 {
                     //g.DrawLine(ScalePen, -20, 0, 20, 0);
                     //g.DrawLine(ScalePen, 0, -20, 0, 20);
-                    g.DrawString("debug build", CopyrightFont, Brushes.Blue, 2, CopyrightFont.Height);
+                    //g.DrawString("debug build", CopyrightFont, Brushes.Blue, 2, CopyrightFont.Height);
                 }
 #endif
 
@@ -1626,6 +1649,7 @@ namespace SgxMap
                     throw;
             }
         }
+
 
         private void DrawScale(Graphics g, int top, int right, int bottom, int left, string caption)
         {
@@ -1819,7 +1843,7 @@ namespace SgxMap
         {
             base.OnMouseDown(e);
 
-            if (!IsMouseOverMarker && !IsMouseOverPolygon && !IsMouseOverEllipse)
+            if (!IsMouseOverObject)
             {
                 if (e.Button == DragButton && CanDragMap)
                 {
@@ -1836,10 +1860,6 @@ namespace SgxMap
                     _selectionStart = FromLocalToLatLng(e.X, e.Y);
                 }
             }
-            else if (IsMouseOverPolygon)
-                IsMouseOverPolygon = false;
-            else if (IsMouseOverEllipse)
-                IsMouseOverEllipse = false;
         } /* OnMouseDown */
 
 
@@ -1906,10 +1926,26 @@ namespace SgxMap
 
             if (!Core.IsDragging)
             {
-                bool overlayObjet = false;
+                bool overlayObject = false;
+                m_selected_object = null;
 
+                for (int i = Layers.Count - 1; i >= 0; i--)
+                {
+                    var l = Layers[i];
+                    if (l.IsVisible)
+                    {
+                        var o = l.GetObjectbyLocalPosition(e.X, e.Y);
+                        if (o != null)
+                        {
+                            overlayObject = true;
+                            o.IsSelected = true;
+                            m_selected_object = o;
+                            break;
+                        }
+                    }
+                }
 
-                if (!overlayObjet && Core.MouseDown != GPoint.Empty)
+                if (!overlayObject && Core.MouseDown != GPoint.Empty)
                     OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
             }
         }
@@ -2018,7 +2054,7 @@ namespace SgxMap
         {
             base.OnMouseMove(e);
 
-            if (_show_distance)
+            if (m_show_distance)
                 return;
 
             if (!Core.IsDragging && !Core.MouseDown.IsEmpty)
@@ -2147,7 +2183,7 @@ namespace SgxMap
         {
             base.OnMouseWheel(e);
 
-            if (MouseWheelZoomEnabled && _mouseIn && (!IsMouseOverMarker || IgnoreMarkerOnMouseWheel) &&
+            if (MouseWheelZoomEnabled && _mouseIn && (!IsMouseOverObject || IgnoreMarkerOnMouseWheel) &&
                 !Core.IsDragging)
             {
                 if (Core.MouseLastZoom.X != e.X && Core.MouseLastZoom.Y != e.Y)
@@ -2446,6 +2482,13 @@ namespace SgxMap
         }
 
 
+        public string GetPlaceInfo(int x, int y, bool showaddress = false)
+        {
+            var point = FromLocalToLatLng(x,y);
+            return  point.ToGeoString() + "   "  +   (showaddress ? GetPlaceAddress(point) : "");
+        }
+
+
         /// <summary>
         /// Get distance of two geo point in km
         /// </summary>
@@ -2728,7 +2771,7 @@ namespace SgxMap
             }
         }
 
-        bool _isMouseOverMarker;
+        bool _isMouseOverObject;
         internal int OverObjectCount;
 
         /// <summary>
@@ -2736,15 +2779,15 @@ namespace SgxMap
         /// </summary>
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         [Browsable(false)]
-        public bool IsMouseOverMarker
+        public bool IsMouseOverObject
         {
             get
             {
-                return _isMouseOverMarker;
+                return _isMouseOverObject;
             }
             internal set
             {
-                _isMouseOverMarker = value;
+                _isMouseOverObject = value;
                 OverObjectCount += value ? 1 : -1;
             }
         }
@@ -2754,82 +2797,6 @@ namespace SgxMap
         /// <summary>
         ///     is mouse over route
         /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Browsable(false)]
-        public bool IsMouseOverRoute
-        {
-            get
-            {
-                return _isMouseOverRoute;
-            }
-            internal set
-            {
-                _isMouseOverRoute = value;
-                OverObjectCount += value ? 1 : -1;
-            }
-        }
-
-        bool _isMouseOverPolygon;
-
-        /// <summary>
-        ///     is mouse over polygon
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Browsable(false)]
-        public bool IsMouseOverPolygon
-        {
-            get
-            {
-                return _isMouseOverPolygon;
-            }
-            set
-            {
-                _isMouseOverPolygon = value;
-                OverObjectCount += value ? 1 : -1;
-            }
-        }
-
-
-        bool _isMouseOverEllipse;
-
-        /// <summary>
-        ///     is mouse over ellipse
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Browsable(false)]
-        public bool IsMouseOverEllipse
-        {
-            get
-            {
-                return _isMouseOverEllipse;
-            }
-            set
-            {
-                _isMouseOverEllipse = value;
-                OverObjectCount += value ? 1 : -1;
-            }
-        }
-
-
-        bool _isMouseOverRectangle;
-
-        /// <summary>
-        ///     is mouse over ellipse
-        /// </summary>
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        [Browsable(false)]
-        public bool IsMouseOverRectangle
-        {
-            get
-            {
-                return _isMouseOverRectangle;
-            }
-            set
-            {
-                _isMouseOverRectangle = value;
-                OverObjectCount += value ? 1 : -1;
-            }
-        }
 
 
         /// <summary>
