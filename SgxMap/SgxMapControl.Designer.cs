@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             var resources = new System.ComponentModel.ComponentResourceManager(typeof(SgxMapControl));
             TopPanel = new Panel();
             btn_printMap = new Button();
@@ -48,6 +49,7 @@
             DrawPanel = new Panel();
             btn_draw = new Button();
             MainMap = new SgxMapPanel();
+            toolTip_draw = new ToolTip(components);
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
@@ -79,6 +81,7 @@
             btn_printMap.Name = "btn_printMap";
             btn_printMap.Size = new Size(28, 23);
             btn_printMap.TabIndex = 5;
+            toolTip_draw.SetToolTip(btn_printMap, "Print map");
             btn_printMap.UseVisualStyleBackColor = true;
             // 
             // btn_exprtMap
@@ -88,6 +91,7 @@
             btn_exprtMap.Name = "btn_exprtMap";
             btn_exprtMap.Size = new Size(28, 23);
             btn_exprtMap.TabIndex = 4;
+            toolTip_draw.SetToolTip(btn_exprtMap, "Export map in image file");
             btn_exprtMap.UseVisualStyleBackColor = true;
             // 
             // btn_copyMap
@@ -97,6 +101,7 @@
             btn_copyMap.Name = "btn_copyMap";
             btn_copyMap.Size = new Size(28, 23);
             btn_copyMap.TabIndex = 3;
+            toolTip_draw.SetToolTip(btn_copyMap, "Copy map to clipboard");
             btn_copyMap.UseVisualStyleBackColor = true;
             // 
             // btn_saveMap
@@ -106,6 +111,7 @@
             btn_saveMap.Name = "btn_saveMap";
             btn_saveMap.Size = new Size(28, 23);
             btn_saveMap.TabIndex = 2;
+            toolTip_draw.SetToolTip(btn_saveMap, "Save map in file");
             btn_saveMap.UseVisualStyleBackColor = true;
             // 
             // btn_openMap
@@ -115,6 +121,7 @@
             btn_openMap.Name = "btn_openMap";
             btn_openMap.Size = new Size(28, 23);
             btn_openMap.TabIndex = 1;
+            toolTip_draw.SetToolTip(btn_openMap, "Open a new map");
             btn_openMap.UseVisualStyleBackColor = true;
             // 
             // btn_newMap
@@ -124,6 +131,7 @@
             btn_newMap.Name = "btn_newMap";
             btn_newMap.Size = new Size(28, 23);
             btn_newMap.TabIndex = 0;
+            toolTip_draw.SetToolTip(btn_newMap, "Create a new map");
             btn_newMap.UseVisualStyleBackColor = true;
             // 
             // BottomPanel
@@ -172,6 +180,7 @@
             comboBoxMapType.Size = new Size(213, 23);
             comboBoxMapType.Sorted = true;
             comboBoxMapType.TabIndex = 9;
+            toolTip_draw.SetToolTip(comboBoxMapType, "Select map provider");
             comboBoxMapType.SelectedValueChanged += comboBoxMapType_SelectedValueChanged;
             // 
             // btn_zoomMap
@@ -181,6 +190,7 @@
             btn_zoomMap.Name = "btn_zoomMap";
             btn_zoomMap.Size = new Size(28, 23);
             btn_zoomMap.TabIndex = 8;
+            toolTip_draw.SetToolTip(btn_zoomMap, "Zoom in");
             btn_zoomMap.UseVisualStyleBackColor = true;
             btn_zoomMap.Click += btn_zoomMap_Click;
             // 
@@ -190,6 +200,7 @@
             trackBar_Zoom.Name = "trackBar_Zoom";
             trackBar_Zoom.Size = new Size(116, 45);
             trackBar_Zoom.TabIndex = 7;
+            toolTip_draw.SetToolTip(trackBar_Zoom, "Zoom");
             trackBar_Zoom.Scroll += trackBar_Zoom_Scroll;
             // 
             // btn_shrinkMap
@@ -199,6 +210,7 @@
             btn_shrinkMap.Name = "btn_shrinkMap";
             btn_shrinkMap.Size = new Size(28, 23);
             btn_shrinkMap.TabIndex = 6;
+            toolTip_draw.SetToolTip(btn_shrinkMap, "Zoom out");
             btn_shrinkMap.UseVisualStyleBackColor = true;
             btn_shrinkMap.Click += btn_shrinkMap_Click;
             // 
@@ -209,6 +221,7 @@
             btn_findAddress.Name = "btn_findAddress";
             btn_findAddress.Size = new Size(28, 23);
             btn_findAddress.TabIndex = 5;
+            toolTip_draw.SetToolTip(btn_findAddress, "Find place");
             btn_findAddress.UseVisualStyleBackColor = true;
             btn_findAddress.Click += btn_findAddress_Click;
             // 
@@ -240,7 +253,9 @@
             btn_draw.Size = new Size(58, 22);
             btn_draw.TabIndex = 0;
             btn_draw.Text = "Draw";
+            toolTip_draw.SetToolTip(btn_draw, "Draw items");
             btn_draw.UseVisualStyleBackColor = true;
+            btn_draw.Click += btn_draw_Click;
             // 
             // MainMap
             // 
@@ -248,9 +263,8 @@
             MainMap.CanDragMap = true;
             MainMap.Dock = DockStyle.Fill;
             MainMap.EllipsesEnabled = true;
-            MainMap.EmptyTileColor = Color.Navy;
-            MainMap.GrayScaleMode = false;
-            MainMap.HelperLineOption = HelperLineOptions.DontShow;
+            MainMap.EmptyTileColor = Color.White;
+            MainMap.HelperLineOption = HelperLineOptions.ShowOnModifierKey;
             MainMap.LabelEnabled = true;
             MainMap.LevelsKeepInMemory = 5;
             MainMap.LinesEnabled = true;
@@ -261,7 +275,6 @@
             MainMap.MouseWheelZoomEnabled = true;
             MainMap.MouseWheelZoomType = GMap.NET.MouseWheelZoomType.MousePositionAndCenter;
             MainMap.Name = "MainMap";
-            MainMap.NegativeMode = false;
             MainMap.PolygonsEnabled = true;
             MainMap.RectanglesEnabled = true;
             MainMap.RetryLoadTile = 0;
@@ -270,6 +283,7 @@
             MainMap.SelectedAreaFillColor = Color.FromArgb(33, 65, 105, 225);
             MainMap.ShowCenter = true;
             MainMap.ShowDistance = false;
+            MainMap.ShowGeoGridLines = false;
             MainMap.ShowTileGridLines = false;
             MainMap.Size = new Size(669, 206);
             MainMap.TabIndex = 5;
@@ -317,5 +331,6 @@
         private Button btn_shrinkMap;
         private ComboBox comboBoxMapType;
         public SgxMapPanel MainMap;
+        private ToolTip toolTip_draw;
     }
 }

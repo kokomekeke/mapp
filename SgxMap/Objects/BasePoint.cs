@@ -1,9 +1,10 @@
 ﻿/*=============================================================================
-*  Base point class for SgxMap. (Base class of all drawing objects on map
+*  Base point class for SgxMap. (Base class of all drawing objects on map)
 *
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
+*          Last modification                                       02-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,7 @@ namespace SgxMap.Objects
         protected bool m_isSelected = false;
         protected bool m_isVisible = true;
         protected bool m_isMouseOver = false;
+        protected bool m_isHighlighted = false;
         protected GraphicsPath? m_graphicsPath;
         protected Layer? m_layer;
 
@@ -47,12 +49,17 @@ namespace SgxMap.Objects
         /// <summary>
         /// specifies how the outline is painted
         /// </summary>
-        [NonSerialized] public Pen Stroke = new Pen(Brushes.Red, 2);
+        [NonSerialized] public Pen Stroke = new Pen(Brushes.Black, 2);
+        [NonSerialized] public Pen NormalStroke = new Pen(Brushes.Black, 2);
+        [NonSerialized] public Pen HighlightStroke = new Pen(Brushes.Red, 3);
 
         public long ID
         {
             get { return m_id; }
-            private set { m_id = value; }
+            private set { 
+                m_id = value;
+                if (m_id > LastID) LastID = m_id;
+            }
         }         
 
         public PointLatLng Position
@@ -63,18 +70,34 @@ namespace SgxMap.Objects
                 if (m_position != value)
                 {
                     m_position = value;
+                    m_layer?.RefreshObjects();
                 }
             }   
         }
 
         public Color Color
         {
-            get { return Stroke.Color; }
+            get { return NormalStroke.Color; }
             set
             {
-                if (Stroke.Color != value)
+                if (NormalStroke.Color != value)
                 {
-                    Stroke.Color = value;
+                    NormalStroke.Color = value;
+                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
+                    m_layer?.RefreshObjects();
+                }
+            }
+        }
+
+        public Color HighlightColor
+        {
+            get { return HighlightStroke.Color; }
+            set
+            {
+                if (HighlightStroke.Color != value)
+                {
+                    HighlightStroke.Color = value;
+                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
                 }
             }
         }
@@ -101,6 +124,7 @@ namespace SgxMap.Objects
                 if (m_isSelected != value)
                 {
                     m_isSelected = value;
+                    m_layer?.RefreshObjects();
                 }
             }
         }
@@ -114,6 +138,22 @@ namespace SgxMap.Objects
                 if (m_isVisible != value)
                 {
                     m_isVisible = value;
+                    m_layer?.RefreshObjects();
+                }
+            }
+        }
+
+
+        public bool IsHighlighted
+        {
+            get { return m_isHighlighted; }
+            set
+            {
+                if (m_isHighlighted != value)
+                {
+                    m_isHighlighted = value;
+                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
+                    m_layer?.RefreshObjects();
                 }
             }
         }
@@ -147,13 +187,20 @@ namespace SgxMap.Objects
         }
 
 
-
+        //---------------------------------------------------------------------
+        /// <summary>
+        /// Constructor for BasePoint class
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="position"></param>
+        /// <param name="color"></param>
+        //---------------------------------------------------------------------
         public BasePoint(string name, PointLatLng position, Color color)
         {
             m_id = ++LastID;
             m_position = position;
             m_name = name;
-            Stroke.Color = color;
+            NormalStroke.Color = color;
         }
 
         public BasePoint(PointLatLng position, Color color)
@@ -161,7 +208,7 @@ namespace SgxMap.Objects
             m_id = ++LastID;
             m_position = position;
             m_name = "name-" + m_id;
-            Stroke.Color = color;
+            NormalStroke.Color = color;
         }
 
 
@@ -264,7 +311,7 @@ namespace SgxMap.Objects
             {
                 var d = m_layer?.FromLatLngToLocalPosition(p);
                 if (d != null)
-                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, Stroke);
+                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, NormalStroke);
             }
 
             return false;
@@ -278,12 +325,15 @@ namespace SgxMap.Objects
             info.AddValue("ID", ID);
             info.AddValue("Name", m_name);
             info.AddValue("Position", Position);
-            info.AddValue("Color", Stroke.Color);
+            info.AddValue("Color", NormalStroke.Color);
         }
 
         protected BasePoint(SerializationInfo info, StreamingContext context)
         {
-
+            ID = info.GetInt64("ID");
+            Name = info.GetString("Name") ?? string.Empty;
+            Position = (PointLatLng)info.GetValue("Position", typeof(PointLatLng));
+            Color = (Color)info.GetValue("Color", typeof(Color));
         }
 
         public virtual void OnDeserialization(object? sender)
@@ -296,10 +346,10 @@ namespace SgxMap.Objects
         #region Dispose
         public virtual void Dispose()
         {
-            if (Stroke != null)
+            if (NormalStroke != null)
             {
-                Stroke.Dispose();
-                Stroke = null;
+                NormalStroke.Dispose();
+                NormalStroke = null;
             }
         }
 

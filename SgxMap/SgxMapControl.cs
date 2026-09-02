@@ -5,6 +5,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
+*          Last modification                                       02-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -78,6 +79,7 @@ namespace SgxMap
             InitializeComponent();
             LoadControls();
             MainMap.MouseDown += MainMap_MouseDown;
+            MainMap.showPlaceInfo += MainMap_ShowPlaceInfo;
         }
 
 
@@ -124,7 +126,7 @@ namespace SgxMap
                 if (MainMap.SetPositionByKeywords(controlBox_address.Text) != GeoCoderStatusCode.OK)
                     MessageBox.Show("Address not found!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 else
-                { 
+                {
                     if (!controlBox_address.Items.Contains(controlBox_address.Text))
                         controlBox_address.Items.Add(controlBox_address.Text);
                 }
@@ -135,6 +137,63 @@ namespace SgxMap
         {
             label_status.Text = MainMap.GetPlaceInfo(e.X, e.Y);
         }
+
+        public void MainMap_ShowPlaceInfo(int x, int y)
+        {
+            label_status.Text = MainMap.GetPlaceInfo(x, y);
+        }
+
+        private void btn_draw_Click(object sender, EventArgs e)
+        {
+            var m = new System.Windows.Forms.ContextMenuStrip();
+
+
+            var m1 = new ToolStripMenuItem("Show center");
+            m1.Checked = MainMap.ShowCenter;
+            m1.Click += (s, ev) =>
+            {
+                MainMap.ShowCenter = !MainMap.ShowCenter;
+            };
+            m.Items.Add(m1);
+
+            var m2 = new ToolStripMenuItem("Show tile grid");
+            m2.Checked = MainMap.ShowTileGridLines;
+            m2.Click += (s, ev) =>
+            {
+                MainMap.ShowTileGridLines = !MainMap.ShowTileGridLines;
+            };
+            m.Items.Add(m2);
+
+            var m3 = new ToolStripMenuItem("Show geo grid");
+            m3.Checked = MainMap.ShowGeoGridLines;
+            m3.Click += (s, ev) =>
+            {
+                MainMap.ShowGeoGridLines = !MainMap.ShowGeoGridLines;
+            };
+            m.Items.Add(m3);
+
+            var m4 = new ToolStripMenuItem("Show helper line");
+            m4.Checked = MainMap.HelperLineOption == HelperLineOptions.ShowOnModifierKey;
+            m4.Click += (s, ev) =>
+            {
+                if (m4.Checked)
+                    MainMap.HelperLineOption = HelperLineOptions.DontShow;
+                else
+                    MainMap.HelperLineOption = HelperLineOptions.ShowOnModifierKey;
+            };
+            m.Items.Add(m4);
+
+            var m5 = new ToolStripMenuItem("Show scale");
+            m5.Checked = MainMap.ShowMapScaleInfo;
+            m5.Click += (s, ev) =>
+            {
+                MainMap.ShowMapScaleInfo = !MainMap.ShowMapScaleInfo;
+            };
+            m.Items.Add(m5);
+
+            m.Show(DrawPanel, new Point(btn_draw.Left, btn_draw.Bottom));
+        } /* btn_draw_Click */
+
 
     } /* class SgxMapControl */
 } /* namespace SgxMap */

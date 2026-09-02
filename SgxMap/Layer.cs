@@ -4,6 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
+*          Last modification                                       02-Sep-2026.
 =============================================================================*/
 using System.Runtime.Serialization;
 using GMap.NET;
@@ -16,8 +17,9 @@ namespace SgxMap
     {
         private long m_id;
         private string m_name = string.Empty;
-        bool _isVisibile = true;
-        SgxMapPanel? _control;
+        bool m_isVisibile = true;
+        bool m_isZoomSignificant = true;
+        SgxMapPanel? m_control;
 
 
         /// <summary>
@@ -29,7 +31,12 @@ namespace SgxMap
         public long ID
         {
             get { return m_id; }
-            private set { m_id = value; }
+            private set 
+            { 
+                m_id = value;
+                if (m_id > BasePoint.LastID)
+                    BasePoint.LastID = m_id;
+            }
         }
 
         public string Name
@@ -40,30 +47,75 @@ namespace SgxMap
 
         public bool IsVisible
         {
-            get { return _isVisibile; }
-            set { _isVisibile = value; }
+            get { return m_isVisibile; }
+            set { m_isVisibile = value; }
         }
+
+
+
+        /// <summary>
+        ///     if false don't consider contained objects when box zooming
+        /// </summary>
+        public bool IsZoomSignificant
+        {
+            get { return m_isZoomSignificant; }
+            set { m_isZoomSignificant = value; }
+        }
+
 
 
         public SgxMapPanel? Control
         {
             get
             {
-                return _control;
+                return m_control;
             }
             internal set
             {
-                _control = value;
+                m_control = value;
             }
         }
 
-
+        //---------------------------------------------------------------------
+        /// <summary>
+        /// Constructor for Layer class. 
+        /// Initializes a new instance of the Layer class with an optional name and control.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="control"></param>
+        //---------------------------------------------------------------------
         public Layer(string? name, SgxMapPanel? control = null)
         {
             m_id = BasePoint.LastID++;
             m_name = name ?? "layer-" + m_id;
-            _control = control;
+            m_control = control;
         }
+
+
+        public static Layer? CreateLayer(string[] ls, SgxMapPanel? control, out string errorstring)
+        {
+            try
+            {
+                // 0: "Layer", 1: name
+
+                errorstring = string.Empty;
+
+                if (ls.Length < 2)
+                {
+                    errorstring = "Not enough parameters to create a layer.";
+                    return null;
+                }
+
+                string name = ls[1];
+                return new Layer(name, control);
+            }
+            catch (Exception ex)
+            {
+                errorstring = $"Error creating layer: {ex.Message}";
+                return null;
+            }
+        }
+
 
         public void AddObject(BasePoint obj)
         {
@@ -172,7 +224,7 @@ namespace SgxMap
                 obj.UpdateLocalPosition();
             }
 
-            if (Control != null && !Control.HoldInvalidation)
+            if (Control != null && !Control.m_holdInvalidation)
             {
                 Control.Invalidate();
             }
