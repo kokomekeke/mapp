@@ -70,7 +70,7 @@ namespace SgxMap.Objects
                 if (m_position != value)
                 {
                     m_position = value;
-                    m_layer?.RefreshObjects();
+                    m_layer?.RefreshObject(this);
                 }
             }   
         }
@@ -84,7 +84,7 @@ namespace SgxMap.Objects
                 {
                     NormalStroke.Color = value;
                     Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
-                    m_layer?.RefreshObjects();
+                    m_layer?.RefreshObject(this);
                 }
             }
         }
@@ -124,7 +124,7 @@ namespace SgxMap.Objects
                 if (m_isSelected != value)
                 {
                     m_isSelected = value;
-                    m_layer?.RefreshObjects();
+                    m_layer?.RefreshObject(this);
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace SgxMap.Objects
                 if (m_isVisible != value)
                 {
                     m_isVisible = value;
-                    m_layer?.RefreshObjects();
+                    m_layer?.RefreshObject(this);
                 }
             }
         }
@@ -153,7 +153,7 @@ namespace SgxMap.Objects
                 {
                     m_isHighlighted = value;
                     Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
-                    m_layer?.RefreshObjects();
+                    m_layer?.RefreshObject(this);
                 }
             }
         }
@@ -184,6 +184,13 @@ namespace SgxMap.Objects
             {
                 m_isMouseOver = value;
             }
+        }
+
+        public BasePoint()
+        {
+            m_id = ++LastID;
+            m_position = PointLatLng.Empty;
+            m_name = "name-" + m_id;
         }
 
 
@@ -287,6 +294,13 @@ namespace SgxMap.Objects
             {
                 LocalPosition = Layer.Control.PositiontoLocal(Position);
             }
+        }
+
+
+        public virtual void UpdateObject()
+        {
+            UpdateLocalPosition();
+            UpdateGraphicsPath();
         }
 
         /// <summary>

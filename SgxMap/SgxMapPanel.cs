@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
-*          Last modification                                       02-Sep-2026.
+*          Last modification                                       03-Sep-2026.
 =============================================================================*/
 using System.ComponentModel;
 using System.Diagnostics;
@@ -90,7 +90,10 @@ namespace SgxMap
         public readonly ObservableCollectionThreadSafe<Layer> Layers =
             new ObservableCollectionThreadSafe<Layer>();
 
-        
+        public MouseMoveStatusType MouseMoveStatus = MouseMoveStatusType.None;
+        public MapRuler? m_MapRuler = null;
+
+
         #endregion Fields
 
         #region EVENTS
@@ -447,7 +450,7 @@ namespace SgxMap
                     MouseWheelZoomType = MouseWheelZoomType.MousePositionWithoutCenter;
                 }
 
-                //                Overlays.CollectionChanged += Overlays_CollectionChanged;
+                AddLayer("DEFAULT");
             }
         }
 
@@ -1114,6 +1117,24 @@ namespace SgxMap
             base.Refresh();
         }
 
+
+        public void ClearAll()
+        {
+            foreach(var layer in Layers)
+            {
+                layer.ClearObjects();
+            }
+            Invalidate();
+        }
+
+
+        public void ClearAllLayers()
+        {
+            ClearAll();
+            Layers.Clear();
+            Invalidate();
+        }
+
 #if !DESIGN
         /// <summary>
         ///     enque built-in thread safe invalidation
@@ -1173,6 +1194,13 @@ namespace SgxMap
 
             if (!IsMouseOverObject)
             {
+                if (e.Button == MouseButtons.Left && MouseMoveStatus == MouseMoveStatusType.Ruler)
+                {
+                    m_MapRuler = Layers[0].AddRuler(e.X, e.Y, Color.Black);
+                    Invalidate();
+                    return;
+                }
+
                 if (e.Button == DragButton && CanDragMap)
                 {
                     Core.MouseDown = new GPoint(e.X, e.Y);      //ApplyRotationInversion(e.X, e.Y);
@@ -1192,6 +1220,12 @@ namespace SgxMap
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
+
+            if (m_MapRuler != null)
+            {
+                Layers[0].RemoveObject(m_MapRuler);
+                m_MapRuler = null;
+            }
 
             if (m_isSelecting)
             {
@@ -1244,6 +1278,8 @@ namespace SgxMap
                     Invalidate();
                 }
             }
+
+            MouseMoveStatus = MouseMoveStatusType.None;
         }  /* OnMouseUp */
 
 
@@ -1251,8 +1287,12 @@ namespace SgxMap
         {
             base.OnMouseMove(e);
 
-            if (m_show_distance)
+            if (m_MapRuler != null)
+            {
+                m_MapRuler.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
                 return;
+            }
 
             if (!Core.IsDragging && !Core.MouseDown.IsEmpty)
             {
@@ -1362,6 +1402,211 @@ namespace SgxMap
         } /* OnMouseDoubleClick */
 
         #endregion MouseEvents 
+
+
+        #region Macro
+        public bool LoadMacroFile(string file)
+        {
+            try
+            {
+                if (File.Exists(file))
+                {
+                    string errors = string.Empty;
+                    string[] lines = File.ReadAllLines(file);
+                    foreach (string line in lines)
+                    {
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            if (line.StartsWith("#"))
+                                continue;
+
+                            if (!ProcessMacroCommand(line, out string errorstring))
+                            {
+                                errors += errorstring + Environment.NewLine;
+                            }
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(errors))
+                    {
+                        MessageBox.Show("Errors occurred while processing macro file: " + Environment.NewLine + errors, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Macro file not found: " + file, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading macro file: " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return false;
+        }
+
+
+        public bool ProcessMacroCommand(string command, out string errorstring)
+        {
+            char[] separator = new Char[] { ',', ';', ' ' };
+            errorstring = null;
+
+            try
+            {
+                // Process the macro command here
+                Debug.WriteLine("Processing macro command: " + command);
+
+
+                if (string.IsNullOrEmpty(command))
+                    return true;
+
+                command = command.Trim();
+                if (command.Length == 0)
+                    return true;
+
+                if (command.StartsWith("clear all"))                // clear all objects
+                {
+                    ClearAll();
+                    return true;
+                }
+
+                if (command.StartsWith("clear layers"))                // clear all layers
+                {
+                    ClearAllLayers();
+                    return true;
+                }
+
+
+                var currentLayer = Layers.Count == 0 ? null : Layers[0];
+
+                string[] ls = command.Split(separator);
+
+                switch (ls[0].ToLower())
+                {
+                    case "layer":                       // create layer: "layer", name
+                        {
+                            if (ls.Length < 2)
+                            {
+                                errorstring = "Not enough parameters to create a layer.";
+                                return false;
+                            }
+                            string name = ls[1];
+                            currentLayer = AddLayer(name);
+                        }
+                        break;
+
+                    case "center":                      // set center: "center", lat, lng
+                        if ((ls.Length > 2) && double.TryParse(ls[1], out double lat) && double.TryParse(ls[2], out double lng))
+                        {
+                            Position = new PointLatLng(lat, lng);
+                            return true;
+                        }
+                        break;
+
+                    case "zoom":
+                        if ((ls.Length > 1) && double.TryParse(ls[1], out double z))
+                        {
+                            Zoom = z;
+                            return true;
+                        }
+                        break;
+
+                    case "line":                        // draw line: "line", name, lat1, lng1, lat2, lng2, color
+                    case "ray":                         // draw ray: "ray", name, lat, lng, degree, color
+                    case "polyline":                    // draw poliline: "polyline", name, lat1, lng1, lat2, lng2, lat3, lng3, ..., color
+                    case "circle":                       // draw circle "circle name lat, long, radius, color
+                    case "ellipse":                       // draw ellipse "ellipse name lat, long, radius1, radius2, color
+                    case "rectangle":                       // draw rectangle "rectangle name lat, long, width, height, color
+                    case "label":                       // draw label: "label", name, lat,lng, text
+                    case "route":
+                    case "marker":                      // draw marker: "marker", type, name, lat,lng, color
+                    case "gmarker":                      // draw google marker: "marker", name, lat,lng, color
+                    case "hmarker":                      // draw HFsystem marker: "marker", name, lat,lng, color
+                        break;
+
+                    default:
+                        errorstring = "Invalid command : " + command;
+                        return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error processing macro command: " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+
+        public void ProcessMacroText(string text)
+        {
+            try
+            {
+                // Process the macro text here
+                Debug.WriteLine("Processing macro text: " + text);
+                string errors = string.Empty;
+
+                string[] lines = text.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                foreach (string line in lines)
+                {
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        if (line.StartsWith("#"))
+                            continue;
+
+                        if (!ProcessMacroCommand(line, out string errorstring))
+                        {
+                            errors += errorstring + Environment.NewLine;
+                        }   
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(errors))
+                {
+                    MessageBox.Show("Errors occurred while processing macro file: " + Environment.NewLine + errors, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error processing macro text: " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        public Layer AddLayer(string name)
+        {
+            var existingLayer = GetLayerbyName(name);
+            if (existingLayer != null)
+            {
+                return existingLayer;
+            }
+
+            var layer = new Layer(name, this);
+            Layers.Add(layer);
+            return layer;
+        }
+
+        public void RemoveLayer(string name)
+        {
+            var layer = GetLayerbyName(name);
+            if (layer != null)
+            {
+                layer.ClearObjects();
+                Layers.Remove(layer);
+            }
+        }
+
+        public Layer? GetLayerbyName(string name)
+        {
+            return Layers.FirstOrDefault(obj => obj?.Name == name, null);
+        }
+
+
+        #endregion Macro
 
         /*=====================================================================================================*/
 
@@ -3402,7 +3647,7 @@ namespace SgxMap
         Bottom
     }
 
-    public enum MouseMoveStatus
+    public enum MouseMoveStatusType
     {
         None,
         Drag,

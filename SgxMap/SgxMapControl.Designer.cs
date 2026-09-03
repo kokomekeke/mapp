@@ -47,6 +47,14 @@
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
             DrawPanel = new Panel();
+            btn_draw_textbox = new Button();
+            btn_draw_ruler = new Button();
+            btn_draw_rectangle = new Button();
+            btn_draw_freeform = new Button();
+            btn_draw_arrow = new Button();
+            btn_draw_line = new Button();
+            btn_drwa_scribble = new Button();
+            btn_draw_pushpin = new Button();
             btn_draw = new Button();
             MainMap = new SgxMapPanel();
             toolTip_draw = new ToolTip(components);
@@ -238,19 +246,110 @@
             // 
             DrawPanel.BackColor = SystemColors.ControlDarkDark;
             DrawPanel.BorderStyle = BorderStyle.Fixed3D;
+            DrawPanel.Controls.Add(btn_draw_textbox);
+            DrawPanel.Controls.Add(btn_draw_ruler);
+            DrawPanel.Controls.Add(btn_draw_rectangle);
+            DrawPanel.Controls.Add(btn_draw_freeform);
+            DrawPanel.Controls.Add(btn_draw_arrow);
+            DrawPanel.Controls.Add(btn_draw_line);
+            DrawPanel.Controls.Add(btn_drwa_scribble);
+            DrawPanel.Controls.Add(btn_draw_pushpin);
             DrawPanel.Controls.Add(btn_draw);
             DrawPanel.Dock = DockStyle.Top;
             DrawPanel.Location = new Point(0, 68);
             DrawPanel.Name = "DrawPanel";
-            DrawPanel.Size = new Size(669, 36);
+            DrawPanel.Size = new Size(669, 49);
             DrawPanel.TabIndex = 4;
+            // 
+            // btn_draw_textbox
+            // 
+            btn_draw_textbox.Image = (Image)resources.GetObject("btn_draw_textbox.Image");
+            btn_draw_textbox.Location = new Point(361, 4);
+            btn_draw_textbox.Name = "btn_draw_textbox";
+            btn_draw_textbox.Size = new Size(37, 37);
+            btn_draw_textbox.TabIndex = 8;
+            toolTip_draw.SetToolTip(btn_draw_textbox, "Text box");
+            btn_draw_textbox.UseVisualStyleBackColor = true;
+            // 
+            // btn_draw_ruler
+            // 
+            btn_draw_ruler.Image = (Image)resources.GetObject("btn_draw_ruler.Image");
+            btn_draw_ruler.Location = new Point(319, 4);
+            btn_draw_ruler.Name = "btn_draw_ruler";
+            btn_draw_ruler.Size = new Size(37, 37);
+            btn_draw_ruler.TabIndex = 7;
+            toolTip_draw.SetToolTip(btn_draw_ruler, "Ruler");
+            btn_draw_ruler.UseVisualStyleBackColor = true;
+            btn_draw_ruler.Click += btn_draw_ruler_Click;
+            // 
+            // btn_draw_rectangle
+            // 
+            btn_draw_rectangle.Image = (Image)resources.GetObject("btn_draw_rectangle.Image");
+            btn_draw_rectangle.Location = new Point(277, 4);
+            btn_draw_rectangle.Name = "btn_draw_rectangle";
+            btn_draw_rectangle.Size = new Size(37, 37);
+            btn_draw_rectangle.TabIndex = 6;
+            toolTip_draw.SetToolTip(btn_draw_rectangle, "Rectangle");
+            btn_draw_rectangle.UseVisualStyleBackColor = true;
+            // 
+            // btn_draw_freeform
+            // 
+            btn_draw_freeform.Image = (Image)resources.GetObject("btn_draw_freeform.Image");
+            btn_draw_freeform.Location = new Point(235, 4);
+            btn_draw_freeform.Name = "btn_draw_freeform";
+            btn_draw_freeform.Size = new Size(37, 37);
+            btn_draw_freeform.TabIndex = 5;
+            toolTip_draw.SetToolTip(btn_draw_freeform, "Freeform");
+            btn_draw_freeform.UseVisualStyleBackColor = true;
+            // 
+            // btn_draw_arrow
+            // 
+            btn_draw_arrow.Image = (Image)resources.GetObject("btn_draw_arrow.Image");
+            btn_draw_arrow.Location = new Point(193, 4);
+            btn_draw_arrow.Name = "btn_draw_arrow";
+            btn_draw_arrow.Size = new Size(37, 37);
+            btn_draw_arrow.TabIndex = 4;
+            toolTip_draw.SetToolTip(btn_draw_arrow, "Arrow");
+            btn_draw_arrow.UseVisualStyleBackColor = true;
+            // 
+            // btn_draw_line
+            // 
+            btn_draw_line.Image = (Image)resources.GetObject("btn_draw_line.Image");
+            btn_draw_line.Location = new Point(151, 4);
+            btn_draw_line.Name = "btn_draw_line";
+            btn_draw_line.Size = new Size(37, 37);
+            btn_draw_line.TabIndex = 3;
+            toolTip_draw.SetToolTip(btn_draw_line, "Line");
+            btn_draw_line.UseVisualStyleBackColor = true;
+            btn_draw_line.Click += btn_drtaw_line_Click;
+            // 
+            // btn_drwa_scribble
+            // 
+            btn_drwa_scribble.Image = (Image)resources.GetObject("btn_drwa_scribble.Image");
+            btn_drwa_scribble.Location = new Point(109, 4);
+            btn_drwa_scribble.Name = "btn_drwa_scribble";
+            btn_drwa_scribble.Size = new Size(37, 37);
+            btn_drwa_scribble.TabIndex = 2;
+            toolTip_draw.SetToolTip(btn_drwa_scribble, "Create pushpin");
+            btn_drwa_scribble.UseVisualStyleBackColor = true;
+            // 
+            // btn_draw_pushpin
+            // 
+            btn_draw_pushpin.Image = (Image)resources.GetObject("btn_draw_pushpin.Image");
+            btn_draw_pushpin.Location = new Point(67, 4);
+            btn_draw_pushpin.Name = "btn_draw_pushpin";
+            btn_draw_pushpin.Size = new Size(37, 37);
+            btn_draw_pushpin.TabIndex = 1;
+            toolTip_draw.SetToolTip(btn_draw_pushpin, "Create pushpin");
+            btn_draw_pushpin.UseVisualStyleBackColor = true;
             // 
             // btn_draw
             // 
+            btn_draw.Font = new Font("Segoe UI", 12F);
             btn_draw.Location = new Point(4, 3);
             btn_draw.Margin = new Padding(0);
             btn_draw.Name = "btn_draw";
-            btn_draw.Size = new Size(58, 22);
+            btn_draw.Size = new Size(58, 38);
             btn_draw.TabIndex = 0;
             btn_draw.Text = "Draw";
             toolTip_draw.SetToolTip(btn_draw, "Draw items");
@@ -268,7 +367,8 @@
             MainMap.LabelEnabled = true;
             MainMap.LevelsKeepInMemory = 5;
             MainMap.LinesEnabled = true;
-            MainMap.Location = new Point(0, 104);
+            MainMap.Location = new Point(0, 117);
+            MainMap.MapScaleInfoPosition = MapScaleInfoPosition.Top;
             MainMap.MarkersEnabled = true;
             MainMap.MaxZoom = 2;
             MainMap.MinZoom = 2;
@@ -284,8 +384,9 @@
             MainMap.ShowCenter = true;
             MainMap.ShowDistance = false;
             MainMap.ShowGeoGridLines = false;
+            MainMap.ShowMapScaleInfo = false;
             MainMap.ShowTileGridLines = false;
-            MainMap.Size = new Size(669, 206);
+            MainMap.Size = new Size(669, 193);
             MainMap.TabIndex = 5;
             MainMap.Zoom = 0D;
             // 
@@ -332,5 +433,13 @@
         private ComboBox comboBoxMapType;
         public SgxMapPanel MainMap;
         private ToolTip toolTip_draw;
+        private Button btn_draw_pushpin;
+        private Button btn_draw_line;
+        private Button btn_drwa_scribble;
+        private Button btn_draw_freeform;
+        private Button btn_draw_arrow;
+        private Button btn_draw_ruler;
+        private Button btn_draw_rectangle;
+        private Button btn_draw_textbox;
     }
 }

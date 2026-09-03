@@ -32,13 +32,16 @@
             menuStrip1 = new MenuStrip();
             fileToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
+            macroToolStripMenuItem = new ToolStripMenuItem();
+            loadToolStripMenuItem = new ToolStripMenuItem();
+            editToolStripMenuItem = new ToolStripMenuItem();
             sgxMapControl1 = new SgxMap.SgxMapControl();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, macroToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(800, 24);
@@ -59,6 +62,27 @@
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
+            // macroToolStripMenuItem
+            // 
+            macroToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadToolStripMenuItem, editToolStripMenuItem });
+            macroToolStripMenuItem.Name = "macroToolStripMenuItem";
+            macroToolStripMenuItem.Size = new Size(53, 20);
+            macroToolStripMenuItem.Text = "Macro";
+            // 
+            // loadToolStripMenuItem
+            // 
+            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            loadToolStripMenuItem.Size = new Size(180, 22);
+            loadToolStripMenuItem.Text = "Load";
+            loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
+            // 
+            // editToolStripMenuItem
+            // 
+            editToolStripMenuItem.Name = "editToolStripMenuItem";
+            editToolStripMenuItem.Size = new Size(180, 22);
+            editToolStripMenuItem.Text = "Edit";
+            editToolStripMenuItem.Click += editToolStripMenuItem_Click;
+            // 
             // sgxMapControl1
             // 
             sgxMapControl1.Dock = DockStyle.Fill;
@@ -69,6 +93,7 @@
             sgxMapControl1.ShowToolbar = true;
             sgxMapControl1.Size = new Size(800, 426);
             sgxMapControl1.TabIndex = 1;
+            sgxMapControl1.Zoom = 0D;
             // 
             // MainForm
             // 
@@ -94,5 +119,8 @@
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem exitToolStripMenuItem;
         public SgxMap.SgxMapControl sgxMapControl1;
+        private ToolStripMenuItem macroToolStripMenuItem;
+        private ToolStripMenuItem loadToolStripMenuItem;
+        private ToolStripMenuItem editToolStripMenuItem;
     }
 }

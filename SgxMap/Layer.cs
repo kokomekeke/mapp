@@ -122,6 +122,7 @@ namespace SgxMap
             if (obj == null) return;
             Objects.Add(obj);
             obj.Layer = this;
+            obj.UpdateLocalPosition();
         }
 
         public void RemoveObject(BasePoint obj)
@@ -221,7 +222,7 @@ namespace SgxMap
         {
             foreach (var obj in Objects)
             {
-                obj.UpdateLocalPosition();
+                obj.UpdateObject();
             }
 
             if (Control != null && !Control.m_holdInvalidation)
@@ -229,6 +230,37 @@ namespace SgxMap
                 Control.Invalidate();
             }
         }
+
+        public void RefreshObject(BasePoint obj)
+        {
+             obj.UpdateObject();
+
+            if (Control != null && !Control.m_holdInvalidation)
+            {
+                Control.Invalidate();
+            }
+        }
+
+
+        #region Create and add objects to the layer
+
+        public MapRuler AddRuler(int x, int y, Color color)
+        {
+            var ruler = new MapRuler(this, x, y, color);
+            AddObject(ruler);
+            return ruler;
+        }
+
+        public MapLabel AddLabel(PointLatLng point, string text, Font font, bool border = false)
+        {
+            var label = new MapLabel(point, text, font, border);
+            AddObject(label);
+            return label;
+        }
+
+
+
+        #endregion Create and add objects to the layer
 
 
         #region ISerializable Members

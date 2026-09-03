@@ -194,6 +194,14 @@ namespace SgxMap
             m.Show(DrawPanel, new Point(btn_draw.Left, btn_draw.Bottom));
         } /* btn_draw_Click */
 
+        private void btn_drtaw_line_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void btn_draw_ruler_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Ruler;
+        }
 
     } /* class SgxMapControl */
 } /* namespace SgxMap */

@@ -63,5 +63,34 @@ namespace SgxMapDemo
             Program.initialLongitude = sgxMapControl1.MainMap.Position.Lng;
         }
 
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.CheckFileExists = true;
+            dlg.CheckPathExists = true;
+            dlg.DefaultExt = "gmc";
+            dlg.Filter = "GMap macro file (*.gmc)|*.gmc|All file (*.*)|*.*";
+            dlg.Title = "Select GMAP Macro file";
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                if (sgxMapControl1.MainMap.LoadMacroFile(dlg.FileName))
+                {
+                    MacroEditor.MacroText = File.ReadAllText(dlg.FileName);
+                }
+            }
+        }
+
+        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var frm = MacroEditor.GetInstance();
+            if (frm != null)
+            {
+                frm.Show();
+                frm.BringToFront();
+                frm.TopLevel = true;
+            }
+        }
+
     } /* class MainForm */
 } /* namespace SgxMapDemo */
