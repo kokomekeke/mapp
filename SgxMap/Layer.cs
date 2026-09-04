@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
-*          Last modification                                       02-Sep-2026.
+*          Last modification                                       04-Sep-2026.
 =============================================================================*/
 using System.Runtime.Serialization;
 using GMap.NET;
@@ -128,8 +128,12 @@ namespace SgxMap
         public void RemoveObject(BasePoint obj)
         {
             if (obj == null) return;
-            Objects.Remove(obj);
-            obj.Layer = null;
+            try
+            {
+                Objects.Remove(obj);
+                obj.Layer = null;
+            }
+            catch { };
         }
 
         public void ClearObjects()
@@ -244,20 +248,87 @@ namespace SgxMap
 
         #region Create and add objects to the layer
 
-        public MapRuler AddRuler(int x, int y, Color color)
+
+        public MapLine? AddLine(int x, int y, Color color)
         {
-            var ruler = new MapRuler(this, x, y, color);
-            AddObject(ruler);
-            return ruler;
+            var p1 = Control.FromLocalToLatLng(x, y);
+            if (p1 != null)
+            {
+                var line = new MapLine(p1, p1, color);
+                AddObject(line);
+                return line;
+            }
+            return null;
         }
 
-        public MapLabel AddLabel(PointLatLng point, string text, Font font, bool border = false)
+        public MapLine AddLine(string name, PointLatLng p1, PointLatLng p2, Color color)
         {
-            var label = new MapLabel(point, text, font, border);
+            var line = new MapLine(name, p1, p1, color);
+            AddObject(line);
+            return line;
+        }
+
+
+        public MapLabel AddLabel(string name, PointLatLng point, string text, Font font)
+        {
+            var label = new MapLabel(name, point, text, font);
             AddObject(label);
             return label;
         }
 
+        public MapTextBox AddTextBox(string name, PointLatLng point, string text, Font font)
+        {
+            var label = new MapTextBox(name, point, text, font);
+            AddObject(label);
+            return label;
+        }
+
+        public MapRuler AddRuler(int x, int y, Color color)
+        {
+            var p = Control.FromLocalToLatLng(x, y);
+            var ruler = new MapRuler(p, p, color);
+            AddObject(ruler);
+            return ruler;
+        }
+
+        public MapCircleRuler AddCircleRuler(int x, int y, Color color)
+        {
+            var p = Control.FromLocalToLatLng(x, y);
+            var ruler = new MapCircleRuler(p, p, color);
+            AddObject(ruler);
+            return ruler;
+        }
+
+        public MapRectangle AddRectangle(string name, PointLatLng point, float with, float height, Color color)
+        {
+            var rec = new MapRectangle(name, point, with, height, color);
+            AddObject(rec);
+            return rec;
+        }
+
+        public MapRectangle AddRectangle(int x, int y, Color color)
+        {
+            var p = Control.FromLocalToLatLng(x, y);
+            var rec = new MapRectangle(p, 0.1f, 0.1f, color);
+            AddObject(rec);
+            return rec;
+        }
+
+
+        public MapRectangle AddEllipse(string name, PointLatLng point, float with, float height, Color color)
+        {
+            var rec = new MapEllipse(name, point, with, height, color);
+            AddObject(rec);
+            return rec;
+        }
+
+        public MapRectangle AddEllipse(int x, int y, Color color)
+        {
+            var p = Control.FromLocalToLatLng(x, y);
+            var rec = new MapEllipse(p, 0.1f, 0.1f, color);
+            AddObject(rec);
+            return rec;
+        }
 
 
         #endregion Create and add objects to the layer

@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*=============================================================================
+*  MapRuler: draw a line and display distance
+*
+* (c) Kótai 2026.
+*
+* ver 1.00                                                         03-Sep-2026.
+*           Last modification                                      04-Sep-2026.
+=============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Linq;
@@ -9,17 +17,18 @@ using GMap.NET;
 
 namespace SgxMap.Objects
 {
-    public class MapRuler : MapLine, ISerializable, IDeserializationCallback, IDisposable
+    public class MapRuler : MapLine, ISerializable, IDisposable
     {
 
-        private MapLabel m_label;
+        private MapTextBox? m_label;
 
 
-        public MapRuler(Layer layer, int x, int y, Color color)
-            : base(layer.Control.FromLocalToLatLng(x, y), layer.Control.FromLocalToLatLng(x, y), color)
+        public MapRuler(PointLatLng p1, PointLatLng p2, Color color)
+            : base(p1, p2, color)
         {
-            Layer = layer;
+
         }
+
 
         public override void OnRender(Graphics g)
         {
@@ -53,7 +62,7 @@ namespace SgxMap.Objects
 
             Position2 = point;
             if (m_label == null)
-                m_label = Layer.AddLabel(Position2, Length.ToString("F1") + " km", new Font("Arial", 12), true);
+                m_label = Layer.AddTextBox("", Position2, Length.ToString("F1") + " km", new Font("Arial", 12));
             else
             {
                 if (m_label.Layer == null)
@@ -66,17 +75,18 @@ namespace SgxMap.Objects
             Layer?.RefreshObject(this);
         }
 
-        public void UpdateEndPoint(int x, int y)
+        public override void UpdateEndPoint(int x, int y)
         {
             var point = Layer.Control.FromLocalToLatLng(x, y);
             SetPosition2(point);
         }
 
+
         public void ShowLength()
         {
             if (m_label == null)
             {
-                m_label = new MapLabel(Position2, Length.ToString("F1") + " km ");
+                m_label = new MapTextBox(Position2, Length.ToString("F1") + " km ");
                 m_label.Layer = this.Layer;
                 m_label.Font = new Font("Arial", 8);
             }
@@ -87,6 +97,31 @@ namespace SgxMap.Objects
 
             m_layer?.RefreshObject(m_label);
         }
+
+
+        public void RemoveLabel()
+        {
+            if ((Layer == null) || (m_label == null)) return;
+            try
+            {
+                Layer?.RemoveObject(m_label);
+                m_label = null;
+            }
+            catch { }
+        }
+
+
+        public override void Remove()
+        {
+            if (m_label != null)
+            {
+                m_label?.Remove();
+                m_label=null;
+            }
+            base.Remove();
+        }
+
+
 
     } /* class MapRuler */
 } /* namespace SgxMap.Objects */

@@ -196,12 +196,33 @@ namespace SgxMap
 
         private void btn_drtaw_line_Click(object sender, EventArgs e)
         {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Line;
         }
 
         private void btn_draw_ruler_Click(object sender, EventArgs e)
         {
-            MainMap.MouseMoveStatus = MouseMoveStatusType.Ruler;
+            //MainMap.MouseMoveStatus = MouseMoveStatusType.Ruler;
+            MainMap.MouseMoveStatus = MouseMoveStatusType.CircleRuler;
         }
 
+        private void btn_draw_arrow_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Arrow;
+        }
+
+        private void btn_draw_rectangle_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Rectangle;
+        }
+
+        private void btn_draw_ellipse_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Ellipse;
+        }
+
+        private void btn_draw_textbox_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Textbox;
+        }
     } /* class SgxMapControl */
 } /* namespace SgxMap */

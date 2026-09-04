@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
-*          Last modification                                       02-Sep-2026.
+*          Last modification                                       04-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -41,10 +41,13 @@ namespace SgxMap.Objects
         protected bool m_isVisible = true;
         protected bool m_isMouseOver = false;
         protected bool m_isHighlighted = false;
+        private bool m_isEditable = true;      // if true, then the ellipse can be edited by mouse, otherwise it is read-only
         protected GraphicsPath? m_graphicsPath;
         protected Layer? m_layer;
 
         public Point LocalPosition;
+
+        protected int m_thickness = 2;
 
         /// <summary>
         /// specifies how the outline is painted
@@ -56,7 +59,7 @@ namespace SgxMap.Objects
         public long ID
         {
             get { return m_id; }
-            private set { 
+            protected set { 
                 m_id = value;
                 if (m_id > LastID) LastID = m_id;
             }
@@ -98,6 +101,21 @@ namespace SgxMap.Objects
                 {
                     HighlightStroke.Color = value;
                     Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
+                }
+            }
+        }
+
+        public int Thickness
+        {
+            get { return m_thickness; }
+            set
+            {
+                if (m_thickness != value)
+                {
+                    m_thickness = value;
+                    NormalStroke.Width = m_thickness;
+                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
+                    m_layer?.RefreshObject(this);
                 }
             }
         }
@@ -156,6 +174,12 @@ namespace SgxMap.Objects
                     m_layer?.RefreshObject(this);
                 }
             }
+        }
+
+        public bool IsEditable
+        {
+            get { return m_isEditable; }
+            set { m_isEditable = value; }
         }
 
 
@@ -332,6 +356,10 @@ namespace SgxMap.Objects
         }
 
 
+        public virtual void Remove()
+        {
+            m_layer?.RemoveObject(this);
+        }
 
         #region serialization
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -360,6 +388,7 @@ namespace SgxMap.Objects
         #region Dispose
         public virtual void Dispose()
         {
+            Remove();
             if (NormalStroke != null)
             {
                 NormalStroke.Dispose();

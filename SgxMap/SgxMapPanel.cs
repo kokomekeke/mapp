@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
-*          Last modification                                       03-Sep-2026.
+*          Last modification                                       04-Sep-2026.
 =============================================================================*/
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,9 +17,14 @@ using GMap.NET.MapProviders;
 using SgxMap.ObjectModel;
 using GMap.NET.Projections;
 using SgxMap.Objects;
+using System.Runtime.Serialization.Formatters.Binary;
+
 
 namespace SgxMap
 {
+
+    #pragma warning disable SYSLIB0011
+
     /// <summary>
     ///     GMap.NET control for Windows Forms
     /// </summary>
@@ -34,7 +39,7 @@ namespace SgxMap
         private HelperLineOptions m_helperLineOption = HelperLineOptions.DontShow;
         public bool m_showHelperLine = false;                                              // if true, draw cross lines at the mouse pointer position
         public bool m_showMapScaleInfo = false;                                            // if true, then show map scale info
-        public MapScaleInfoPosition m_mapScaleInfoPosition;                                // Position of the map scale info
+        public MapScaleInfoPositions m_mapScaleInfoPosition;                                // Position of the map scale info
 
 
         private RectLatLng m_selectedArea;                                                  // current selected area in map
@@ -92,6 +97,9 @@ namespace SgxMap
 
         public MouseMoveStatusType MouseMoveStatus = MouseMoveStatusType.None;
         public MapRuler? m_MapRuler = null;
+        public MapRuler? m_MapCircleRuler = null;
+        public MapLine? m_MapLine = null;
+        public MapRectangle? m_MapRectangle = null;
 
 
         #endregion Fields
@@ -221,7 +229,7 @@ namespace SgxMap
 
         [Category("GMap.NET")]
         [Description("Position of the map scale information")]
-        public MapScaleInfoPosition MapScaleInfoPosition
+        public MapScaleInfoPositions MapScaleInfoPosition
         {
             get
             {
@@ -1019,7 +1027,7 @@ namespace SgxMap
 
                 if (m_showMapScaleInfo)
                 {
-                    int top = m_mapScaleInfoPosition == MapScaleInfoPosition.Top ? 10 : Bottom - 30;
+                    int top = m_mapScaleInfoPosition == MapScaleInfoPositions.Top ? 10 : Bottom - 30;
                     int left = 10;
                     int bottom = top + 7;
 
@@ -1194,11 +1202,42 @@ namespace SgxMap
 
             if (!IsMouseOverObject)
             {
-                if (e.Button == MouseButtons.Left && MouseMoveStatus == MouseMoveStatusType.Ruler)
+                if (e.Button == MouseButtons.Left)
                 {
-                    m_MapRuler = Layers[0].AddRuler(e.X, e.Y, Color.Black);
-                    Invalidate();
-                    return;
+                    switch (MouseMoveStatus)
+                    {
+                        case MouseMoveStatusType.Line:
+                            m_MapLine = Layers[0].AddLine(e.X, e.Y, Color.Black);
+                            Invalidate();
+                            return;
+
+                        case MouseMoveStatusType.Arrow:
+                            m_MapLine = Layers[0].AddLine(e.X, e.Y, Color.Black);
+                            m_MapLine.ArrowPosition = ArrowPositions.AtEnd;
+                            Invalidate();
+                            return;
+
+                        case MouseMoveStatusType.Ruler:
+                            m_MapRuler = Layers[0].AddRuler(e.X, e.Y, Color.Black);
+                            Invalidate();
+                            return;
+
+                        case MouseMoveStatusType.CircleRuler:
+                            m_MapCircleRuler = Layers[0].AddCircleRuler(e.X, e.Y, Color.Black);
+                            Invalidate();
+                            return;
+
+                        case MouseMoveStatusType.Rectangle:
+                            m_MapRectangle = Layers[0].AddRectangle(e.X, e.Y, Color.Black);
+                            Invalidate();
+                            return;
+
+                        case MouseMoveStatusType.Ellipse:
+                            m_MapRectangle = Layers[0].AddEllipse(e.X, e.Y, Color.Black);
+                            Invalidate();
+                            return;
+
+                    } /* switch */
                 }
 
                 if (e.Button == DragButton && CanDragMap)
@@ -1223,8 +1262,30 @@ namespace SgxMap
 
             if (m_MapRuler != null)
             {
-                Layers[0].RemoveObject(m_MapRuler);
+                m_MapRuler.Remove();
                 m_MapRuler = null;
+            }
+
+            if (m_MapLine != null)
+            {
+                if (m_MapLine.ArrowPosition == ArrowPositions.None) 
+                    m_MapLine.Thickness = 1;
+                m_MapLine.LineColor = Color.Red;
+                m_MapLine = null;
+            }
+
+            if (m_MapCircleRuler != null)
+            {
+                m_MapCircleRuler.Thickness = 1;
+                m_MapCircleRuler.LineColor = Color.Red;
+                m_MapCircleRuler = null;
+            }
+
+            if (m_MapRectangle != null)
+            {
+                m_MapRectangle.Thickness = 1;
+                m_MapRectangle.LineColor = Color.Red;
+                m_MapRectangle = null;
             }
 
             if (m_isSelecting)
@@ -1293,6 +1354,28 @@ namespace SgxMap
                 Invalidate();
                 return;
             }
+
+            if (m_MapCircleRuler != null)
+            {
+                m_MapCircleRuler.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
+                return;
+            }
+
+            if (m_MapLine != null)
+            {
+                m_MapLine.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
+                return;
+            }
+
+            if (m_MapRectangle != null)
+            {
+                m_MapRectangle.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
+                return;
+            }
+
 
             if (!Core.IsDragging && !Core.MouseDown.IsEmpty)
             {
@@ -3574,44 +3657,43 @@ namespace SgxMap
         ///     Serializes the overlays.
         /// </summary>
         /// <param name="stream">The stream.</param>
-        //public void SerializeOverlays(Stream stream)
-        //{
-        //    if (stream == null)
-        //    {
-        //        throw new ArgumentNullException("stream");
-        //    }
+        public void SerializeOverlays(Stream stream)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
 
-        //    // Create an array from the overlays
-        //    var overlayArray = new GMapOverlay[Overlays.Count];
-        //    Overlays.CopyTo(overlayArray, 0);
+            // Create an array from the overlays
+            var layerArray = new Layer[Layers.Count];
+            Layers.CopyTo(layerArray, 0);
 
-        //    // Serialize the overlays
-        //    BinaryFormatter.Serialize(stream, overlayArray);
-        //}
+            // Serialize the overlays
+            //BinaryFormatter.Serialize(stream, layerArray);
+        }
 
         /// <summary>
         ///     De-serializes the overlays.
         /// </summary>
         /// <param name="stream">The stream.</param>
-        //public void DeserializeOverlays(Stream stream)
-        //{
-        //    if (stream == null)
-        //    {
-        //        throw new ArgumentNullException("stream");
-        //    }
+        public void DeserializeOverlays(Stream stream)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
 
-        //    // De-serialize the overlays
-        //    var overlayArray = BinaryFormatter.Deserialize(stream) as GMapOverlay[];
+            // De-serialize the overlays
+            //var layerArray = BinaryFormatter.Deserialize(stream) as Layer[];
 
-        //    // Populate the collection of overlays.
-        //    foreach (var overlay in overlayArray)
-        //    {
-        //        overlay.Control = this;
-        //        Overlays.Add(overlay);
-        //    }
-
-        //    ForceUpdateOverlays();
-        //}
+            //// Populate the collection of overlays.
+            //foreach (var layer in layerArray)
+            //{
+            //    layer.Control = this;
+            //    Layers.Add(layer);
+            //}
+            //ForceUpdateOverlays();
+        }
 
         #endregion Serialization
     } /* class GMapControl */
@@ -3641,7 +3723,7 @@ namespace SgxMap
         ShowOnModifierKey = 2
     }
 
-    public enum MapScaleInfoPosition
+    public enum MapScaleInfoPositions
     {
         Top,
         Bottom
@@ -3651,8 +3733,23 @@ namespace SgxMap
     {
         None,
         Drag,
+        Line,
+        Arrow,
+        Rectangle,
+        Circle,
+        Ellipse,
         Ruler,
+        CircleRuler,
+        Textbox,
         MovePoint,
+    }
+
+    public enum ArrowPositions
+    {
+        None,
+        AtBegin,
+        AtEnd,
+        Both,
     }
 
     #endregion Enums
