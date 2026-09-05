@@ -35,13 +35,15 @@ namespace SgxMap.Objects
         #endregion
 
         protected long m_id;
-        protected PointLatLng m_position;
+        protected PointLatLng m_position = PointLatLng.Empty;
         protected string m_name = string.Empty;
         protected bool m_isSelected = false;
         protected bool m_isVisible = true;
         protected bool m_isMouseOver = false;
         protected bool m_isHighlighted = false;
-        private bool m_isEditable = true;      // if true, then the ellipse can be edited by mouse, otherwise it is read-only
+        protected bool m_isEditable = true;           // if true, then the ellipse can be edited by mouse, otherwise it is read-only
+        protected bool IsHitTestVisible = true;        // can receive input
+
         protected GraphicsPath? m_graphicsPath;
         protected Layer? m_layer;
 
@@ -232,6 +234,7 @@ namespace SgxMap.Objects
             m_position = position;
             m_name = name;
             NormalStroke.Color = color;
+            Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
         }
 
         public BasePoint(PointLatLng position, Color color)
@@ -240,6 +243,21 @@ namespace SgxMap.Objects
             m_position = position;
             m_name = "name-" + m_id;
             NormalStroke.Color = color;
+            Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
+        }
+
+        public BasePoint(string name, List<PointLatLng> points, Color color)
+        {
+            m_id = ++LastID;
+            if (string.IsNullOrEmpty(name))
+                 name = "Object-" + m_id.ToString();
+            else m_name = name;
+            NormalStroke.Color = color;
+            Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
+            if ((points != null) && (points.Count > 0))
+            {
+                m_position = points[0];
+            }
         }
 
 

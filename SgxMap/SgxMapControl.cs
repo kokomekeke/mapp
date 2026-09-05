@@ -200,7 +200,7 @@ namespace SgxMap
             MainMap.MouseMoveStatus = MouseMoveStatusType.Line;
         }
 
-        private void btn_draw_ruler_Click(object sender, EventArgs e)
+        private void btn_draw_radius_Click(object sender, EventArgs e)
         {
             //MainMap.MouseMoveStatus = MouseMoveStatusType.Ruler;
             MainMap.MouseMoveStatus = MouseMoveStatusType.CircleRuler;
@@ -226,6 +226,18 @@ namespace SgxMap
             MainMap.MouseMoveStatus = MouseMoveStatusType.Textbox;
         }
 
+        private void btn_draw_ruler_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Ruler;
+        }
+
+        private void btn_draw_circle_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Circle;
+        }
+
+
+
         private void textBox_editor_VisibleChanged(object sender, EventArgs e)
         {
             if (!textBox_editor.Visible)
@@ -233,6 +245,8 @@ namespace SgxMap
                 Monitor.Exit(m_monitor);
             }
         }
+
+
 
         private void textBox_editor_Leave(object sender, EventArgs e)
         {
@@ -266,5 +280,6 @@ namespace SgxMap
         {
             MainMap.ClearAll();
         }
+
     } /* class SgxMapControl */
 } /* namespace SgxMap */

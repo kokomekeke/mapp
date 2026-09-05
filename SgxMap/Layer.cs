@@ -343,6 +343,15 @@ namespace SgxMap
             return rec;
         }
 
+        public GeoCircle AddCircle(int x, int y, Color color)
+        {
+            var p = Control.FromLocalToLatLng(x, y);
+            var rec = new GeoCircle(p, 0.1, color);
+            AddObject(rec);
+            return rec;
+        }
+
+
 
         #endregion Create and add objects to the layer
 

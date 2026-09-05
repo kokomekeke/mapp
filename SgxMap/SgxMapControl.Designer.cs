@@ -47,9 +47,11 @@
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
             DrawPanel = new Panel();
+            btn_draw_circle = new Button();
+            btn_draw_ruler = new Button();
             btn_draw_ellipse = new Button();
             btn_draw_textbox = new Button();
-            btn_draw_ruler = new Button();
+            btn_draw_radius = new Button();
             btn_draw_rectangle = new Button();
             btn_draw_freeform = new Button();
             btn_draw_arrow = new Button();
@@ -249,9 +251,11 @@
             // 
             DrawPanel.BackColor = SystemColors.ControlDarkDark;
             DrawPanel.BorderStyle = BorderStyle.Fixed3D;
+            DrawPanel.Controls.Add(btn_draw_circle);
+            DrawPanel.Controls.Add(btn_draw_ruler);
             DrawPanel.Controls.Add(btn_draw_ellipse);
             DrawPanel.Controls.Add(btn_draw_textbox);
-            DrawPanel.Controls.Add(btn_draw_ruler);
+            DrawPanel.Controls.Add(btn_draw_radius);
             DrawPanel.Controls.Add(btn_draw_rectangle);
             DrawPanel.Controls.Add(btn_draw_freeform);
             DrawPanel.Controls.Add(btn_draw_arrow);
@@ -264,6 +268,28 @@
             DrawPanel.Name = "DrawPanel";
             DrawPanel.Size = new Size(669, 49);
             DrawPanel.TabIndex = 4;
+            // 
+            // btn_draw_circle
+            // 
+            btn_draw_circle.Image = (Image)resources.GetObject("btn_draw_circle.Image");
+            btn_draw_circle.Location = new Point(486, 5);
+            btn_draw_circle.Name = "btn_draw_circle";
+            btn_draw_circle.Size = new Size(37, 37);
+            btn_draw_circle.TabIndex = 11;
+            toolTip_draw.SetToolTip(btn_draw_circle, "Circle");
+            btn_draw_circle.UseVisualStyleBackColor = true;
+            btn_draw_circle.Click += btn_draw_circle_Click;
+            // 
+            // btn_draw_ruler
+            // 
+            btn_draw_ruler.Image = (Image)resources.GetObject("btn_draw_ruler.Image");
+            btn_draw_ruler.Location = new Point(443, 5);
+            btn_draw_ruler.Name = "btn_draw_ruler";
+            btn_draw_ruler.Size = new Size(37, 37);
+            btn_draw_ruler.TabIndex = 10;
+            toolTip_draw.SetToolTip(btn_draw_ruler, "Ruler");
+            btn_draw_ruler.UseVisualStyleBackColor = true;
+            btn_draw_ruler.Click += btn_draw_ruler_Click;
             // 
             // btn_draw_ellipse
             // 
@@ -287,16 +313,16 @@
             btn_draw_textbox.UseVisualStyleBackColor = true;
             btn_draw_textbox.Click += btn_draw_textbox_Click;
             // 
-            // btn_draw_ruler
+            // btn_draw_radius
             // 
-            btn_draw_ruler.Image = (Image)resources.GetObject("btn_draw_ruler.Image");
-            btn_draw_ruler.Location = new Point(359, 3);
-            btn_draw_ruler.Name = "btn_draw_ruler";
-            btn_draw_ruler.Size = new Size(37, 37);
-            btn_draw_ruler.TabIndex = 7;
-            toolTip_draw.SetToolTip(btn_draw_ruler, "Radius");
-            btn_draw_ruler.UseVisualStyleBackColor = true;
-            btn_draw_ruler.Click += btn_draw_ruler_Click;
+            btn_draw_radius.Image = (Image)resources.GetObject("btn_draw_radius.Image");
+            btn_draw_radius.Location = new Point(359, 3);
+            btn_draw_radius.Name = "btn_draw_radius";
+            btn_draw_radius.Size = new Size(37, 37);
+            btn_draw_radius.TabIndex = 7;
+            toolTip_draw.SetToolTip(btn_draw_radius, "Radius");
+            btn_draw_radius.UseVisualStyleBackColor = true;
+            btn_draw_radius.Click += btn_draw_radius_Click;
             // 
             // btn_draw_rectangle
             // 
@@ -469,10 +495,12 @@
         private Button btn_drwa_scribble;
         private Button btn_draw_freeform;
         private Button btn_draw_arrow;
-        private Button btn_draw_ruler;
+        private Button btn_draw_radius;
         private Button btn_draw_rectangle;
         private Button btn_draw_textbox;
         private Button btn_draw_ellipse;
         private TextBox textBox_editor;
+        private Button btn_draw_ruler;
+        private Button btn_draw_circle;
     }
 }

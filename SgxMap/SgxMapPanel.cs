@@ -100,6 +100,7 @@ namespace SgxMap
         public MapRuler? m_MapCircleRuler = null;
         public MapLine? m_MapLine = null;
         public MapRectangle? m_MapRectangle = null;
+        public GeoCircle? m_mapCircle = null;
 
 
         #endregion Fields
@@ -1237,6 +1238,10 @@ namespace SgxMap
                             Invalidate();
                             return;
 
+                        case MouseMoveStatusType.Circle:
+                            m_mapCircle = Layers[0].AddCircle(e.X, e.Y, Color.Black);
+                            break;
+
                     } /* switch */
                 }
 
@@ -1286,6 +1291,13 @@ namespace SgxMap
                 m_MapRectangle.Thickness = 1;
                 m_MapRectangle.LineColor = Color.Red;
                 m_MapRectangle = null;
+            }
+
+            if (m_mapCircle != null)
+            {
+                m_mapCircle.Thickness = 1;
+                m_mapCircle.Color = Color.Red;
+                m_mapCircle = null;
             }
 
             if (m_isSelecting)
@@ -1373,6 +1385,13 @@ namespace SgxMap
             if (m_MapRectangle != null)
             {
                 m_MapRectangle.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
+                return;
+            }
+
+            if (m_mapCircle != null)
+            {
+                m_mapCircle.ChangeRadius(e.X, e.Y); 
                 Invalidate();
                 return;
             }
