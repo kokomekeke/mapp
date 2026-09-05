@@ -59,6 +59,7 @@
             btn_draw = new Button();
             MainMap = new SgxMapPanel();
             toolTip_draw = new ToolTip(components);
+            textBox_editor = new TextBox();
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
@@ -142,6 +143,7 @@
             btn_newMap.TabIndex = 0;
             toolTip_draw.SetToolTip(btn_newMap, "Create a new map");
             btn_newMap.UseVisualStyleBackColor = true;
+            btn_newMap.Click += btn_newMap_Click;
             // 
             // BottomPanel
             // 
@@ -292,7 +294,7 @@
             btn_draw_ruler.Name = "btn_draw_ruler";
             btn_draw_ruler.Size = new Size(37, 37);
             btn_draw_ruler.TabIndex = 7;
-            toolTip_draw.SetToolTip(btn_draw_ruler, "Ruler");
+            toolTip_draw.SetToolTip(btn_draw_ruler, "Radius");
             btn_draw_ruler.UseVisualStyleBackColor = true;
             btn_draw_ruler.Click += btn_draw_ruler_Click;
             // 
@@ -405,11 +407,23 @@
             MainMap.Size = new Size(669, 193);
             MainMap.TabIndex = 5;
             MainMap.Zoom = 0D;
+            MainMap.MouseClick += MainMap_MouseClick;
+            // 
+            // textBox_editor
+            // 
+            textBox_editor.Location = new Point(288, 168);
+            textBox_editor.Name = "textBox_editor";
+            textBox_editor.Size = new Size(100, 23);
+            textBox_editor.TabIndex = 6;
+            textBox_editor.Visible = false;
+            textBox_editor.VisibleChanged += textBox_editor_VisibleChanged;
+            textBox_editor.Leave += textBox_editor_Leave;
             // 
             // SgxMapControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(textBox_editor);
             Controls.Add(MainMap);
             Controls.Add(DrawPanel);
             Controls.Add(SearchPanel);
@@ -425,6 +439,7 @@
             ((System.ComponentModel.ISupportInitialize)trackBar_Zoom).EndInit();
             DrawPanel.ResumeLayout(false);
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -458,5 +473,6 @@
         private Button btn_draw_rectangle;
         private Button btn_draw_textbox;
         private Button btn_draw_ellipse;
+        private TextBox textBox_editor;
     }
 }

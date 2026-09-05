@@ -1340,7 +1340,8 @@ namespace SgxMap
                 }
             }
 
-            MouseMoveStatus = MouseMoveStatusType.None;
+            if (MouseMoveStatus != MouseMoveStatusType.Textbox)
+                MouseMoveStatus = MouseMoveStatusType.None;
         }  /* OnMouseUp */
 
 
@@ -1908,19 +1909,19 @@ namespace SgxMap
         /// <summary>
         ///     update objects when map is draged/zoomed
         /// </summary>
-        internal void ForceUpdateOverlays()
+        internal void ForceUpdateLayers()
         {
             try
             {
                 m_holdInvalidation = true;
 
-                //foreach (var o in Overlays)
-                //{
-                //    if (o.IsVisibile)
-                //    {
-                //        o.ForceUpdate();
-                //    }
-                //}
+                foreach (var o in Layers)
+                {
+                    if (o.IsVisible)
+                    {
+                        o.ForceUpdate();
+                    }
+                }
             }
             finally
             {
@@ -2172,7 +2173,7 @@ namespace SgxMap
 
                 Core.DragOffset(new GPoint(x, y));
 
-                ForceUpdateOverlays();
+                ForceUpdateLayers();
             }
         }
 
@@ -2273,7 +2274,7 @@ namespace SgxMap
                     }
 
                     Core.OnMapOpen().ProgressChanged += InvalidatorEngage;
-                    ForceUpdateOverlays();
+                    ForceUpdateLayers();
                     //};
                     //this.BeginInvoke(m);
                 }
@@ -2443,7 +2444,7 @@ namespace SgxMap
 
                     if (!m_holdInvalidation && Core.IsStarted)
                     {
-                        ForceUpdateOverlays();
+                        ForceUpdateLayers();
                     }
                 }
             }
@@ -2505,7 +2506,7 @@ namespace SgxMap
                         UpdateRotationMatrix();
                     }
 
-                    ForceUpdateOverlays();
+                    ForceUpdateLayers();
                 }
             }
         }
@@ -3161,7 +3162,7 @@ namespace SgxMap
 
                     if (Core.IsStarted && !IsDragging)
                     {
-                        ForceUpdateOverlays();
+                        ForceUpdateLayers();
                     }
                 }
             }
@@ -3212,7 +3213,7 @@ namespace SgxMap
 
                 if (Core.IsStarted)
                 {
-                    ForceUpdateOverlays();
+                    ForceUpdateLayers();
                 }
             }
         }
@@ -3351,7 +3352,7 @@ namespace SgxMap
                         }
                         else
                         {
-                            ForceUpdateOverlays();
+                            ForceUpdateLayers();
                         }
                     }
                 }

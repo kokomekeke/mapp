@@ -184,7 +184,7 @@ namespace SgxMap
                 {
                     if (obj.IsVisible)
                     {
-                        obj.UpdateLocalPosition();
+                        obj.UpdateObject();     //UpdateLocalPosition();
                     }
                 }
             }
@@ -282,6 +282,19 @@ namespace SgxMap
             AddObject(label);
             return label;
         }
+
+        public MapTextBox? AddTextBox(string name, int x, int y, string text, Font font)
+        {
+            var p1 = Control.FromLocalToLatLng(x, y);
+            if (p1 != null)
+            {
+                var label = new MapTextBox(name, p1, text, font);
+                AddObject(label);
+                return label;
+            }
+            return null;
+        }
+
 
         public MapRuler AddRuler(int x, int y, Color color)
         {

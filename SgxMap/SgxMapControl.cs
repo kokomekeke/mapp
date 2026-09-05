@@ -25,6 +25,7 @@ namespace SgxMap
 {
     public partial class SgxMapControl : UserControl
     {
+        private object m_monitor = new object();
 
         public bool ShowToolbar
         {
@@ -223,6 +224,47 @@ namespace SgxMap
         private void btn_draw_textbox_Click(object sender, EventArgs e)
         {
             MainMap.MouseMoveStatus = MouseMoveStatusType.Textbox;
+        }
+
+        private void textBox_editor_VisibleChanged(object sender, EventArgs e)
+        {
+            if (!textBox_editor.Visible)
+            {
+                Monitor.Exit(m_monitor);
+            }
+        }
+
+        private void textBox_editor_Leave(object sender, EventArgs e)
+        {
+            //textBox_editor.Visible = false;
+        }
+
+        private void MainMap_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (MainMap.MouseMoveStatus == MouseMoveStatusType.Textbox)
+            {
+                if (textBox_editor.Visible)
+                {
+                    if (textBox_editor.Focused)
+                        return;
+                    textBox_editor.Visible = false;
+                    MainMap.MouseMoveStatus = MouseMoveStatusType.None;
+                    var t = MainMap.Layers[0].AddTextBox("", textBox_editor.Location.X, textBox_editor.Location.Y - MainMap.Location.Y + textBox_editor.Height, textBox_editor.Text, DefaultFont);
+                    t.Color = Color.Red;
+                    t.Thickness = 1;
+                    return;
+                }
+                textBox_editor.Visible = true;
+                textBox_editor.Text = string.Empty;
+                textBox_editor.Location = new Point(e.X, e.Y + MainMap.Location.Y);
+                textBox_editor.Focus();
+                Monitor.Enter(m_monitor);
+            }
+        }
+
+        private void btn_newMap_Click(object sender, EventArgs e)
+        {
+            MainMap.ClearAll();
         }
     } /* class SgxMapControl */
 } /* namespace SgxMap */
