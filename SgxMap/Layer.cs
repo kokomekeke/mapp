@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using GMap.NET;
 using SgxMap.ObjectModel;
 using SgxMap.Objects;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SgxMap
 {
@@ -269,21 +270,21 @@ namespace SgxMap
         }
 
 
-        public MapLabel AddLabel(string name, PointLatLng point, string text, Font font)
+        public MapLabel AddLabel(string name, PointLatLng point, string text, System.Drawing.Font font)
         {
             var label = new MapLabel(name, point, text, font);
             AddObject(label);
             return label;
         }
 
-        public MapTextBox AddTextBox(string name, PointLatLng point, string text, Font font)
+        public MapTextBox AddTextBox(string name, PointLatLng point, string text, System.Drawing.Font font)
         {
             var label = new MapTextBox(name, point, text, font);
             AddObject(label);
             return label;
         }
 
-        public MapTextBox? AddTextBox(string name, int x, int y, string text, Font font)
+        public MapTextBox? AddTextBox(string name, int x, int y, string text, System.Drawing.Font font)
         {
             var p1 = Control.FromLocalToLatLng(x, y);
             if (p1 != null)
@@ -291,6 +292,29 @@ namespace SgxMap
                 var label = new MapTextBox(name, p1, text, font);
                 AddObject(label);
                 return label;
+            }
+            return null;
+        }
+
+        public MapBaseMarker? AddBaseMarker(int x, int y, int size, Color color)
+        {
+            var p = Control.FromLocalToLatLng(x, y);
+            if (p != null)
+            {
+                var marker = new MapBaseMarker("", p, size, color);
+                AddObject(marker);
+                return marker;
+            }
+            return null;
+        }
+
+        public MapBaseMarker? AddBaseMarker(string name, PointLatLng p, int size, Color color)
+        {
+            if (p != null)
+            {
+                var marker = new MapBaseMarker(name, p, size, color);
+                AddObject(marker);
+                return marker;
             }
             return null;
         }

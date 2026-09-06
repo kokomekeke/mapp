@@ -74,7 +74,7 @@ namespace SgxMap.Objects
             {
                 if (m_position != value)
                 {
-                    m_position = value;
+                    ChangePosition(value);
                     m_layer?.RefreshObject(this);
                 }
             }   
@@ -234,6 +234,7 @@ namespace SgxMap.Objects
             m_position = position;
             m_name = name;
             NormalStroke.Color = color;
+            Stroke.Color = color;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
         }
 
@@ -243,6 +244,7 @@ namespace SgxMap.Objects
             m_position = position;
             m_name = "name-" + m_id;
             NormalStroke.Color = color;
+            Stroke.Color = color;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
         }
 
@@ -253,6 +255,7 @@ namespace SgxMap.Objects
                  name = "Object-" + m_id.ToString();
             else m_name = name;
             NormalStroke.Color = color;
+            Stroke.Color = color;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
             if ((points != null) && (points.Count > 0))
             {
@@ -297,6 +300,11 @@ namespace SgxMap.Objects
         public string ToGeoString()
         {
             return m_position.ToGeoString();
+        }
+
+        protected virtual void ChangePosition(PointLatLng pos)
+        {
+            m_position = pos;
         }
 
 

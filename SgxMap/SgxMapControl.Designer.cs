@@ -47,6 +47,8 @@
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
             DrawPanel = new Panel();
+            label1 = new Label();
+            button1 = new Button();
             btn_draw_circle = new Button();
             btn_draw_ruler = new Button();
             btn_draw_ellipse = new Button();
@@ -251,6 +253,8 @@
             // 
             DrawPanel.BackColor = SystemColors.ControlDarkDark;
             DrawPanel.BorderStyle = BorderStyle.Fixed3D;
+            DrawPanel.Controls.Add(label1);
+            DrawPanel.Controls.Add(button1);
             DrawPanel.Controls.Add(btn_draw_circle);
             DrawPanel.Controls.Add(btn_draw_ruler);
             DrawPanel.Controls.Add(btn_draw_ellipse);
@@ -269,10 +273,31 @@
             DrawPanel.Size = new Size(669, 49);
             DrawPanel.TabIndex = 4;
             // 
+            // label1
+            // 
+            label1.BackColor = Color.Black;
+            label1.Location = new Point(539, 1);
+            label1.Name = "label1";
+            label1.Size = new Size(10, 41);
+            label1.TabIndex = 13;
+            label1.Text = "label1";
+            // 
+            // button1
+            // 
+            button1.BackColor = SystemColors.ActiveCaptionText;
+            button1.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            button1.ForeColor = Color.White;
+            button1.Location = new Point(102, 4);
+            button1.Name = "button1";
+            button1.Size = new Size(20, 37);
+            button1.TabIndex = 12;
+            button1.Text = "V";
+            button1.UseVisualStyleBackColor = false;
+            // 
             // btn_draw_circle
             // 
             btn_draw_circle.Image = (Image)resources.GetObject("btn_draw_circle.Image");
-            btn_draw_circle.Location = new Point(486, 5);
+            btn_draw_circle.Location = new Point(496, 4);
             btn_draw_circle.Name = "btn_draw_circle";
             btn_draw_circle.Size = new Size(37, 37);
             btn_draw_circle.TabIndex = 11;
@@ -283,7 +308,7 @@
             // btn_draw_ruler
             // 
             btn_draw_ruler.Image = (Image)resources.GetObject("btn_draw_ruler.Image");
-            btn_draw_ruler.Location = new Point(443, 5);
+            btn_draw_ruler.Location = new Point(455, 4);
             btn_draw_ruler.Name = "btn_draw_ruler";
             btn_draw_ruler.Size = new Size(37, 37);
             btn_draw_ruler.TabIndex = 10;
@@ -294,7 +319,7 @@
             // btn_draw_ellipse
             // 
             btn_draw_ellipse.Image = (Image)resources.GetObject("btn_draw_ellipse.Image");
-            btn_draw_ellipse.Location = new Point(318, 4);
+            btn_draw_ellipse.Location = new Point(332, 4);
             btn_draw_ellipse.Name = "btn_draw_ellipse";
             btn_draw_ellipse.Size = new Size(37, 37);
             btn_draw_ellipse.TabIndex = 9;
@@ -305,7 +330,7 @@
             // btn_draw_textbox
             // 
             btn_draw_textbox.Image = (Image)resources.GetObject("btn_draw_textbox.Image");
-            btn_draw_textbox.Location = new Point(400, 5);
+            btn_draw_textbox.Location = new Point(414, 4);
             btn_draw_textbox.Name = "btn_draw_textbox";
             btn_draw_textbox.Size = new Size(37, 37);
             btn_draw_textbox.TabIndex = 8;
@@ -316,7 +341,7 @@
             // btn_draw_radius
             // 
             btn_draw_radius.Image = (Image)resources.GetObject("btn_draw_radius.Image");
-            btn_draw_radius.Location = new Point(359, 3);
+            btn_draw_radius.Location = new Point(373, 4);
             btn_draw_radius.Name = "btn_draw_radius";
             btn_draw_radius.Size = new Size(37, 37);
             btn_draw_radius.TabIndex = 7;
@@ -327,7 +352,7 @@
             // btn_draw_rectangle
             // 
             btn_draw_rectangle.Image = (Image)resources.GetObject("btn_draw_rectangle.Image");
-            btn_draw_rectangle.Location = new Point(277, 4);
+            btn_draw_rectangle.Location = new Point(291, 4);
             btn_draw_rectangle.Name = "btn_draw_rectangle";
             btn_draw_rectangle.Size = new Size(37, 37);
             btn_draw_rectangle.TabIndex = 6;
@@ -338,7 +363,7 @@
             // btn_draw_freeform
             // 
             btn_draw_freeform.Image = (Image)resources.GetObject("btn_draw_freeform.Image");
-            btn_draw_freeform.Location = new Point(235, 4);
+            btn_draw_freeform.Location = new Point(250, 4);
             btn_draw_freeform.Name = "btn_draw_freeform";
             btn_draw_freeform.Size = new Size(37, 37);
             btn_draw_freeform.TabIndex = 5;
@@ -348,7 +373,7 @@
             // btn_draw_arrow
             // 
             btn_draw_arrow.Image = (Image)resources.GetObject("btn_draw_arrow.Image");
-            btn_draw_arrow.Location = new Point(193, 4);
+            btn_draw_arrow.Location = new Point(209, 4);
             btn_draw_arrow.Name = "btn_draw_arrow";
             btn_draw_arrow.Size = new Size(37, 37);
             btn_draw_arrow.TabIndex = 4;
@@ -359,7 +384,7 @@
             // btn_draw_line
             // 
             btn_draw_line.Image = (Image)resources.GetObject("btn_draw_line.Image");
-            btn_draw_line.Location = new Point(151, 4);
+            btn_draw_line.Location = new Point(168, 4);
             btn_draw_line.Name = "btn_draw_line";
             btn_draw_line.Size = new Size(37, 37);
             btn_draw_line.TabIndex = 3;
@@ -370,7 +395,7 @@
             // btn_drwa_scribble
             // 
             btn_drwa_scribble.Image = (Image)resources.GetObject("btn_drwa_scribble.Image");
-            btn_drwa_scribble.Location = new Point(109, 4);
+            btn_drwa_scribble.Location = new Point(127, 4);
             btn_drwa_scribble.Name = "btn_drwa_scribble";
             btn_drwa_scribble.Size = new Size(37, 37);
             btn_drwa_scribble.TabIndex = 2;
@@ -386,10 +411,13 @@
             btn_draw_pushpin.TabIndex = 1;
             toolTip_draw.SetToolTip(btn_draw_pushpin, "Create pushpin");
             btn_draw_pushpin.UseVisualStyleBackColor = true;
+            btn_draw_pushpin.Click += btn_draw_pushpin_Click;
             // 
             // btn_draw
             // 
+            btn_draw.BackColor = SystemColors.ActiveCaptionText;
             btn_draw.Font = new Font("Segoe UI", 12F);
+            btn_draw.ForeColor = Color.White;
             btn_draw.Location = new Point(4, 3);
             btn_draw.Margin = new Padding(0);
             btn_draw.Name = "btn_draw";
@@ -397,7 +425,7 @@
             btn_draw.TabIndex = 0;
             btn_draw.Text = "Draw";
             toolTip_draw.SetToolTip(btn_draw, "Draw items");
-            btn_draw.UseVisualStyleBackColor = true;
+            btn_draw.UseVisualStyleBackColor = false;
             btn_draw.Click += btn_draw_Click;
             // 
             // MainMap
@@ -502,5 +530,7 @@
         private TextBox textBox_editor;
         private Button btn_draw_ruler;
         private Button btn_draw_circle;
+        private Button button1;
+        private Label label1;
     }
 }

@@ -237,6 +237,12 @@ namespace SgxMap
         }
 
 
+        private void btn_draw_pushpin_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Marker;
+        }
+
+
 
         private void textBox_editor_VisibleChanged(object sender, EventArgs e)
         {

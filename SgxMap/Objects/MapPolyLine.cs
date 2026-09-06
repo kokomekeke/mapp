@@ -480,7 +480,7 @@ namespace SgxMap.Objects
 
         public void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
         {
-            if (!m_isEditable || (newpoint == null))
+            if (!m_isEditable || (newpoint == null) || (oldpoint == null))
                 return;
 
             int index = Points.IndexOf(oldpoint);

@@ -14,10 +14,9 @@ using System.Drawing.Text;
 using GMap.NET;
 using GMap.NET.Internals;
 using GMap.NET.MapProviders;
-using SgxMap.ObjectModel;
 using GMap.NET.Projections;
+using SgxMap.ObjectModel;
 using SgxMap.Objects;
-using System.Runtime.Serialization.Formatters.Binary;
 
 
 namespace SgxMap
@@ -100,7 +99,8 @@ namespace SgxMap
         public MapRuler? m_MapCircleRuler = null;
         public MapLine? m_MapLine = null;
         public MapRectangle? m_MapRectangle = null;
-        public GeoCircle? m_mapCircle = null;
+        public GeoCircle? m_MapCircle = null;
+        public MapBaseMarker? m_MapMarker = null;
 
 
         #endregion Fields
@@ -1239,7 +1239,11 @@ namespace SgxMap
                             return;
 
                         case MouseMoveStatusType.Circle:
-                            m_mapCircle = Layers[0].AddCircle(e.X, e.Y, Color.Black);
+                            m_MapCircle = Layers[0].AddCircle(e.X, e.Y, Color.Black);
+                            break;
+
+                        case MouseMoveStatusType.Marker:
+                            m_MapMarker = Layers[0].AddBaseMarker(e.X, e.Y, 14, Color.Red);
                             break;
 
                     } /* switch */
@@ -1293,11 +1297,11 @@ namespace SgxMap
                 m_MapRectangle = null;
             }
 
-            if (m_mapCircle != null)
+            if (m_MapCircle != null)
             {
-                m_mapCircle.Thickness = 1;
-                m_mapCircle.Color = Color.Red;
-                m_mapCircle = null;
+                m_MapCircle.Thickness = 1;
+                m_MapCircle.Color = Color.Red;
+                m_MapCircle = null;
             }
 
             if (m_isSelecting)
@@ -1389,9 +1393,9 @@ namespace SgxMap
                 return;
             }
 
-            if (m_mapCircle != null)
+            if (m_MapCircle != null)
             {
-                m_mapCircle.ChangeRadius(e.X, e.Y); 
+                m_MapCircle.ChangeRadius(e.X, e.Y); 
                 Invalidate();
                 return;
             }
@@ -3724,16 +3728,8 @@ namespace SgxMap
     #region Enums
     public enum ScaleModes
     {
-        /// <summary>
-        ///     no scaling
-        /// </summary>
-        Integer,
-
-        /// <summary>
-        ///     scales to fractional level, CURRENT VERSION DOESN'T HANDLE OBJECT POSITIONS CORRECLTY,
-        ///     http://greatmaps.codeplex.com/workitem/16046
-        /// </summary>
-        Fractional,
+        Integer,    // no scaling
+        Fractional, // scales to fractional level, CURRENT VERSION DOESN'T HANDLE OBJECT POSITIONS CORRECLTY,http://greatmaps.codeplex.com/workitem/16046
     }
 
     public enum HelperLineOptions
@@ -3761,6 +3757,7 @@ namespace SgxMap
         Ruler,
         CircleRuler,
         Textbox,
+        Marker,
         MovePoint,
     }
 
@@ -3771,6 +3768,22 @@ namespace SgxMap
         AtEnd,
         Both,
     }
+
+    public enum MovementType
+    {
+        None,
+        Horizontal,
+        Vertical,
+        Both
+    }
+
+    public enum MarkerTooltipMode
+    {
+        OnMouseOver,
+        Never,
+        Always,
+    }
+
 
     #endregion Enums
 
