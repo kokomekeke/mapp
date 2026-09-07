@@ -319,7 +319,7 @@ namespace GMap.NET.WindowsForms
 
 
         /// <summary>
-        ///     checks if point is inside the polygon,
+        ///     checks if point is inside the polyline,
         ///     info.: http://greatmaps.codeplex.com/discussions/279437#post700449
         /// </summary>
         /// <param name="p"></param>

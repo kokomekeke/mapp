@@ -163,7 +163,7 @@ namespace SgxMap.Objects
             info.AddValue("font", Font);
         }   
 
-        public override void OnDeserialization(object sender)
+        public override void OnDeserialization(object? sender)
         {
         }   
 

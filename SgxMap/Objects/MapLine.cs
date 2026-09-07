@@ -24,8 +24,8 @@ namespace SgxMap.Objects
         public Point       LocalPosition2;
 
         protected ArrowPositions m_arrowPosition = ArrowPositions.None;
-        protected CustomLineCap m_endCap;
-        protected CustomLineCap m_startCap;
+        protected CustomLineCap? m_endCap;
+        protected CustomLineCap? m_startCap;
 
         public PointLatLng Position2
         {
@@ -73,16 +73,24 @@ namespace SgxMap.Objects
                             Stroke.EndCap = LineCap.NoAnchor;
                             break;
                         case ArrowPositions.AtBegin:
-                            Stroke.CustomStartCap = m_startCap;
+                            if (m_startCap != null)
+                                 Stroke.CustomStartCap = m_startCap;
+                            else Stroke.StartCap = LineCap.NoAnchor;
                             Stroke.EndCap = LineCap.NoAnchor;
                             break;
                         case ArrowPositions.AtEnd:
                             Stroke.StartCap = LineCap.NoAnchor;
-                            Stroke.CustomEndCap = m_endCap;
-                            break;
+                            if (m_endCap != null)
+                                 Stroke.CustomEndCap = m_endCap;
+                            else Stroke.EndCap = LineCap.NoAnchor;
+                                break;
                         case ArrowPositions.Both:
-                            Stroke.CustomStartCap = m_startCap;
-                            Stroke.CustomEndCap = m_endCap;
+                            if (m_startCap != null)
+                                 Stroke.CustomStartCap = m_startCap;
+                            else Stroke.StartCap = LineCap.NoAnchor;
+                            if (m_endCap != null)
+                                Stroke.CustomEndCap = m_endCap;
+                            else Stroke.EndCap= LineCap.NoAnchor;
                             break;
                     }
                 }
@@ -182,6 +190,25 @@ namespace SgxMap.Objects
         }
 
 
+        public override void Select(bool select)
+        {
+            if (select)
+            {
+                if (m_isSelected)
+                    return;
+
+                Layer?.ClearLinePoints();
+                Layer?.AddLinePoint(this, Position, MovementType.Both, Color.Black);
+                Layer?.AddLinePoint(this, Position2, MovementType.Both, Color.Black);
+            }
+            else
+            {
+                Layer?.ClearLinePoints(this);
+            }
+            base.Select(select);
+        }
+
+
         public override void UpdateLocalPosition()
         {
             if (Layer != null && Layer.Control != null)
@@ -190,6 +217,68 @@ namespace SgxMap.Objects
                 LocalPosition2 = Layer.Control.PositiontoLocal(Position2);
             }
         }
+
+
+        public override bool IsInside(int x, int y)
+        {
+            double x1 = LocalPosition.X;
+            double y1 = LocalPosition.Y;
+            double x2 = LocalPosition2.X;
+            double y2 = LocalPosition2.Y;
+
+            if (Math.Abs(y2 - y1) > Math.Abs(x2 - x1))
+            {
+                if (y1 < y && y2 >= y || y2 < y && y1 >= y)
+                {
+                    if (Math.Abs(x1 + (y - y1) / (y2 - y1) * (x2 - x1) - x) < 10)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                if (x1 < x && x2 >= x || x2 < x && x1 >= x)
+                {
+                    if (Math.Abs(y1 + (x - x1) / (x2 - x1) * (y2 - y1) - y) < 10)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public override bool IsInside(PointLatLng p)
+        {
+                var p1 = Position;
+                var p2 = Position2;
+
+                if (Math.Abs(p2.Lat - p1.Lat) > Math.Abs(p2.Lng - p1.Lng))
+                {
+                    if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
+                    {
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
+                    {
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+        } /*IsInside */
+
 
 
         public override void BuildGraphicsPath()
@@ -204,6 +293,14 @@ namespace SgxMap.Objects
         }
 
 
+        public override void Remove()
+        {
+            Layer?.RemoveLinePoints(this);
+            base.Remove();
+        }
+
+
+
         #region serialization
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -213,7 +310,7 @@ namespace SgxMap.Objects
 
         }
 
-        public void OnDeserialization(object sender)
+        public override void OnDeserialization(object? sender)
         {
         }
 

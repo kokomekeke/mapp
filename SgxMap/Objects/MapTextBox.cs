@@ -107,7 +107,7 @@ namespace SgxMap.Objects
             info.AddValue("fillcolor", FillColor);
         }
 
-        public override void OnDeserialization(object sender)
+        public override void OnDeserialization(object? sender)
         {
         }
 

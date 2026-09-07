@@ -147,12 +147,12 @@ namespace SgxMap.Objects
         }
 
 
-        public static GeoCircle CreateCircle(string[] ls, out string errorstring)
+        public static GeoCircle? CreateCircle(string[] ls, out string errorstring)
         {
             try
             {
                 // 0: "circle", 1: name,  2: lat1, 3: lng1, 4: radius, 5: color
-                errorstring = null;
+                errorstring = string.Empty;
                 var p1 = new PointLatLng(double.Parse(ls[2]), double.Parse(ls[3]));
                 var color = ColorTranslator.FromHtml(ls[5]);
                 double radius = double.Parse(ls[4]);
@@ -188,7 +188,7 @@ namespace SgxMap.Objects
             //Points.Remove(Points[0]);
         }
 
-        public override void OnDeserialization(object sender)
+        public override void OnDeserialization(object? sender)
         {
             base.OnDeserialization(sender);
         }

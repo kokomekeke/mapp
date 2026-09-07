@@ -29,6 +29,13 @@ namespace SgxMap
         public readonly ObservableCollectionThreadSafe<BasePoint> Objects =
             new ObservableCollectionThreadSafe<BasePoint>();
 
+        /// <summary>
+        ///     list of objects, should be thread safe
+        /// </summary>
+        public readonly ObservableCollectionThreadSafe<MapLinePoint> LinePoints =
+            new ObservableCollectionThreadSafe<MapLinePoint>();
+
+
         public long ID
         {
             get { return m_id; }
@@ -123,7 +130,7 @@ namespace SgxMap
             if (obj == null) return;
             Objects.Add(obj);
             obj.Layer = this;
-            obj.UpdateLocalPosition();
+            obj.UpdateObject();
         }
 
         public void RemoveObject(BasePoint obj)
@@ -145,6 +152,77 @@ namespace SgxMap
             }
             Objects.Clear();
         }
+
+        public void Clear()
+        {
+            ClearObjects();
+            ClearLinePoints();
+        }
+
+
+        public void AddLinePoint(MapLinePoint obj)
+        {
+            if (obj == null) return;
+            LinePoints.Add(obj);
+            obj.Layer = this;
+            obj.UpdateObject();
+        }
+
+        public void RemoveLinePoint(MapLinePoint obj)
+        {
+            if (obj == null) return;
+            try
+            {
+                LinePoints.Remove(obj);
+                obj.Layer = null;
+            }
+            catch { }
+            ;
+        }
+
+        public void RemoveLinePoints(MapLine obj)
+        {
+            if (obj == null) return;
+
+            try
+            {
+                for (int i = LinePoints.Count - 1; i >= 0; i--)
+                {
+                    var o = LinePoints[i];
+                    if (o.Parent == obj)
+                    {
+                        RemoveLinePoint(o);
+                    }
+                }
+            }
+            catch { }
+    ;
+        }
+
+
+        public void ClearLinePoints()
+        {
+            foreach (var obj in LinePoints)
+            {
+                obj.Layer = null;
+            }
+            LinePoints.Clear();
+        }
+
+        public void ClearLinePoints(MapLine parent)
+        {
+            //foreach (var obj in LinePoints)
+            for (int i = LinePoints.Count - 1; i >= 0; i--)
+            {
+                var obj = LinePoints[i];
+                if ((obj != null) && (obj.Parent == parent))
+                {
+                    obj.Layer = null;
+                    LinePoints.Remove(obj);
+                }
+            }
+        }
+
 
 
         public Point? FromLatLngToLocalPosition(PointLatLng position)
@@ -174,8 +252,18 @@ namespace SgxMap
 
         public BasePoint? GetObjectbyLocalPosition(int x, int y)
         {
-            return Objects.FirstOrDefault(obj => obj.IsInside(x, y));
+            var p = new GPoint(x, y);
+            p.OffsetNegative(Control.Core.RenderOffset);
+            return Objects.FirstOrDefault(obj => obj.IsInside((int)p.X, (int)p.Y));
         }
+
+        public MapLinePoint? GetLinePointbyLocalPosition(int x, int y)
+        {
+            var p = new GPoint(x, y);
+            p.OffsetNegative(Control.Core.RenderOffset);
+            return LinePoints.FirstOrDefault(obj => obj.IsInside((int)p.X, (int)p.Y));
+        }
+
 
         public void ForceUpdate()
         {
@@ -188,8 +276,16 @@ namespace SgxMap
                         obj.UpdateObject();     //UpdateLocalPosition();
                     }
                 }
+
+                foreach (var obj in LinePoints)
+                {
+                    if (obj.IsVisible)
+                    {
+                        obj.UpdateObject();     //UpdateLocalPosition();
+                    }
+                }
             }
-        }
+        } /* ForceUpdate */
 
 
         /// <summary>
@@ -203,9 +299,15 @@ namespace SgxMap
                 foreach (var o in Objects)
                 {
                     if (o.IsVisible)
-                    {
+                       o.OnRender(g);
+                
+                }
+                
+                for (int i = 0; i < LinePoints.Count; i++)
+                {
+                    var o = LinePoints[i];
+                    if (o.IsVisible)
                         o.OnRender(g);
-                    }
                 }
             }
         }
@@ -219,6 +321,11 @@ namespace SgxMap
                     Objects.Add(m);
                 }
 
+                //foreach (var m in overlay.LinePoints)
+                for (int i = 0; i< overlay.LinePoints.Count;i++)
+                {
+                    LinePoints.Add(overlay.LinePoints[i]);
+                }
             }
         }
 
@@ -229,6 +336,12 @@ namespace SgxMap
             {
                 obj.UpdateObject();
             }
+
+            foreach (var obj in LinePoints)
+            {
+                obj.UpdateObject();
+            }
+
 
             if (Control != null && !Control.m_holdInvalidation)
             {
@@ -376,6 +489,13 @@ namespace SgxMap
         }
 
 
+        public MapLinePoint AddLinePoint(MapLine parent, PointLatLng point, MovementType movement,  Color color)
+        {
+            var p = new MapLinePoint("", parent, point, color, movement);
+            AddLinePoint(p);
+            return p;
+        }
+
 
         #endregion Create and add objects to the layer
 
@@ -425,6 +545,14 @@ namespace SgxMap
                 }
 
                 ClearObjects();
+
+                foreach (var m in LinePoints)
+                {
+                    m.Dispose();
+                }
+
+                ClearLinePoints();
+
             }
         }
 

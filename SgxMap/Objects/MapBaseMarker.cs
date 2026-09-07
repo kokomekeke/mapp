@@ -18,8 +18,8 @@ namespace SgxMap.Objects
 {
     public class MapBaseMarker: BasePoint, ISerializable
     {
-        public MovementType Movement = MovementType.Both;
-        public object? m_parent = null;
+        public MovementType m_movement = MovementType.Both;
+        public BasePoint? m_parent = null;
         protected Point  m_offset;
         protected Rectangle m_area;    // System.Drawing rectangle
         public bool DisableRegionCheck;             // if true, marker will be rendered even if it's outside current view
@@ -32,7 +32,7 @@ namespace SgxMap.Objects
         protected SolidBrush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
         protected Pen BorderPen = new Pen(Color.Black);
 
-        public object? Parent
+        public BasePoint? Parent
         {
             get { return m_parent; }
             protected set { m_parent = value; }
@@ -210,13 +210,13 @@ namespace SgxMap.Objects
             Stroke = new Pen(color, Stroke.Width);
         }
 
-        protected override void ChangePosition(PointLatLng pos)
+        protected override void MoveTo(PointLatLng pos)
         {
             if (pos == m_position)
                 return;
 
             m_oldposition = m_position;
-            base.ChangePosition(pos);
+            base.MoveTo(pos);
 
             if (IsVisible)
             {
@@ -296,7 +296,13 @@ namespace SgxMap.Objects
             info.AddValue("IsHitTestVisible", IsHitTestVisible);
             info.AddValue("Color", Stroke.Color.ToArgb());
             info.AddValue("FillColor", Fill.Color.ToArgb());
+            info.AddValue("MoveMentType", m_movement);
+            if (Parent != null)
+            {
+                info.AddValue("Parent", Parent.ID);
+            }
         }
+
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="MapBaseMarker" /> class.
@@ -320,7 +326,27 @@ namespace SgxMap.Objects
             IsHitTestVisible = info.GetBoolean("IsHitTestVisible");
             ChangeColor(Color.FromArgb(Extensions.GetStruct(info, "Color", Color.MidnightBlue.ToArgb())));
             Fill = new SolidBrush(Color.FromArgb(Extensions.GetStruct(info, "FillColor", Color.FromArgb(155, Color.AliceBlue).ToArgb())));
+            m_movement = Extensions.GetStruct(info, "MovementType", MovementType.Both);
         }
+
+
+        public override bool IsInside(int x, int y)
+        {
+            return m_area.Contains(new Point(x, y));
+        }
+
+        public override bool IsInside(PointLatLng p)
+        {
+            if (m_graphicsPath != null)
+            {
+                var d = m_layer?.FromLatLngToLocalPosition(p);
+                if (d != null)
+                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, NormalStroke);
+            }
+
+            return false;
+        }
+
 
         #endregion
 
@@ -328,7 +354,7 @@ namespace SgxMap.Objects
 
         bool _disposed;
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             if (!_disposed)
             {

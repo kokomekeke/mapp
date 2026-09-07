@@ -270,8 +270,11 @@ namespace SgxMap
                     textBox_editor.Visible = false;
                     MainMap.MouseMoveStatus = MouseMoveStatusType.None;
                     var t = MainMap.Layers[0].AddTextBox("", textBox_editor.Location.X, textBox_editor.Location.Y - MainMap.Location.Y + textBox_editor.Height, textBox_editor.Text, DefaultFont);
-                    t.Color = Color.Red;
-                    t.Thickness = 1;
+                    if (t != null)
+                    {
+                        t.Color = Color.Red;
+                        t.Thickness = 1;
+                    }
                     return;
                 }
                 textBox_editor.Visible = true;

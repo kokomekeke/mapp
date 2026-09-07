@@ -121,7 +121,7 @@ namespace SgxMap.Objects
 
 
 
-        public virtual void UpdateEndPoint(int x, int y)
+        public override void UpdateEndPoint(int x, int y)
         {
             SetPosition2(Layer.Control.FromLocalToLatLng(x, y)); 
         }

@@ -40,17 +40,16 @@ namespace SgxMap
         public bool m_showMapScaleInfo = false;                                            // if true, then show map scale info
         public MapScaleInfoPositions m_mapScaleInfoPosition;                                // Position of the map scale info
 
-
+        //.. selecting area
         private RectLatLng m_selectedArea;                                                  // current selected area in map
-        BasePoint? m_selected_object = null;
-        bool m_isSelecting = false;                                                         // true, when selection is in progress
+        bool m_isSelecting = false;                                                         // true, when selection of an area is in progress
         bool m_isDragging = false;                                                          // true, when dragging is in progress
         PointLatLng m_selectionStart;
         PointLatLng m_selectionEnd;
         public bool m_selectionAlways = true;                                               // if true, selects area just by holding mouse and moving (does not check for alt os shift key)
 
 
-        double m_zoomReal;
+        double      m_zoomReal;
         Bitmap?     m_backBuffer;
         Graphics?   m_gxOff;
 
@@ -94,6 +93,7 @@ namespace SgxMap
         public readonly ObservableCollectionThreadSafe<Layer> Layers =
             new ObservableCollectionThreadSafe<Layer>();
 
+        //.. creating of objects on map is in progress
         public MouseMoveStatusType MouseMoveStatus = MouseMoveStatusType.None;
         public MapRuler? m_MapRuler = null;
         public MapRuler? m_MapCircleRuler = null;
@@ -101,6 +101,9 @@ namespace SgxMap
         public MapRectangle? m_MapRectangle = null;
         public GeoCircle? m_MapCircle = null;
         public MapBaseMarker? m_MapMarker = null;
+
+        public BasePoint? m_selected_object = null; 
+        public MapLinePoint? m_selected_LinePoint = null;
 
 
         #endregion Fields
@@ -416,6 +419,19 @@ namespace SgxMap
             get
             {
                 return GMaps.Instance;
+            }
+        }
+
+
+        public BasePoint? SelectedObject
+        {
+            get { return m_selected_object; }
+            set
+            {
+                if (value != m_selected_object)
+                {
+                    m_selected_object = value;
+                }
             }
         }
 
@@ -1131,7 +1147,7 @@ namespace SgxMap
         {
             foreach(var layer in Layers)
             {
-                layer.ClearObjects();
+                layer.Clear();
             }
             Invalidate();
         }
@@ -1205,6 +1221,7 @@ namespace SgxMap
             {
                 if (e.Button == MouseButtons.Left)
                 {
+
                     switch (MouseMoveStatus)
                     {
                         case MouseMoveStatusType.Line:
@@ -1214,7 +1231,8 @@ namespace SgxMap
 
                         case MouseMoveStatusType.Arrow:
                             m_MapLine = Layers[0].AddLine(e.X, e.Y, Color.Black);
-                            m_MapLine.ArrowPosition = ArrowPositions.AtEnd;
+                            if (m_MapLine != null)
+                                m_MapLine.ArrowPosition = ArrowPositions.AtEnd;
                             Invalidate();
                             return;
 
@@ -1248,6 +1266,9 @@ namespace SgxMap
 
                     } /* switch */
                 }
+
+                if (e.Button == DragButton && FindSelectedObject(e))
+                    return;
 
                 if (e.Button == DragButton && CanDragMap)
                 {
@@ -1304,7 +1325,7 @@ namespace SgxMap
                 m_MapCircle = null;
             }
 
-            if (m_isSelecting)
+            if (m_isSelecting)          // selecting an area
             {
                 m_isSelecting = false;
             }
@@ -1411,6 +1432,11 @@ namespace SgxMap
                 }
             }
 
+            if ((SelectedObject != null) && (e.Button == DragButton))
+            {
+                SelectedObject.MovePoint(SelectedObject.Position, FromLocalToLatLng(e.X, e.Y));
+            }
+
             if (Core.IsDragging)
             {
                 if (!m_isDragging)
@@ -1470,24 +1496,7 @@ namespace SgxMap
 
             if (!Core.IsDragging)
             {
-                bool overlayObject = false;
-                m_selected_object = null;
-
-                for (int i = Layers.Count - 1; i >= 0; i--)
-                {
-                    var l = Layers[i];
-                    if (l.IsVisible)
-                    {
-                        var o = l.GetObjectbyLocalPosition(e.X, e.Y);
-                        if (o != null)
-                        {
-                            overlayObject = true;
-                            o.IsSelected = true;
-                            m_selected_object = o;
-                            break;
-                        }
-                    }
-                }
+                bool overlayObject = FindSelectedObject(e);
 
                 if (!overlayObject && Core.MouseDown != GPoint.Empty)
                     OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
@@ -1507,6 +1516,60 @@ namespace SgxMap
 
             }
         } /* OnMouseDoubleClick */
+
+
+        protected bool FindSelectedObject(MouseEventArgs e)
+        {
+            bool overlayObject = false;
+            if (m_selected_object != null)
+                m_selected_object.IsSelected = false;
+            m_selected_object = null;
+
+            for (int i = Layers.Count - 1; i >= 0; i--)
+            {
+                var l = Layers[i];
+                if (l.IsVisible)
+                {
+                    var o = l.GetObjectbyLocalPosition(e.X, e.Y);
+                    if (o != null)
+                    {
+                        overlayObject = true;
+                        o.IsSelected = true;
+                        m_selected_object = o;
+                        break;
+                    }
+                }
+            }
+
+            return overlayObject;
+        }
+
+        protected bool FindSelectedLinePoint(MouseEventArgs e)
+        {
+            bool overlayObject = false;
+            if (m_selected_object != null)
+                m_selected_object.IsSelected = false;
+            m_selected_object = null;
+
+            for (int i = Layers.Count - 1; i >= 0; i--)
+            {
+                var l = Layers[i];
+                if (l.IsVisible)
+                {
+                    var o = l.GetObjectbyLocalPosition(e.X, e.Y);
+                    if (o != null)
+                    {
+                        overlayObject = true;
+                        o.IsSelected = true;
+                        m_selected_object = o;
+                        break;
+                    }
+                }
+            }
+
+            return overlayObject;
+        }
+
 
         #endregion MouseEvents 
 
@@ -1559,7 +1622,7 @@ namespace SgxMap
         public bool ProcessMacroCommand(string command, out string errorstring)
         {
             char[] separator = new Char[] { ',', ';', ' ' };
-            errorstring = null;
+            errorstring = string.Empty;
 
             try
             {
@@ -1818,7 +1881,7 @@ namespace SgxMap
                     if (_emptyTileBrush != null)
                     {
                         _emptyTileBrush.Dispose();
-                        _emptyTileBrush = null;
+                        //_emptyTileBrush = null;
                     }
 
                     _emptyTileBrush = new SolidBrush(_emptyTileColor);
@@ -3298,12 +3361,6 @@ namespace SgxMap
                 OverObjectCount += value ? 1 : -1;
             }
         }
-
-        bool _isMouseOverRoute;
-
-        /// <summary>
-        ///     is mouse over route
-        /// </summary>
 
 
         /// <summary>

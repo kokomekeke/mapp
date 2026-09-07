@@ -15,6 +15,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
+using Newtonsoft.Json.Linq;
 
 namespace SgxMap.Objects
 {
@@ -74,7 +75,7 @@ namespace SgxMap.Objects
             {
                 if (m_position != value)
                 {
-                    ChangePosition(value);
+                    MoveTo(value);
                     m_layer?.RefreshObject(this);
                 }
             }   
@@ -143,8 +144,7 @@ namespace SgxMap.Objects
             {
                 if (m_isSelected != value)
                 {
-                    m_isSelected = value;
-                    m_layer?.RefreshObject(this);
+                    Select(value);
                 }
             }
         }
@@ -302,9 +302,15 @@ namespace SgxMap.Objects
             return m_position.ToGeoString();
         }
 
-        protected virtual void ChangePosition(PointLatLng pos)
+        protected virtual void MoveTo(PointLatLng pos)
         {
             m_position = pos;
+        }
+
+        public virtual void Select(bool select)
+        {
+            m_isSelected = select;
+            m_layer?.RefreshObject(this);
         }
 
 
@@ -386,6 +392,13 @@ namespace SgxMap.Objects
         {
             m_layer?.RemoveObject(this);
         }
+
+        public virtual void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            if (Position == oldpoint)
+                Position = newpoint;
+        }
+
 
         #region serialization
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)

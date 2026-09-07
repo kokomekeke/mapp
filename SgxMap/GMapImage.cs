@@ -48,7 +48,7 @@ namespace SgxMap
 
         public static readonly GMapImageProxy Instance = new GMapImageProxy();
 
-        internal ColorMatrix? ColorMatrix;
+        internal ColorMatrix? ColorMatrix = new ColorMatrix();
 
         static readonly bool Win7OrLater = Stuff.IsRunningOnWin7OrLater();
 

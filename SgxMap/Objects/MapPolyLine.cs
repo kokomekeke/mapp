@@ -28,7 +28,7 @@ namespace SgxMap.Objects
         [NonSerialized] public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
 
         public readonly List<PointLatLng> Points = new List<PointLatLng>(); // points of route in geo coordinates
-        public readonly List<GPoint> LocalPoints = new List<GPoint>(); // List of points in map  (x,y)
+        public readonly List<GPoint> LocalPoints = new List<GPoint>();      // List of points in map  (x,y)
 
 
 
@@ -207,6 +207,10 @@ namespace SgxMap.Objects
                 }
             }
         }
+
+        public GPoint[] DeserializedLocalPoints { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+        public GPoint[] DeserializedLocalPoints1 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+        public GPoint[] DeserializedLocalPoints2 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
 
 
         /// <summary>
@@ -586,7 +590,8 @@ namespace SgxMap.Objects
         }
 
         // Temp store for de-serialization.
-        private GPoint[] deserializedLocalPoints;
+
+        private GPoint[] deserializedLocalPoints = new GPoint[1];
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="MapRoute" /> class.
@@ -612,7 +617,7 @@ namespace SgxMap.Objects
         ///     The object that initiated the callback. The functionality for this parameter is not currently
         ///     implemented.
         /// </param>
-        public override void OnDeserialization(object sender)
+        public override void OnDeserialization(object? sender)
         {
             base.OnDeserialization(sender);
 
@@ -627,7 +632,7 @@ namespace SgxMap.Objects
 
         bool _disposed;
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             if (!_disposed)
             {
@@ -640,12 +645,12 @@ namespace SgxMap.Objects
 
         #endregion
 
-        public static MapPolyLine CreatePolyline(string[] ls, out string errorstring)
+        public static MapPolyLine? CreatePolyline(string[] ls, out string errorstring)
         {
             try
             {
                 // 0: "polyline", 1: name,  2: lat1, 3: lng1, 4: lat2, 5: lng2, 6: lat3, 7: lng3, ... , x: color
-                errorstring = null;
+                errorstring = string.Empty;
                 var points = new List<PointLatLng>();
                 for (int i = 2; i < ls.Length - 1; i += 2)
                 {
