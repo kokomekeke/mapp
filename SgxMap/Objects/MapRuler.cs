@@ -57,7 +57,7 @@ namespace SgxMap.Objects
 
         public void SetPosition2(PointLatLng point)
         {
-            if ((point == null) || point.IsEmpty || (point == Position2))
+            if (point.IsEmpty || (point == Position2))
                 return;
 
             Position2 = point;
@@ -77,7 +77,7 @@ namespace SgxMap.Objects
 
         public override void UpdateEndPoint(int x, int y)
         {
-            var point = Layer.Control.FromLocalToLatLng(x, y);
+            var point = Layer.MapPanel.FromLocalToLatLng(x, y);
             SetPosition2(point);
         }
 

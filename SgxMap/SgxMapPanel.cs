@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
+using System.Security.Permissions;
 using GMap.NET;
 using GMap.NET.Internals;
 using GMap.NET.MapProviders;
@@ -36,8 +37,9 @@ namespace SgxMap
         private bool m_showTileGridLines = false;
         private bool m_showGeoGridLines = false;
         private HelperLineOptions m_helperLineOption = HelperLineOptions.DontShow;
-        public bool m_showHelperLine = false;                                              // if true, draw cross lines at the mouse pointer position
-        public bool m_showMapScaleInfo = false;                                            // if true, then show map scale info
+        public bool m_showHelperLine = false;                                               // if true, draw cross lines at the mouse pointer position
+        public bool m_showMapScaleInfo = false;                                             // if true, then show map scale info
+        public bool m_showPlaceInfo = false;                                                // if true, then show place info(address) of given location 
         public MapScaleInfoPositions m_mapScaleInfoPosition;                                // Position of the map scale info
 
         //.. selecting area
@@ -102,20 +104,22 @@ namespace SgxMap
         public GeoCircle? m_MapCircle = null;
         public MapBaseMarker? m_MapMarker = null;
 
+        //.. selected objects
         public BasePoint? m_selected_object = null; 
-        public MapLinePoint? m_selected_LinePoint = null;
-
+        public MapLinePoint? m_selected_linepoint = null;
+        public readonly ObservableCollectionThreadSafe<MapLinePoint> LinePoints =
+            new ObservableCollectionThreadSafe<MapLinePoint>();                         // list of line points of selected lines, should be thread safe
+        public PointLatLng m_lastpoint;
 
         #endregion Fields
 
         #region EVENTS
 
-        public ShowPlaceInfo showPlaceInfo;
-
         /// <summary>
         ///     occurs when an exception is thrown inside the map control
         /// </summary>
         public event ExceptionThrown OnExceptionThrown;
+        public ShowPlaceInfo OnShowPlaceInfo;
 
         #endregion EVENTS
 
@@ -434,6 +438,19 @@ namespace SgxMap
                 }
             }
         }
+
+        public MapLinePoint? SelectedLinePoint
+        {
+            get { return m_selected_linepoint; }
+            set
+            {
+                if (value != m_selected_linepoint)
+                {
+                    m_selected_linepoint = value;
+                }
+            }
+        }
+
 
         #endregion Properties
 
@@ -986,6 +1003,14 @@ namespace SgxMap
                     }
                 }
 
+                for (int i = 0; i < LinePoints.Count; i++)
+                {
+                    var o = LinePoints[i];
+                    if (o.IsVisible && (o.Parent != null) && o.Parent.IsVisible)
+                        o.OnRender(g);
+                }
+
+
                 //// separate tooltip drawing
                 //foreach (var l in Layers)
                 //{
@@ -1018,7 +1043,7 @@ namespace SgxMap
 
                     g.DrawLine(HelperLinePen, p.X, 0, p.X, Height);
                     g.DrawLine(HelperLinePen, 0, p.Y, Width, p.Y);
-                    showPlaceInfo?.Invoke(p.X, p.Y);
+                    OnShowPlaceInfo?.Invoke(p.X, p.Y);
                 }
 
                 if (ShowCenter)
@@ -1149,6 +1174,15 @@ namespace SgxMap
             {
                 layer.Clear();
             }
+
+            foreach (var obj in LinePoints)
+            {
+                obj.Reset();
+            }
+
+            LinePoints.Clear();
+            m_selected_object = null;
+            m_selected_linepoint = null;
             Invalidate();
         }
 
@@ -1217,6 +1251,8 @@ namespace SgxMap
         {
             base.OnMouseDown(e);
 
+            m_lastpoint = FromLocalToLatLng(e.X, e.Y);
+
             if (!IsMouseOverObject)
             {
                 if (e.Button == MouseButtons.Left)
@@ -1266,6 +1302,9 @@ namespace SgxMap
 
                     } /* switch */
                 }
+
+                if (e.Button == DragButton && FindSelectedLinePoint(e))
+                    return;
 
                 if (e.Button == DragButton && FindSelectedObject(e))
                     return;
@@ -1323,6 +1362,16 @@ namespace SgxMap
                 m_MapCircle.Thickness = 1;
                 m_MapCircle.Color = Color.Red;
                 m_MapCircle = null;
+            }
+
+            if (m_selected_linepoint != null)
+            {
+                m_selected_linepoint.Parent.UpdateLinePoints();
+                m_selected_linepoint.IsSelected = false;
+                m_selected_linepoint = null;
+                Invalidate();
+                MouseMoveStatus = MouseMoveStatusType.None;
+                return;
             }
 
             if (m_isSelecting)          // selecting an area
@@ -1432,9 +1481,17 @@ namespace SgxMap
                 }
             }
 
+            if (SelectedLinePoint != null)
+            {
+                SelectedLinePoint.MovePoint(SelectedLinePoint.Position, FromLocalToLatLng(e.X, e.Y));
+                return;
+            }
+
+
             if ((SelectedObject != null) && (e.Button == DragButton))
             {
-                SelectedObject.MovePoint(SelectedObject.Position, FromLocalToLatLng(e.X, e.Y));
+                SelectedObject.Shift(m_lastpoint, FromLocalToLatLng(e.X, e.Y));
+                m_lastpoint = FromLocalToLatLng(e.X, e.Y);
             }
 
             if (Core.IsDragging)
@@ -1496,7 +1553,14 @@ namespace SgxMap
 
             if (!Core.IsDragging)
             {
-                bool overlayObject = FindSelectedObject(e);
+                bool overlayObject = FindSelectedLinePoint(e);
+
+                if (!overlayObject && Core.MouseDown != GPoint.Empty)
+                    OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
+                if (overlayObject)
+                    return;
+
+                overlayObject = FindSelectedObject(e);
 
                 if (!overlayObject && Core.MouseDown != GPoint.Empty)
                     OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
@@ -1547,24 +1611,16 @@ namespace SgxMap
         protected bool FindSelectedLinePoint(MouseEventArgs e)
         {
             bool overlayObject = false;
-            if (m_selected_object != null)
-                m_selected_object.IsSelected = false;
-            m_selected_object = null;
+            if (m_selected_linepoint != null)
+                m_selected_linepoint.IsSelected = false;
+            m_selected_linepoint = null;
 
-            for (int i = Layers.Count - 1; i >= 0; i--)
+            var o = GetLinePointbyLocalPosition(e.X, e.Y);
+            if (o != null)
             {
-                var l = Layers[i];
-                if (l.IsVisible)
-                {
-                    var o = l.GetObjectbyLocalPosition(e.X, e.Y);
-                    if (o != null)
-                    {
-                        overlayObject = true;
-                        o.IsSelected = true;
-                        m_selected_object = o;
-                        break;
-                    }
-                }
+                overlayObject = true;
+                o.IsSelected = true;
+                m_selected_linepoint = o;
             }
 
             return overlayObject;
@@ -2006,6 +2062,14 @@ namespace SgxMap
                     if (o.IsVisible)
                     {
                         o.ForceUpdate();
+                    }
+                }
+
+                foreach (var obj in LinePoints)
+                {
+                    if (obj.IsVisible)
+                    {
+                        obj.UpdateObject();     //UpdateLocalPosition();
                     }
                 }
             }
@@ -2833,6 +2897,82 @@ namespace SgxMap
         }
 
         #endregion
+
+        #region LinePoints
+
+        internal void AddLinePoint(Layer layer, MapLinePoint obj)
+        {
+            if (obj == null) return;
+            LinePoints.Add(obj);
+            obj.Layer = layer;
+            obj.UpdateObject();
+        }
+
+        internal void RemoveLinePoint(MapLinePoint obj)
+        {
+            if (obj == null) return;
+            try
+            {
+                LinePoints.Remove(obj);
+                obj.Layer = null;
+            }
+            catch { }
+            ;
+        }
+
+        internal void RemoveLinePoints(MapLine obj)
+        {
+            if (obj == null) return;
+
+            try
+            {
+                for (int i = LinePoints.Count - 1; i >= 0; i--)
+                {
+                    var o = LinePoints[i];
+                    if (o.Parent == obj)
+                    {
+                        RemoveLinePoint(o);
+                    }
+                }
+            }
+            catch { }
+    ;
+        }
+
+
+        internal void ClearLinePoints()
+        {
+            foreach (var obj in LinePoints)
+            {
+                obj.Layer = null;
+            }
+            LinePoints.Clear();
+        }
+
+        internal void ClearLinePoints(MapLine parent)
+        {
+            //foreach (var obj in LinePoints)
+            for (int i = LinePoints.Count - 1; i >= 0; i--)
+            {
+                var obj = LinePoints[i];
+                if ((obj != null) && (obj.Parent == parent))
+                {
+                    obj.Layer = null;
+                    LinePoints.Remove(obj);
+                }
+            }
+        }
+
+        internal MapLinePoint? GetLinePointbyLocalPosition(int x, int y)
+        {
+            var p = new GPoint(x, y);
+            p.OffsetNegative(Core.RenderOffset);
+            return LinePoints.FirstOrDefault(obj => obj.IsInside((int)p.X, (int)p.Y));
+        }
+
+
+        #endregion LinePoints
+
 
         #region IGControl Members
 

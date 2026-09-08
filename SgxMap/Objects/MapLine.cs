@@ -18,7 +18,7 @@ using GMap.NET.MapProviders;
 
 namespace SgxMap.Objects
 {
-    public class MapLine :BasePoint, ISerializable, IDeserializationCallback, IDisposable
+    public class MapLine: BasePoint, ISerializable, IDeserializationCallback, IDisposable
     {
         public PointLatLng m_position2;
         public Point       LocalPosition2;
@@ -49,7 +49,7 @@ namespace SgxMap.Objects
                 {
                     Stroke.Color = value;
 
-                    if (Layer != null && Layer.Control != null)
+                    if (Layer != null && Layer.MapPanel != null)
                     {
                         m_layer?.RefreshObject(this);
                     }
@@ -104,7 +104,7 @@ namespace SgxMap.Objects
                 if ((m_position == PointLatLng.Empty) || (m_position2 == PointLatLng.Empty) || (m_position == m_position2))
                     return 0;
 
-                return Layer.Control.GetDistance(m_position,m_position2);
+                return Layer.MapPanel.GetDistance(m_position,m_position2);
             }
         }
 
@@ -115,7 +115,7 @@ namespace SgxMap.Objects
                 if ((m_position == PointLatLng.Empty) || (m_position2 == PointLatLng.Empty) || (m_position == m_position2))
                     return 0;
 
-                return Layer.Control.GetBearing2(m_position, m_position2);
+                return Layer.MapPanel.GetBearing2(m_position, m_position2);
             }
         }
 
@@ -197,13 +197,13 @@ namespace SgxMap.Objects
                 if (m_isSelected)
                     return;
 
-                Layer?.ClearLinePoints();
+                Layer?.MapPanel.ClearLinePoints();
                 Layer?.AddLinePoint(this, Position, MovementType.Both, Color.Black);
                 Layer?.AddLinePoint(this, Position2, MovementType.Both, Color.Black);
             }
             else
             {
-                Layer?.ClearLinePoints(this);
+                Layer?.MapPanel.ClearLinePoints(this);
             }
             base.Select(select);
         }
@@ -211,10 +211,10 @@ namespace SgxMap.Objects
 
         public override void UpdateLocalPosition()
         {
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
                 base.UpdateLocalPosition();
-                LocalPosition2 = Layer.Control.PositiontoLocal(Position2);
+                LocalPosition2 = Layer.MapPanel.PositiontoLocal(Position2);
             }
         }
 
@@ -280,6 +280,22 @@ namespace SgxMap.Objects
         } /*IsInside */
 
 
+        public override void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            if (Position == oldpoint)
+                Position = newpoint;
+            else if (Position2 == oldpoint)
+                Position2 = newpoint;
+        }
+
+        public override void Shift(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            var b = Layer.MapPanel.GetBearing2(oldpoint, newpoint);
+            var d = Layer.MapPanel.GetDistance(oldpoint, newpoint);
+
+            m_position = Layer.MapPanel.GetPositionFromPoint(Position, d, b);
+            Position2  = Layer.MapPanel.GetPositionFromPoint(Position2, d, b);
+        }
 
         public override void BuildGraphicsPath()
         {
@@ -288,14 +304,14 @@ namespace SgxMap.Objects
 
         public virtual void UpdateEndPoint(int x, int y)
         {
-            var point = Layer.Control.FromLocalToLatLng(x, y);
+            var point = Layer.MapPanel.FromLocalToLatLng(x, y);
             Position2 = point;
         }
 
 
         public override void Remove()
         {
-            Layer?.RemoveLinePoints(this);
+            Layer?.MapPanel.RemoveLinePoints(this);
             base.Remove();
         }
 

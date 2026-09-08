@@ -25,7 +25,7 @@ namespace SgxMap.Objects
         /// <summary>
         ///     background color
         /// </summary>
-        [NonSerialized] public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
+        //[NonSerialized] public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
 
         public readonly List<PointLatLng> Points = new List<PointLatLng>(); // points of route in geo coordinates
         public readonly List<GPoint> LocalPoints = new List<GPoint>();      // List of points in map  (x,y)
@@ -50,7 +50,7 @@ namespace SgxMap.Objects
                     Stroke.Color = value;
                     LastColor = value;
 
-                    if (Layer != null && Layer.Control != null)
+                    if (Layer != null && Layer.MapPanel != null)
                     {
                         Layer.RefreshObject(this);
                     }
@@ -200,17 +200,13 @@ namespace SgxMap.Objects
                         }
                     }
 
-                    if (Layer != null && Layer.Control != null)
+                    if (Layer != null && Layer.MapPanel != null)
                     {
                         Layer?.RefreshObject(this);
                     }
                 }
             }
         }
-
-        public GPoint[] DeserializedLocalPoints { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
-        public GPoint[] DeserializedLocalPoints1 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
-        public GPoint[] DeserializedLocalPoints2 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
 
 
         /// <summary>
@@ -419,7 +415,7 @@ namespace SgxMap.Objects
 
         public void Append(PointLatLng point)
         {
-            if (!m_isEditable || (point == null))
+            if (!m_isEditable || point.IsEmpty)
                 return;
 
             Points.Add(point);
@@ -431,7 +427,7 @@ namespace SgxMap.Objects
             //    Layer?.Markers.Add(m);
             //}
 
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
                 Layer.RefreshObject(this);
             }
@@ -440,7 +436,7 @@ namespace SgxMap.Objects
 
         public void Insert(int index, PointLatLng point)
         {
-            if (!m_isEditable || (point == null))
+            if (!m_isEditable || point.IsEmpty)
                 return;
 
             Points.Insert(index, point);
@@ -450,7 +446,7 @@ namespace SgxMap.Objects
             //    var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, point);
             //    Layer?.Markers.Add(m);
             //}
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
                 Layer.RefreshObject(this);
             }
@@ -459,7 +455,7 @@ namespace SgxMap.Objects
 
         public void MovePoint(int index, PointLatLng point)
         {
-            if (!m_isEditable || (point == null))
+            if (!m_isEditable || point.IsEmpty)
                 return;
 
             if (index >= 0 && index < Points.Count)
@@ -475,16 +471,16 @@ namespace SgxMap.Objects
                     //    }
                     //}
                 }
-                if (Layer != null && Layer.Control != null)
+                if (Layer != null && Layer.MapPanel != null)
                 {
                     Layer.RefreshObject(this);
                 }
             }
         }
 
-        public void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
+        public override void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
         {
-            if (!m_isEditable || (newpoint == null) || (oldpoint == null))
+            if (!m_isEditable || newpoint.IsEmpty || oldpoint.IsEmpty)
                 return;
 
             int index = Points.IndexOf(oldpoint);
@@ -492,7 +488,7 @@ namespace SgxMap.Objects
             {
                 Points[index] = newpoint;
 
-                if (Layer != null && Layer.Control != null)
+                if (Layer != null && Layer.MapPanel != null)
                 {
                     Layer.RefreshObject(this);
                 }
@@ -516,7 +512,7 @@ namespace SgxMap.Objects
                 //}
             }
 
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
                 Layer.RefreshObject(this);
             }
@@ -524,7 +520,7 @@ namespace SgxMap.Objects
 
         public void RemovePoint(PointLatLng point)
         {
-            if (!m_isEditable || (point == null))
+            if (!m_isEditable || !point.IsEmpty)
                 return;
 
             int index = Points.IndexOf(point);
@@ -543,7 +539,7 @@ namespace SgxMap.Objects
                     //}
                 }
 
-                if (Layer != null && Layer.Control != null)
+                if (Layer != null && Layer.MapPanel != null)
                 {
                     Layer.RefreshObject(this);
                 }
@@ -567,6 +563,12 @@ namespace SgxMap.Objects
 
 
         #region ISerializable Members
+
+        public GPoint[] DeserializedLocalPoints { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+        public GPoint[] DeserializedLocalPoints1 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+        public GPoint[] DeserializedLocalPoints2 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+
+
 
         /// <summary>
         ///     Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with the data needed to serialize the

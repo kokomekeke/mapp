@@ -16,11 +16,13 @@ namespace SgxMap
 {
     public class Layer
     {
+
+
         private long m_id;
         private string m_name = string.Empty;
         bool m_isVisibile = true;
         bool m_isZoomSignificant = true;
-        SgxMapPanel? m_control;
+        SgxMapPanel m_mapPanel;
 
 
         /// <summary>
@@ -28,12 +30,6 @@ namespace SgxMap
         /// </summary>
         public readonly ObservableCollectionThreadSafe<BasePoint> Objects =
             new ObservableCollectionThreadSafe<BasePoint>();
-
-        /// <summary>
-        ///     list of objects, should be thread safe
-        /// </summary>
-        public readonly ObservableCollectionThreadSafe<MapLinePoint> LinePoints =
-            new ObservableCollectionThreadSafe<MapLinePoint>();
 
 
         public long ID
@@ -72,15 +68,15 @@ namespace SgxMap
 
 
 
-        public SgxMapPanel? Control
+        public SgxMapPanel MapPanel
         {
             get
             {
-                return m_control;
+                return m_mapPanel;
             }
             internal set
             {
-                m_control = value;
+                m_mapPanel = value;
             }
         }
 
@@ -92,15 +88,15 @@ namespace SgxMap
         /// <param name="name"></param>
         /// <param name="control"></param>
         //---------------------------------------------------------------------
-        public Layer(string? name, SgxMapPanel? control = null)
+        public Layer(string? name, SgxMapPanel control) // = null)
         {
             m_id = BasePoint.LastID++;
             m_name = name ?? "layer-" + m_id;
-            m_control = control;
+            m_mapPanel = control;
         }
 
 
-        public static Layer? CreateLayer(string[] ls, SgxMapPanel? control, out string errorstring)
+        public static Layer? CreateLayer(string[] ls, SgxMapPanel control, out string errorstring)
         {
             try
             {
@@ -156,80 +152,16 @@ namespace SgxMap
         public void Clear()
         {
             ClearObjects();
-            ClearLinePoints();
-        }
-
-
-        public void AddLinePoint(MapLinePoint obj)
-        {
-            if (obj == null) return;
-            LinePoints.Add(obj);
-            obj.Layer = this;
-            obj.UpdateObject();
-        }
-
-        public void RemoveLinePoint(MapLinePoint obj)
-        {
-            if (obj == null) return;
-            try
-            {
-                LinePoints.Remove(obj);
-                obj.Layer = null;
-            }
-            catch { }
-            ;
-        }
-
-        public void RemoveLinePoints(MapLine obj)
-        {
-            if (obj == null) return;
-
-            try
-            {
-                for (int i = LinePoints.Count - 1; i >= 0; i--)
-                {
-                    var o = LinePoints[i];
-                    if (o.Parent == obj)
-                    {
-                        RemoveLinePoint(o);
-                    }
-                }
-            }
-            catch { }
-    ;
-        }
-
-
-        public void ClearLinePoints()
-        {
-            foreach (var obj in LinePoints)
-            {
-                obj.Layer = null;
-            }
-            LinePoints.Clear();
-        }
-
-        public void ClearLinePoints(MapLine parent)
-        {
-            //foreach (var obj in LinePoints)
-            for (int i = LinePoints.Count - 1; i >= 0; i--)
-            {
-                var obj = LinePoints[i];
-                if ((obj != null) && (obj.Parent == parent))
-                {
-                    obj.Layer = null;
-                    LinePoints.Remove(obj);
-                }
-            }
+            //ClearLinePoints();
         }
 
 
 
         public Point? FromLatLngToLocalPosition(PointLatLng position)
         {
-            if (Control != null)
+            if (MapPanel != null)
             {
-                return Control.FromLatLngToLocalPosition(position);
+                return MapPanel.FromLatLngToLocalPosition(position);
             }
             return null;
         }
@@ -253,21 +185,14 @@ namespace SgxMap
         public BasePoint? GetObjectbyLocalPosition(int x, int y)
         {
             var p = new GPoint(x, y);
-            p.OffsetNegative(Control.Core.RenderOffset);
+            p.OffsetNegative(MapPanel.Core.RenderOffset);
             return Objects.FirstOrDefault(obj => obj.IsInside((int)p.X, (int)p.Y));
-        }
-
-        public MapLinePoint? GetLinePointbyLocalPosition(int x, int y)
-        {
-            var p = new GPoint(x, y);
-            p.OffsetNegative(Control.Core.RenderOffset);
-            return LinePoints.FirstOrDefault(obj => obj.IsInside((int)p.X, (int)p.Y));
         }
 
 
         public void ForceUpdate()
         {
-            if (Control != null)
+            if (MapPanel != null)
             {
                 foreach (var obj in Objects)
                 {
@@ -277,13 +202,6 @@ namespace SgxMap
                     }
                 }
 
-                foreach (var obj in LinePoints)
-                {
-                    if (obj.IsVisible)
-                    {
-                        obj.UpdateObject();     //UpdateLocalPosition();
-                    }
-                }
             }
         } /* ForceUpdate */
 
@@ -294,7 +212,7 @@ namespace SgxMap
         /// <param name="g"></param>
         public virtual void OnRender(Graphics g)
         {
-            if (Control != null)
+            if (MapPanel != null)
             {
                 foreach (var o in Objects)
                 {
@@ -302,13 +220,7 @@ namespace SgxMap
                        o.OnRender(g);
                 
                 }
-                
-                for (int i = 0; i < LinePoints.Count; i++)
-                {
-                    var o = LinePoints[i];
-                    if (o.IsVisible)
-                        o.OnRender(g);
-                }
+               
             }
         }
 
@@ -319,12 +231,6 @@ namespace SgxMap
                 foreach (var m in overlay.Objects)
                 {
                     Objects.Add(m);
-                }
-
-                //foreach (var m in overlay.LinePoints)
-                for (int i = 0; i< overlay.LinePoints.Count;i++)
-                {
-                    LinePoints.Add(overlay.LinePoints[i]);
                 }
             }
         }
@@ -337,15 +243,15 @@ namespace SgxMap
                 obj.UpdateObject();
             }
 
-            foreach (var obj in LinePoints)
+            foreach (var obj in MapPanel.LinePoints)
             {
                 obj.UpdateObject();
             }
 
 
-            if (Control != null && !Control.m_holdInvalidation)
+            if (MapPanel != null && !MapPanel.m_holdInvalidation)
             {
-                Control.Invalidate();
+                MapPanel.Invalidate();
             }
         }
 
@@ -353,9 +259,9 @@ namespace SgxMap
         {
              obj.UpdateObject();
 
-            if (Control != null && !Control.m_holdInvalidation)
+            if (MapPanel != null && !MapPanel.m_holdInvalidation)
             {
-                Control.Invalidate();
+                MapPanel.Invalidate();
             }
         }
 
@@ -365,8 +271,8 @@ namespace SgxMap
 
         public MapLine? AddLine(int x, int y, Color color)
         {
-            var p1 = Control.FromLocalToLatLng(x, y);
-            if (p1 != null)
+            var p1 = MapPanel.FromLocalToLatLng(x, y);
+            if (!p1.IsEmpty)
             {
                 var line = new MapLine(p1, p1, color);
                 AddObject(line);
@@ -399,8 +305,8 @@ namespace SgxMap
 
         public MapTextBox? AddTextBox(string name, int x, int y, string text, System.Drawing.Font font)
         {
-            var p1 = Control.FromLocalToLatLng(x, y);
-            if (p1 != null)
+            var p1 = MapPanel.FromLocalToLatLng(x, y);
+            if (!p1.IsEmpty)
             {
                 var label = new MapTextBox(name, p1, text, font);
                 AddObject(label);
@@ -411,8 +317,8 @@ namespace SgxMap
 
         public MapBaseMarker? AddBaseMarker(int x, int y, int size, Color color)
         {
-            var p = Control.FromLocalToLatLng(x, y);
-            if (p != null)
+            var p = MapPanel.FromLocalToLatLng(x, y);
+            if (!p.IsEmpty)
             {
                 var marker = new MapBaseMarker("", p, size, color);
                 AddObject(marker);
@@ -423,7 +329,7 @@ namespace SgxMap
 
         public MapBaseMarker? AddBaseMarker(string name, PointLatLng p, int size, Color color)
         {
-            if (p != null)
+            if (!p.IsEmpty)
             {
                 var marker = new MapBaseMarker(name, p, size, color);
                 AddObject(marker);
@@ -435,7 +341,7 @@ namespace SgxMap
 
         public MapRuler AddRuler(int x, int y, Color color)
         {
-            var p = Control.FromLocalToLatLng(x, y);
+            var p = MapPanel.FromLocalToLatLng(x, y);
             var ruler = new MapRuler(p, p, color);
             AddObject(ruler);
             return ruler;
@@ -443,7 +349,7 @@ namespace SgxMap
 
         public MapCircleRuler AddCircleRuler(int x, int y, Color color)
         {
-            var p = Control.FromLocalToLatLng(x, y);
+            var p = MapPanel.FromLocalToLatLng(x, y);
             var ruler = new MapCircleRuler(p, p, color);
             AddObject(ruler);
             return ruler;
@@ -458,7 +364,7 @@ namespace SgxMap
 
         public MapRectangle AddRectangle(int x, int y, Color color)
         {
-            var p = Control.FromLocalToLatLng(x, y);
+            var p = MapPanel.FromLocalToLatLng(x, y);
             var rec = new MapRectangle(p, 0.1f, 0.1f, color);
             AddObject(rec);
             return rec;
@@ -474,7 +380,7 @@ namespace SgxMap
 
         public MapRectangle AddEllipse(int x, int y, Color color)
         {
-            var p = Control.FromLocalToLatLng(x, y);
+            var p = MapPanel.FromLocalToLatLng(x, y);
             var rec = new MapEllipse(p, 0.1f, 0.1f, color);
             AddObject(rec);
             return rec;
@@ -482,7 +388,7 @@ namespace SgxMap
 
         public GeoCircle AddCircle(int x, int y, Color color)
         {
-            var p = Control.FromLocalToLatLng(x, y);
+            var p = MapPanel.FromLocalToLatLng(x, y);
             var rec = new GeoCircle(p, 0.1, color);
             AddObject(rec);
             return rec;
@@ -492,7 +398,7 @@ namespace SgxMap
         public MapLinePoint AddLinePoint(MapLine parent, PointLatLng point, MovementType movement,  Color color)
         {
             var p = new MapLinePoint("", parent, point, color, movement);
-            AddLinePoint(p);
+            MapPanel.AddLinePoint(this, p);
             return p;
         }
 
@@ -545,13 +451,6 @@ namespace SgxMap
                 }
 
                 ClearObjects();
-
-                foreach (var m in LinePoints)
-                {
-                    m.Dispose();
-                }
-
-                ClearLinePoints();
 
             }
         }

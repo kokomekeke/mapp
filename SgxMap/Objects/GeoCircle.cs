@@ -111,14 +111,14 @@ namespace SgxMap.Objects
 
         public override void UpdateLocalPosition()
         {
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
                 LocalPoints.Clear();
 
                 for (int i = 0; i < Points.Count; i++)
                 {
-                    var p = Layer.Control.FromLatLngToLocal(Points[i]);
-                    p.OffsetNegative(Layer.Control.Core.RenderOffset);
+                    var p = Layer.MapPanel.FromLatLngToLocal(Points[i]);
+                    p.OffsetNegative(Layer.MapPanel.Core.RenderOffset);
                     LocalPoints.Add(p);
                 }
 
@@ -129,12 +129,12 @@ namespace SgxMap.Objects
 
         public void ChangeRadius(PointLatLng newpoint)
         {
-            if (!m_isEditable || (newpoint == null))
+            if (!m_isEditable || newpoint.IsEmpty)
                 return;
 
-            Radius = Layer.Control.GetDistance(Center, newpoint);
+            Radius = Layer.MapPanel.GetDistance(Center, newpoint);
 
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
                 Layer.RefreshObject(this);
             }
@@ -142,7 +142,7 @@ namespace SgxMap.Objects
 
         public void ChangeRadius(int x, int y)
         {
-            var p = Layer.Control.FromLocalToLatLng(x, y);
+            var p = Layer.MapPanel.FromLocalToLatLng(x, y);
             ChangeRadius(p);
         }
 
@@ -165,6 +165,12 @@ namespace SgxMap.Objects
                 return null;
             }
         }
+
+        public override void Shift(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            Center = newpoint;
+        }
+
 
         #region ISerializable Members
 

@@ -8,6 +8,7 @@
 =============================================================================*/
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -44,9 +45,10 @@ namespace SgxMap.Objects
         protected bool m_isHighlighted = false;
         protected bool m_isEditable = true;           // if true, then the ellipse can be edited by mouse, otherwise it is read-only
         protected bool IsHitTestVisible = true;        // can receive input
+        protected bool m_isfilled = false;
 
         protected GraphicsPath? m_graphicsPath;
-        protected Layer? m_layer;
+        protected Layer m_layer;
 
         public Point LocalPosition;
 
@@ -58,6 +60,7 @@ namespace SgxMap.Objects
         [NonSerialized] public Pen Stroke = new Pen(Brushes.Black, 2);
         [NonSerialized] public Pen NormalStroke = new Pen(Brushes.Black, 2);
         [NonSerialized] public Pen HighlightStroke = new Pen(Brushes.Red, 3);
+        [NonSerialized] public SolidBrush Fill = new SolidBrush(Color.Blue);
 
         public long ID
         {
@@ -107,6 +110,20 @@ namespace SgxMap.Objects
                 }
             }
         }
+
+        public Color FillColor
+        {
+            get { return Fill.Color; }
+            set
+            {
+                if (value != Fill.Color)
+                {
+                    Fill.Color = value;
+                    m_layer?.RefreshObject(this);
+                }
+            }
+        }
+
 
         public int Thickness
         {
@@ -185,7 +202,7 @@ namespace SgxMap.Objects
         }
 
 
-        public Layer? Layer
+        public Layer Layer
         {
             get { return m_layer; }
             internal set
@@ -211,6 +228,21 @@ namespace SgxMap.Objects
                 m_isMouseOver = value;
             }
         }
+
+        public bool IsFilled
+        {
+            get { return m_isfilled; }
+            set
+            {
+                if (value = m_isfilled)
+                {
+                    m_isfilled = value;
+                    UpdateLocalPosition();
+                }
+            }
+        }
+
+        //***************************************************************************/
 
         public BasePoint()
         {
@@ -341,14 +373,19 @@ namespace SgxMap.Objects
             {
                 UpdateGraphicsPath();
             }
-            g.DrawPath(Stroke, m_graphicsPath);
+            if (m_graphicsPath != null)
+            { 
+                if (m_isfilled)
+                     g.FillPath(Fill, m_graphicsPath);
+                else g.DrawPath(Stroke, m_graphicsPath);
+            }
         }
 
         public virtual void UpdateLocalPosition()
         {
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
-                LocalPosition = Layer.Control.PositiontoLocal(Position);
+                LocalPosition = Layer.MapPanel.PositiontoLocal(Position);
             }
         }
 
@@ -397,6 +434,17 @@ namespace SgxMap.Objects
         {
             if (Position == oldpoint)
                 Position = newpoint;
+        }
+
+
+        public virtual void Shift(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            Position = newpoint;
+        }
+
+        public virtual void UpdateLinePoints()
+        {
+            //UpdateLocalPosition(); UpdateGraphicsPath();
         }
 
 

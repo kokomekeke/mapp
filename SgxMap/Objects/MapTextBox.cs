@@ -18,7 +18,7 @@ namespace SgxMap.Objects
     public class MapTextBox: MapLabel, ISerializable, IDisposable
     {
         [NonSerialized] public Brush BorderColor = new SolidBrush(Color.Black);  // border color 
-        [NonSerialized] public Brush FillColor = new SolidBrush(Color.White);    // background color
+        //[NonSerialized] public Brush FillColor = new SolidBrush(Color.White);    // background color
 
         public Size TextPadding = new Size(3, 3);
 
@@ -76,7 +76,7 @@ namespace SgxMap.Objects
             var rectText = rect;
             rectText.Offset(TextPadding.Width, TextPadding.Height); //Inflate(-TextPadding.Width, -TextPadding.Height);
 
-            g.FillRectangle(FillColor, rect);
+            g.FillRectangle(Fill, rect);
             g.DrawRectangle(Stroke, rect);
             g.DrawString(Text, Font, TextColor, rectText);
             g.Flush();
@@ -95,7 +95,7 @@ namespace SgxMap.Objects
             Font      = (Font)info.GetValue("font", typeof(Font));
             TextColor = new SolidBrush(Color);
             BorderColor = (SolidBrush)info.GetValue("bordercolor", typeof(Brush)); 
-            FillColor = (SolidBrush)info.GetValue("fillcolor", typeof(Brush)); 
+            //FillColor = (SolidBrush)info.GetValue("fillcolor", typeof(Brush)); 
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -104,7 +104,7 @@ namespace SgxMap.Objects
             info.AddValue("text", Text);
             info.AddValue("font", Font);
             info.AddValue("bordercolor", BorderColor);
-            info.AddValue("fillcolor", FillColor);
+            //info.AddValue("fillcolor", FillColor);
         }
 
         public override void OnDeserialization(object? sender)

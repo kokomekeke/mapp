@@ -80,7 +80,7 @@ namespace SgxMap
             InitializeComponent();
             LoadControls();
             MainMap.MouseDown += MainMap_MouseDown;
-            MainMap.showPlaceInfo += MainMap_ShowPlaceInfo;
+            MainMap.OnShowPlaceInfo += MainMap_ShowPlaceInfo;
         }
 
 

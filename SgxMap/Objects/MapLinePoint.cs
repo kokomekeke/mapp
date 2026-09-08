@@ -12,24 +12,28 @@ namespace SgxMap.Objects
     {
 
         public MapLinePoint(BasePoint parent, PointLatLng p, Color color)
-           : base("",p, new Size(8, 8), color)
+           : base("",p, new Size(12, 12), color)
         {
             Parent = parent;
             Name = Parent.Name;
+            Fill = new SolidBrush(color);
+            Stroke = new Pen(Color.Red);
         }
 
         public MapLinePoint(string name, BasePoint parent, PointLatLng p, Color color, MovementType movement)
-           : base(name,p, new Size(8,8), color)
+           : base(name,p, new Size(12,12), color)
         {
             Parent = parent;
             m_movement = movement;
+            Fill = new SolidBrush(color);
+            Stroke = new Pen(Color.Red);
         }
 
         public override void OnRender(Graphics g)
         {
-            g.DrawRectangle(Stroke, new Rectangle(LocalPosition.X - Size.Width / 4, LocalPosition.Y - Size.Height / 4, Size.Width / 2, Size.Height / 2));
+            g.FillRectangle(Fill, new Rectangle(LocalPosition.X - Size.Width / 4, LocalPosition.Y - Size.Height / 4, Size.Width / 2, Size.Height / 2));
             if (IsSelected)
-                g.DrawRectangle(Pens.Red, LocalArea);
+                g.DrawRectangle(Stroke, Rectangle.Inflate(LocalArea,2,2));
         }
 
 

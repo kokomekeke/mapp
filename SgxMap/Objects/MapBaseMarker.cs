@@ -29,7 +29,7 @@ namespace SgxMap.Objects
         /// background color
         /// </summary>
         [NonSerialized]
-        protected SolidBrush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
+        //protected SolidBrush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
         protected Pen BorderPen = new Pen(Color.Black);
 
         public BasePoint? Parent
@@ -101,11 +101,6 @@ namespace SgxMap.Objects
             }
         }
 
-        public Color FillColor
-        {
-            get { return Fill.Color; }
-            set { Fill = new SolidBrush(value); }
-        }
 
         //public GMapToolTip ToolTip;
 
@@ -199,6 +194,11 @@ namespace SgxMap.Objects
         } /* CreateMarker */
 
 
+        public void Reset()
+        {
+            Parent = null;
+        }
+
         public virtual void CopyToClipboard()
         {
             System.Windows.Forms.Clipboard.SetText(Position.ToGeoString());
@@ -222,11 +222,15 @@ namespace SgxMap.Objects
             {
                 if (Parent != null)
                 {
-                    if (Parent is GeoCircle)
+                    if (Parent is MapLine)
+                    {
+                        ((MapLine)Parent).MovePoint(m_oldposition, pos);
+                    }
+                    else if (Parent is GeoCircle)
                     {
                         ((GeoCircle)Parent).ChangeRadius(m_position);
                     }
-                    else if ((Parent is MapPolyLine) && (m_oldposition != null))
+                    else if ((Parent is MapPolyLine) && !m_oldposition.IsEmpty)
                     {
                         ((MapPolyLine)Parent).MovePoint(m_oldposition, m_position);
                     }
@@ -240,7 +244,7 @@ namespace SgxMap.Objects
 
         public override void UpdateLocalPosition()
         {
-            if (Layer != null && Layer.Control != null)
+            if (Layer != null && Layer.MapPanel != null)
             {
                 base.UpdateLocalPosition();
                 m_area.Location = new Point(LocalPosition.X - Size.Width / 2, LocalPosition.Y - Size.Height / 2);

@@ -43,7 +43,7 @@ namespace SgxMap.Objects
                 _text = value;
                 Size = TextRenderer.MeasureText(_text, Font);
 
-                if (Layer != null && Layer.Control != null)
+                if (Layer != null && Layer.MapPanel != null)
                 {
                     m_layer?.RefreshObjects();
                 }
