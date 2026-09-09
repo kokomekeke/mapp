@@ -156,6 +156,17 @@ namespace SgxMap
         }
 
 
+        public void RemoveLinePoint(MapLinePoint linePoint)
+        {
+            MapPanel.LinePoints.Remove(linePoint);
+        }
+
+        public void RemoveLinePoint(int i)
+        {
+            MapPanel.LinePoints.RemoveAt(i);
+        }
+
+
 
         public Point? FromLatLngToLocalPosition(PointLatLng position)
         {
@@ -394,8 +405,16 @@ namespace SgxMap
             return rec;
         }
 
+        public MapRayLine AddRayLine(int x, int y, Color color)
+        {
+            var p = MapPanel.FromLocalToLatLng(x, y);
+            var rec = new MapRayLine(p, 35, 10, color);
+            AddObject(rec);
+            return rec;
+        }
 
-        public MapLinePoint AddLinePoint(MapLine parent, PointLatLng point, MovementType movement,  Color color)
+
+        public MapLinePoint AddLinePoint(BasePoint parent, PointLatLng point, MovementType movement,  Color color)
         {
             var p = new MapLinePoint("", parent, point, color, movement);
             MapPanel.AddLinePoint(this, p);

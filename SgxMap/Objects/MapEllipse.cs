@@ -4,6 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         04-Sep-2026.
+*         Last modification                                        09-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -78,7 +79,7 @@ namespace SgxMap.Objects
         {
             float dx = x - LocalPosition.X - m_localWidth / 2f;
             float dy = y - LocalPosition.Y - m_localHeight / 2f;
-            return Math.Abs(((dx * dx) / (m_localWidth * m_localWidth / 4) + (dy * dy) / (m_localHeight * m_localHeight / 4)) - 1.0) <= 10;
+            return Math.Abs(((dx * dx) / (m_localWidth * m_localWidth / 4) + (dy * dy) / (m_localHeight * m_localHeight / 4)) - 1.0) <= 0.1;
         }
 
 

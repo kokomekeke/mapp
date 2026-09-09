@@ -64,6 +64,7 @@
             MainMap = new SgxMapPanel();
             toolTip_draw = new ToolTip(components);
             textBox_editor = new TextBox();
+            btn_draw_rayline = new Button();
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
@@ -253,6 +254,7 @@
             // 
             DrawPanel.BackColor = SystemColors.ControlDarkDark;
             DrawPanel.BorderStyle = BorderStyle.Fixed3D;
+            DrawPanel.Controls.Add(btn_draw_rayline);
             DrawPanel.Controls.Add(label1);
             DrawPanel.Controls.Add(button1);
             DrawPanel.Controls.Add(btn_draw_circle);
@@ -276,7 +278,7 @@
             // label1
             // 
             label1.BackColor = Color.Black;
-            label1.Location = new Point(539, 1);
+            label1.Location = new Point(582, 0);
             label1.Name = "label1";
             label1.Size = new Size(10, 41);
             label1.TabIndex = 13;
@@ -453,6 +455,8 @@
             MainMap.RoutesEnabled = true;
             MainMap.ScaleMode = ScaleModes.Integer;
             MainMap.SelectedAreaFillColor = Color.FromArgb(33, 65, 105, 225);
+            MainMap.SelectedLinePoint = null;
+            MainMap.SelectedObject = null;
             MainMap.ShowCenter = true;
             MainMap.ShowDistance = false;
             MainMap.ShowGeoGridLines = false;
@@ -472,6 +476,17 @@
             textBox_editor.Visible = false;
             textBox_editor.VisibleChanged += textBox_editor_VisibleChanged;
             textBox_editor.Leave += textBox_editor_Leave;
+            // 
+            // btn_draw_rayline
+            // 
+            btn_draw_rayline.Image = (Image)resources.GetObject("btn_draw_rayline.Image");
+            btn_draw_rayline.Location = new Point(539, 3);
+            btn_draw_rayline.Name = "btn_draw_rayline";
+            btn_draw_rayline.Size = new Size(37, 37);
+            btn_draw_rayline.TabIndex = 14;
+            toolTip_draw.SetToolTip(btn_draw_rayline, "Ray");
+            btn_draw_rayline.UseVisualStyleBackColor = true;
+            btn_draw_rayline.Click += btn_draw_rayline_Click;
             // 
             // SgxMapControl
             // 
@@ -532,5 +547,6 @@
         private Button btn_draw_circle;
         private Button button1;
         private Label label1;
+        private Button btn_draw_rayline;
     }
 }

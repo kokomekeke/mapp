@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,6 +79,7 @@ namespace SgxMap.Objects
         private void BuildCircle()
         {
             Points.Clear();
+            LocalPoints.Clear();
             double bearing = 0.0;
             double startRadLat = Center.Lat / 180.0 * Math.PI;
             double startRadLon = Center.Lng / 180.0 * Math.PI;
@@ -106,24 +108,6 @@ namespace SgxMap.Objects
             }
 
             Points.Add(Points[0]);
-        }
-
-
-        public override void UpdateLocalPosition()
-        {
-            if (Layer != null && Layer.MapPanel != null)
-            {
-                LocalPoints.Clear();
-
-                for (int i = 0; i < Points.Count; i++)
-                {
-                    var p = Layer.MapPanel.FromLatLngToLocal(Points[i]);
-                    p.OffsetNegative(Layer.MapPanel.Core.RenderOffset);
-                    LocalPoints.Add(p);
-                }
-
-                UpdateGraphicsPath();
-            }
         }
 
 
@@ -168,8 +152,32 @@ namespace SgxMap.Objects
 
         public override void Shift(PointLatLng oldpoint, PointLatLng newpoint)
         {
-            Center = newpoint;
+            var b = Layer.MapPanel.GetBearing2(oldpoint, newpoint);
+            var d = Layer.MapPanel.GetDistance(oldpoint, newpoint);
+
+            Center = Layer.MapPanel.GetPositionFromPoint(Center, d, b);
         }
+
+
+        public override void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            if (!m_isEditable || newpoint.IsEmpty || oldpoint.IsEmpty)
+                return;
+
+            int index = Points.IndexOf(oldpoint);
+            if (index != -1)
+            {
+                Radius = Layer.MapPanel.GetDistance(Points[index], newpoint);
+                Points[index] = newpoint;
+                UpdateLocalPosition();
+
+                if (Layer != null && Layer.MapPanel != null)
+                {
+                    Layer.RefreshObject(this);
+                }
+            }
+        }
+
 
 
         #region ISerializable Members
@@ -200,7 +208,6 @@ namespace SgxMap.Objects
         }
 
         #endregion
-
 
 
     }

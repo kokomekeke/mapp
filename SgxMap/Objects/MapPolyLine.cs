@@ -28,7 +28,7 @@ namespace SgxMap.Objects
         //[NonSerialized] public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
 
         public readonly List<PointLatLng> Points = new List<PointLatLng>(); // points of route in geo coordinates
-        public readonly List<GPoint> LocalPoints = new List<GPoint>();      // List of points in map  (x,y)
+        public readonly List<Point> LocalPoints = new List<Point>();      // List of points in map  (x,y)
 
 
 
@@ -84,6 +84,40 @@ namespace SgxMap.Objects
             LastColor = Stroke.Color;
         }
 
+        public MapPolyLine(string name, PointLatLng point, Color color)
+                : base(name, point, color)
+        {
+            Points.Add(point);
+            Stroke.LineJoin = LineJoin.Round;
+            Stroke.Width = 5;
+            LocalPoints.Capacity = Points.Count;
+            Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
+            LastColor = Stroke.Color;
+        }
+
+
+        public static MapPolyLine? CreatePolyline(string[] ls, out string errorstring)
+        {
+            try
+            {
+                // 0: "polyline", 1: name,  2: lat1, 3: lng1, 4: lat2, 5: lng2, 6: lat3, 7: lng3, ... , x: color
+                errorstring = string.Empty;
+                var points = new List<PointLatLng>();
+                for (int i = 2; i < ls.Length - 1; i += 2)
+                {
+                    points.Add(new PointLatLng(double.Parse(ls[i]), double.Parse(ls[i + 1])));
+                }
+                var color = ColorTranslator.FromHtml(ls[ls.Length - 1]);
+                return new MapPolyLine(ls[1], points, color);
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.ToString();
+                return null;
+            }
+        }
+
+
         /// <summary>
         ///     clears points and sets tag and name to null
         /// </summary>
@@ -92,93 +126,6 @@ namespace SgxMap.Objects
             Points.Clear();
         }
 
-
-        /// <summary>
-        ///     is polyline visible
-        /// </summary>
-        //public bool IsVisible
-        //{
-        //    get
-        //    {
-        //        return m_isVisible;
-        //    }
-        //    set
-        //    {
-        //        if (value != m_isVisible)
-        //        {
-        //            m_isVisible = value;
-
-        //            if (Layer != null && Layer.Control != null)
-        //            {
-        //                if (m_isVisible)
-        //                {
-        //                    Layer.Control.UpdatePolygonLocalPosition(this);
-        //                }
-        //                else
-        //                {
-        //                    if (Layer.Control.IsMouseOverPolygon)
-        //                    {
-        //                        Layer.Control.IsMouseOverPolygon = false;
-        //                        Layer.Control.RestoreCursorOnLeave();
-        //                    }
-        //                }
-
-        //                {
-        //                    if (!Layer.Control.HoldInvalidation)
-        //                    {
-        //                        Layer.Control.Invalidate();
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-
-        /// <summary>
-        ///     is mouse over
-        /// </summary>
-
-
-
-        //public bool IsSelected
-        //{
-        //    get { return m_isSelected; }
-        //    set
-        //    {
-        //        if (value != m_isSelected)
-        //        {
-        //            m_isSelected = value;
-
-        //            if (m_isSelected)
-        //            {
-        //                for (int i = 0; i < Points.Count; i++)
-        //                {
-        //                    var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, Points[i]);
-        //                    Layer?.AddObject(m);
-        //                }
-        //            }
-        //            else
-        //            {
-        //                for (int i = Layer.Markers.Count - 1; i >= 0; i--)
-        //                {
-        //                    if (Layer.Markers[i].Parent == this)
-        //                    {
-        //                        Layer.Markers.RemoveAt(i);
-        //                    }
-        //                }
-        //            }
-
-        //            if (Layer != null && Layer.Control != null)
-        //            {
-        //                if (!Layer.Control.HoldInvalidation)
-        //                {
-        //                    Layer.Control.Invalidate();
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
 
         public bool IsClosed
         {
@@ -225,13 +172,32 @@ namespace SgxMap.Objects
             return false;
         }
 
+        public override void UpdateLocalPosition()
+        {
+            if (Layer != null && Layer.MapPanel != null)
+            {
+                base.UpdateLocalPosition();
+                //LocalPoints.Capacity = Points.Count;
+                LocalPoints.Clear();
+
+                for (int i = 0; i < Points.Count; i++)
+                {
+                    var o = Layer.FromLatLngToLocalPosition(Points[i]);
+                    if (o != null)
+                        LocalPoints.Add((Point)o);
+                }
+
+                UpdateGraphicsPath();
+            }
+        }
+
+
         public override void BuildGraphicsPath()
         {
-            var pnts = new System.Drawing.Point[LocalPoints.Count];
+            var pnts = new Point[LocalPoints.Count];
             for (int i = 0; i < LocalPoints.Count; i++)
             {
-                var p2 = new System.Drawing.Point((int)LocalPoints[i].X, (int)LocalPoints[i].Y);
-                pnts[pnts.Length - 1 - i] = p2;
+                pnts[pnts.Length - 1 - i] = LocalPoints[i];
             }
 
             if (pnts.Length > 2)
@@ -503,13 +469,7 @@ namespace SgxMap.Objects
 
             if (IsSelected)
             {
-                //for (int i = Layer.Markers.Count - 1; i >= 0; i--)
-                //{
-                //    if (Layer.Markers[i].Parent == this)
-                //    {
-                //        Layer.Markers.RemoveAt(i);
-                //    }
-                //}
+                Layer.MapPanel.ClearLinePoints(this);
             }
 
             if (Layer != null && Layer.MapPanel != null)
@@ -530,13 +490,14 @@ namespace SgxMap.Objects
                 LocalPoints.RemoveAt(index);
                 if (IsSelected)
                 {
-                    //for (int i = Layer.Markers.Count - 1; i >= 0; i--)
-                    //{
-                    //    if (Layer.Markers[i].Parent == this && ((GMap.NET.WindowsForms.Markers.GMarkerLinePoint)Layer.Markers[i]).Position == point)
-                    //    {
-                    //        Layer.Markers.RemoveAt(i);
-                    //    }
-                    //}
+                    for (int i = Layer.MapPanel.LinePoints.Count - 1; i >= 0; i--)
+                    {
+                        var o = Layer.MapPanel.LinePoints[i];
+                        if ((o.Parent == this) && (o.Position == point))
+                        {
+                            Layer.RemoveLinePoint(i);
+                        }
+                    }
                 }
 
                 if (Layer != null && Layer.MapPanel != null)
@@ -561,12 +522,65 @@ namespace SgxMap.Objects
             //label.UpdateLocalPosition();
         }
 
+        public override void Select(bool select)
+        {
+            if (select)
+            {
+                if (m_isSelected)
+                    return;
+
+                Layer.MapPanel.ClearLinePoints();
+
+                for (int i = 0; i < Points.Count; i++)
+                {
+                    if (!Points[i].IsEmpty)
+                        Layer.AddLinePoint(this, Points[i], MovementType.Both, Color.Black);
+                }
+            }
+            else
+            {
+                Layer.MapPanel.ClearLinePoints(this);
+            }
+
+            //base.Select(select);
+            m_isSelected = select;
+            m_layer?.RefreshObject(this);
+        }
+
+
+        public override void UpdateLinePoints()
+        {
+            if (m_isSelected && m_layer != null)
+            {
+                Layer.MapPanel.ClearLinePoints(this);
+                for (int i = 0; i < Points.Count; i++)
+                {
+                    if (!Points[i].IsEmpty)
+                        Layer.AddLinePoint(this, Points[i], MovementType.Both, Color.Black);
+                }
+            }
+            Layer.RefreshObject(this);
+        }
+
+
+        public override void Shift(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            var b = Layer.MapPanel.GetBearing2(oldpoint, newpoint);
+            var d = Layer.MapPanel.GetDistance(oldpoint, newpoint);
+
+            for (int i = 0; i < Points.Count; i++)
+                Points[i] = Layer.MapPanel.GetPositionFromPoint(Points[i], d, b);
+
+            Layer.RefreshObject(this);
+        }
+
+
 
         #region ISerializable Members
 
-        public GPoint[] DeserializedLocalPoints { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
-        public GPoint[] DeserializedLocalPoints1 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
-        public GPoint[] DeserializedLocalPoints2 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+        public Point[] DeserializedLocalPoints { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+        public Point[] DeserializedLocalPoints1 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
+        public Point[] DeserializedLocalPoints2 { get => deserializedLocalPoints; set => deserializedLocalPoints = value; }
 
 
 
@@ -593,7 +607,7 @@ namespace SgxMap.Objects
 
         // Temp store for de-serialization.
 
-        private GPoint[] deserializedLocalPoints = new GPoint[1];
+        private Point[] deserializedLocalPoints = new Point[1];
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="MapRoute" /> class.
@@ -603,7 +617,7 @@ namespace SgxMap.Objects
         protected MapPolyLine(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
-            deserializedLocalPoints = Extensions.GetValue<GPoint[]>(info, "LocalPoints");
+            deserializedLocalPoints = Extensions.GetValue<Point[]>(info, "LocalPoints");
             IsVisible = Extensions.GetStruct(info, "Visible", true);
             LineColor = Color.FromArgb(Extensions.GetStruct(info, "LineColor", Color.MidnightBlue.ToArgb()));
         }
@@ -647,26 +661,6 @@ namespace SgxMap.Objects
 
         #endregion
 
-        public static MapPolyLine? CreatePolyline(string[] ls, out string errorstring)
-        {
-            try
-            {
-                // 0: "polyline", 1: name,  2: lat1, 3: lng1, 4: lat2, 5: lng2, 6: lat3, 7: lng3, ... , x: color
-                errorstring = string.Empty;
-                var points = new List<PointLatLng>();
-                for (int i = 2; i < ls.Length - 1; i += 2)
-                {
-                    points.Add(new PointLatLng(double.Parse(ls[i]), double.Parse(ls[i + 1])));
-                }
-                var color = ColorTranslator.FromHtml(ls[ls.Length - 1]);
-                return new MapPolyLine(ls[1], points, color);
-            }
-            catch (Exception ex)
-            {
-                errorstring = ex.ToString();
-                return null;
-            }
-        }
 
     } /* class GMapPolyLine */
 

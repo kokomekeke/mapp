@@ -62,7 +62,7 @@ namespace SgxMap.Objects
             get { return m_arrowPosition; }
             set
             {
-                if (m_arrowPosition != value)
+                //if (m_arrowPosition != value)
                 {
                     m_arrowPosition = value;
                     // TODO: apply arror position

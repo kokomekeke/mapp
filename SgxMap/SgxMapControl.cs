@@ -81,6 +81,7 @@ namespace SgxMap
             LoadControls();
             MainMap.MouseDown += MainMap_MouseDown;
             MainMap.OnShowPlaceInfo += MainMap_ShowPlaceInfo;
+            MainMap.OnShowPlaceInfoEx += MainMap_ShowPlaceInfoEx;
         }
 
 
@@ -142,6 +143,11 @@ namespace SgxMap
         public void MainMap_ShowPlaceInfo(int x, int y)
         {
             label_status.Text = MainMap.GetPlaceInfo(x, y);
+        }
+
+        public void MainMap_ShowPlaceInfoEx(int x, int y, double bearing, double distance)
+        {
+            label_status.Text = MainMap.GetPlaceInfo(x, y) + "   bearing: " + bearing.ToString("F2") + "°   distance: " + distance.ToString("F2") + " km";
         }
 
         private void btn_draw_Click(object sender, EventArgs e)
@@ -240,6 +246,12 @@ namespace SgxMap
         private void btn_draw_pushpin_Click(object sender, EventArgs e)
         {
             MainMap.MouseMoveStatus = MouseMoveStatusType.Marker;
+        }
+
+
+        private void btn_draw_rayline_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Ray;
         }
 
 

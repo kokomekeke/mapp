@@ -103,6 +103,7 @@ namespace SgxMap
         public MapRectangle? m_MapRectangle = null;
         public GeoCircle? m_MapCircle = null;
         public MapBaseMarker? m_MapMarker = null;
+        public MapRayLine? m_MapRayLine = null;
 
         //.. selected objects
         public BasePoint? m_selected_object = null; 
@@ -120,6 +121,7 @@ namespace SgxMap
         /// </summary>
         public event ExceptionThrown OnExceptionThrown;
         public ShowPlaceInfo OnShowPlaceInfo;
+        public ShowPlaceInfoEx OnShowPlaceInfoEx;
 
         #endregion EVENTS
 
@@ -1300,6 +1302,10 @@ namespace SgxMap
                             m_MapMarker = Layers[0].AddBaseMarker(e.X, e.Y, 14, Color.Red);
                             break;
 
+                        case MouseMoveStatusType.Ray:
+                            m_MapRayLine = Layers[0].AddRayLine(e.X, e.Y, Color.Black);
+                            break;
+
                     } /* switch */
                 }
 
@@ -1364,9 +1370,18 @@ namespace SgxMap
                 m_MapCircle = null;
             }
 
+            if (m_MapRayLine != null)
+            {
+                if (m_MapRayLine.ArrowPosition == ArrowPositions.None)
+                    m_MapRayLine.Thickness = 1;
+                m_MapRayLine.Color = Color.Red;
+                m_MapRayLine.ArrowPosition = ArrowPositions.AtEnd;
+                m_MapRayLine = null;
+            }
+
             if (m_selected_linepoint != null)
             {
-                m_selected_linepoint.Parent.UpdateLinePoints();
+                m_selected_linepoint.Parent?.UpdateLinePoints();
                 m_selected_linepoint.IsSelected = false;
                 m_selected_linepoint = null;
                 Invalidate();
@@ -1470,6 +1485,13 @@ namespace SgxMap
                 return;
             }
 
+            if (m_MapRayLine != null)
+            {
+                m_MapRayLine.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
+                OnShowPlaceInfoEx?.Invoke(e.X, e.Y, m_MapRayLine.Direction, m_MapRayLine.Distance);
+                return;
+            }
 
             if (!Core.IsDragging && !Core.MouseDown.IsEmpty)
             {
@@ -2949,7 +2971,7 @@ namespace SgxMap
             LinePoints.Clear();
         }
 
-        internal void ClearLinePoints(MapLine parent)
+        internal void ClearLinePoints(BasePoint parent)
         {
             //foreach (var obj in LinePoints)
             for (int i = LinePoints.Count - 1; i >= 0; i--)
@@ -3955,6 +3977,7 @@ namespace SgxMap
         CircleRuler,
         Textbox,
         Marker,
+        Ray,
         MovePoint,
     }
 
@@ -3992,6 +4015,9 @@ namespace SgxMap
     public delegate void MapDoubleClick(PointLatLng pointClick, MouseEventArgs e);
 
     public delegate void ShowPlaceInfo(int x, int y);
+
+    public delegate void ShowPlaceInfoEx(int x, int y, double bearing, double distance);
+
     #endregion Delegates
 
 } /* namespace GMap.NET.WindowsForms */

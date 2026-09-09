@@ -4,6 +4,7 @@
 * (c) Kótai 2026
 *
 * ver 1.00                                                         04-Sep-2026.
+*          Last modification                                       09-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -149,20 +150,22 @@ namespace SgxMap.Objects
 
         protected void BuildPoints()
         {
+            Points[0] = Position;                                                           // top left
+            Points[1] = Position2;                                                          // bottom right
+            Points[2] = new PointLatLng(Position2.Lat, Position.Lng);                       // bottom left
+            Points[3] = new PointLatLng(Position.Lat, Position2.Lng);                       // top right
 
-            Points[0] = Position;
-            Points[1] = Position2;
-            Points[2] = Layer.MapPanel.GetPositionFromPoint(Position2, Height, 360);
-            Points[3] = Layer.MapPanel.GetPositionFromPoint(Position, Height, 180);
+            var p = Layer.MapPanel.GetPositionFromPoint(Position, Width / 2, 90);
+            Points[4] = new PointLatLng(Position.Lat, p.Lng);                         // top center
+            p = Layer.MapPanel.GetPositionFromPoint(Position2, Width / 2, -90);
+            Points[5] = new PointLatLng(Position2.Lat, p.Lng);                               // bottom center
 
-            Points[4] = Layer.MapPanel.GetPositionFromPoint(Position, Width / 2, 90);
-            Points[5] = Layer.MapPanel.GetPositionFromPoint(Position2, Width / 2, -90);
-
-            Points[6] = Layer.MapPanel.GetPositionFromPoint(Position, Height / 2, 180);
-            Points[7] = Layer.MapPanel.GetPositionFromPoint(Position2, Height / 2, 360);
-
-
+            p = Layer.MapPanel.GetPositionFromPoint(Position, Height / 2, 180);
+            Points[6] = new PointLatLng(p.Lat, Position.Lng);                                // left center
+            p= Layer.MapPanel.GetPositionFromPoint(Position2, Height / 2, 360);
+            Points[7] = new PointLatLng(p.Lat, Position2.Lng);                               // right cnter
         }
+
 
         public override void Select(bool select)
         {
@@ -175,10 +178,11 @@ namespace SgxMap.Objects
 
                 BuildPoints();
 
-                foreach (var point in Points)
+                for (int i = 0; i < Points.Length; i++)
                 {
-                    if (!point.IsEmpty)
-                        Layer.AddLinePoint(this, point, MovementType.Both, Color.Black);
+                    if (!Points[i].IsEmpty)
+                        //Layer.AddLinePoint(this, Points[i], (i > 5) ? MovementType.Horizontal : (i > 3)? MovementType.Vertical : MovementType.Both, Color.Black);
+                        Layer.AddLinePoint(this, Points[i], MovementType.Both, Color.Black);
                 }
             }
             else
@@ -219,14 +223,32 @@ namespace SgxMap.Objects
                     {
                         case 0: Position = newpoint; break;
                         case 1: Position2 = newpoint; break;
-                        case 2:
-                            //var p = new PointLatLng(newpoint.Lat, Position.Lng);
-                            m_position.Lat = newpoint.Lat;
+                        case 2: 
+                            Position = new PointLatLng(m_position.Lat, newpoint.Lng); 
+                            Position2 = new PointLatLng(newpoint.Lat, m_position2.Lng);
+                            break;
+                        case 3:
+                            Position = new PointLatLng(newpoint.Lat, m_position.Lng);
+                            m_position2 = new PointLatLng(m_position2.Lat, newpoint.Lng);
+                            break;
+                        case 4:
+                            Position = new PointLatLng(newpoint.Lat, m_position.Lng);
+                            break;
+                        case 5:
+                            Position2 = new PointLatLng(newpoint.Lat, m_position2.Lng);
+                            break;
+                        case 6:
+                            Position = new PointLatLng(m_position.Lat, newpoint.Lng);
+                            break;
+                        case 7:
+                            Position2 = new PointLatLng(m_position2.Lat, newpoint.Lng);
                             break;
 
                         default: return;
                     }
                     BuildPoints();
+                    if (i >= 4)
+                        Points[i] = newpoint; 
                     return;
                 }
             }
