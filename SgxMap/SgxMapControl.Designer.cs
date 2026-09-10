@@ -47,6 +47,7 @@
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
             DrawPanel = new Panel();
+            btn_draw_rayline = new Button();
             label1 = new Label();
             button1 = new Button();
             btn_draw_circle = new Button();
@@ -64,7 +65,7 @@
             MainMap = new SgxMapPanel();
             toolTip_draw = new ToolTip(components);
             textBox_editor = new TextBox();
-            btn_draw_rayline = new Button();
+            label2 = new Label();
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
@@ -254,6 +255,7 @@
             // 
             DrawPanel.BackColor = SystemColors.ControlDarkDark;
             DrawPanel.BorderStyle = BorderStyle.Fixed3D;
+            DrawPanel.Controls.Add(label2);
             DrawPanel.Controls.Add(btn_draw_rayline);
             DrawPanel.Controls.Add(label1);
             DrawPanel.Controls.Add(button1);
@@ -275,12 +277,23 @@
             DrawPanel.Size = new Size(669, 49);
             DrawPanel.TabIndex = 4;
             // 
+            // btn_draw_rayline
+            // 
+            btn_draw_rayline.Image = (Image)resources.GetObject("btn_draw_rayline.Image");
+            btn_draw_rayline.Location = new Point(548, 3);
+            btn_draw_rayline.Name = "btn_draw_rayline";
+            btn_draw_rayline.Size = new Size(37, 37);
+            btn_draw_rayline.TabIndex = 14;
+            toolTip_draw.SetToolTip(btn_draw_rayline, "Ray");
+            btn_draw_rayline.UseVisualStyleBackColor = true;
+            btn_draw_rayline.Click += btn_draw_rayline_Click;
+            // 
             // label1
             // 
             label1.BackColor = Color.Black;
-            label1.Location = new Point(582, 0);
+            label1.Location = new Point(456, 1);
             label1.Name = "label1";
-            label1.Size = new Size(10, 41);
+            label1.Size = new Size(4, 41);
             label1.TabIndex = 13;
             label1.Text = "label1";
             // 
@@ -299,7 +312,7 @@
             // btn_draw_circle
             // 
             btn_draw_circle.Image = (Image)resources.GetObject("btn_draw_circle.Image");
-            btn_draw_circle.Location = new Point(496, 4);
+            btn_draw_circle.Location = new Point(505, 4);
             btn_draw_circle.Name = "btn_draw_circle";
             btn_draw_circle.Size = new Size(37, 37);
             btn_draw_circle.TabIndex = 11;
@@ -310,7 +323,7 @@
             // btn_draw_ruler
             // 
             btn_draw_ruler.Image = (Image)resources.GetObject("btn_draw_ruler.Image");
-            btn_draw_ruler.Location = new Point(455, 4);
+            btn_draw_ruler.Location = new Point(464, 4);
             btn_draw_ruler.Name = "btn_draw_ruler";
             btn_draw_ruler.Size = new Size(37, 37);
             btn_draw_ruler.TabIndex = 10;
@@ -401,7 +414,7 @@
             btn_drwa_scribble.Name = "btn_drwa_scribble";
             btn_drwa_scribble.Size = new Size(37, 37);
             btn_drwa_scribble.TabIndex = 2;
-            toolTip_draw.SetToolTip(btn_drwa_scribble, "Create pushpin");
+            toolTip_draw.SetToolTip(btn_drwa_scribble, "Scribble");
             btn_drwa_scribble.UseVisualStyleBackColor = true;
             // 
             // btn_draw_pushpin
@@ -470,23 +483,23 @@
             // textBox_editor
             // 
             textBox_editor.Location = new Point(288, 168);
+            textBox_editor.Multiline = true;
             textBox_editor.Name = "textBox_editor";
+            textBox_editor.ScrollBars = ScrollBars.Both;
             textBox_editor.Size = new Size(100, 23);
             textBox_editor.TabIndex = 6;
             textBox_editor.Visible = false;
             textBox_editor.VisibleChanged += textBox_editor_VisibleChanged;
             textBox_editor.Leave += textBox_editor_Leave;
             // 
-            // btn_draw_rayline
+            // label2
             // 
-            btn_draw_rayline.Image = (Image)resources.GetObject("btn_draw_rayline.Image");
-            btn_draw_rayline.Location = new Point(539, 3);
-            btn_draw_rayline.Name = "btn_draw_rayline";
-            btn_draw_rayline.Size = new Size(37, 37);
-            btn_draw_rayline.TabIndex = 14;
-            toolTip_draw.SetToolTip(btn_draw_rayline, "Ray");
-            btn_draw_rayline.UseVisualStyleBackColor = true;
-            btn_draw_rayline.Click += btn_draw_rayline_Click;
+            label2.BackColor = Color.Black;
+            label2.Location = new Point(589, 2);
+            label2.Name = "label2";
+            label2.Size = new Size(4, 41);
+            label2.TabIndex = 15;
+            label2.Text = "label2";
             // 
             // SgxMapControl
             // 
@@ -548,5 +561,6 @@
         private Button button1;
         private Label label1;
         private Button btn_draw_rayline;
+        private Label label2;
     }
 }

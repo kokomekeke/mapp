@@ -29,12 +29,13 @@ namespace SgxMap.Objects
         public MapTextBox(PointLatLng pointLatLng, string text)
             : base(pointLatLng, text)
         {
-
+            FillColor = Color.White;
         }
 
         public MapTextBox(string name, PointLatLng pointLatLng, string text, Font font)
             : base(name, pointLatLng, text, font)
         {
+            FillColor = Color.White;
         }
 
 

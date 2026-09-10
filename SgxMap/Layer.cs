@@ -10,6 +10,7 @@ using System.Runtime.Serialization;
 using GMap.NET;
 using SgxMap.ObjectModel;
 using SgxMap.Objects;
+using SgxMap.Objects.ToolTips;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SgxMap
@@ -333,6 +334,7 @@ namespace SgxMap
             {
                 var marker = new MapBaseMarker("", p, size, color);
                 AddObject(marker);
+                AddToolTip(marker, "Próba");
                 return marker;
             }
             return null;
@@ -344,6 +346,7 @@ namespace SgxMap
             {
                 var marker = new MapBaseMarker(name, p, size, color);
                 AddObject(marker);
+                AddToolTip(marker, "Próba");
                 return marker;
             }
             return null;
@@ -419,6 +422,20 @@ namespace SgxMap
             var p = new MapLinePoint("", parent, point, color, movement);
             MapPanel.AddLinePoint(this, p);
             return p;
+        }
+
+        public MapToolTip AddToolTip(MapToolTip toolTip)
+        {
+            AddObject(toolTip);
+            return toolTip;
+        }
+
+        public MapToolTip AddToolTip(MapBaseMarker marker, string text)
+        {
+            var t = marker.AddToolTip();
+            marker.ToolTipText = text;
+            AddObject(t);
+            return t;
         }
 
 

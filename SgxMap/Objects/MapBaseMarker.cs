@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
 using GMap.NET.MapProviders;
+using SgxMap.Objects.ToolTips;
 
 namespace SgxMap.Objects
 {
@@ -25,12 +26,12 @@ namespace SgxMap.Objects
         public bool DisableRegionCheck;             // if true, marker will be rendered even if it's outside current view
         protected PointLatLng m_oldposition;
 
-        /// <summary>
-        /// background color
-        /// </summary>
-        [NonSerialized]
-        //protected SolidBrush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
         protected Pen BorderPen = new Pen(Color.Black);
+
+        protected MapToolTip m_toolTip;
+        protected MarkerTooltipMode m_toolTipMode = MarkerTooltipMode.Always;
+        string m_toolTipText;
+
 
         public BasePoint? Parent
         {
@@ -64,20 +65,6 @@ namespace SgxMap.Objects
         }
 
 
-
-        /// <summary>
-        ///     ToolTip position in local coordinates
-        /// </summary>
-        public Point ToolTipPosition
-        {
-            get
-            {
-                var ret = m_area.Location + new Size(m_area.Size.Width / 2, m_area.Size.Height / 2);
-                ret.Offset(-Offset.X, -Offset.Y);
-                return ret;
-            }
-        }
-
         public Size Size
         {
             get
@@ -102,33 +89,72 @@ namespace SgxMap.Objects
         }
 
 
-        //public GMapToolTip ToolTip;
+        public MapToolTip ToolTip
+        {
+            get { return m_toolTip; }
+        }
 
-        //public MarkerTooltipMode ToolTipMode = MarkerTooltipMode.OnMouseOver;
+        /// <summary>
+        ///     ToolTip position in local coordinates
+        /// </summary>
+        public Point ToolTipPosition
+        {
+            get
+            {
+                var ret = m_area.Location + new Size(m_area.Size.Width / 2, m_area.Size.Height / 2);
+                ret.Offset(-Offset.X, -Offset.Y);
+                return ret;
+            }
+        }
 
-        //string _toolTipText;
+        public virtual string ToolTipText
+        {
+            get
+            {
+                return m_toolTipText;
+            }
 
-        //public virtual string ToolTipText
-        //{
-        //    get
-        //    {
-        //        return _toolTipText;
-        //    }
+            set
+            {
+                if (m_toolTip == null && !string.IsNullOrEmpty(value))
+                {
+                    m_toolTip = new MapToolTip(this);
+                }
 
-        //    set
-        //    {
-        //        if (ToolTip == null && !string.IsNullOrEmpty(value))
-        //        {
-        //            ToolTip = new GMapRoundedToolTip(this);
-        //        }
-
-        //        _toolTipText = value;
-        //    }
-        //}
-
+                m_toolTipText = value;
+                Layer?.RefreshObject(this);
+            }
+        }
 
 
+        public MarkerTooltipMode ToolTipMode
+        {
+            get { return m_toolTipMode; }
+            set
+            {
+                if (value != m_toolTipMode)
+                {
+                    m_toolTipMode = value;
+                    Layer?.RefreshObject(this);
+                }
+            }
+        }
 
+
+        public override bool IsVisible
+        {
+            get { return m_isVisible; }
+            set
+            {
+                if (m_isVisible == value)
+                {
+                    m_isVisible = value;
+                    m_toolTip.IsVisible = value && m_toolTipMode != MarkerTooltipMode.Never;
+                }
+            }
+        }
+
+        //--------------------------------------------------------------------------------------
 
         public MapBaseMarker()
         {
@@ -197,6 +223,14 @@ namespace SgxMap.Objects
         public void Reset()
         {
             Parent = null;
+        }
+
+        public MapToolTip AddToolTip()
+        { 
+            var t = new MapToolTip(this);
+            Layer.AddToolTip(t);
+            t.IsVisible = IsVisible && m_toolTipMode != MarkerTooltipMode.Never;
+            return t;
         }
 
         public virtual void CopyToClipboard()

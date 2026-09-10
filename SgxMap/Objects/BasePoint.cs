@@ -60,7 +60,7 @@ namespace SgxMap.Objects
         [NonSerialized] public Pen Stroke = new Pen(Brushes.Black, 2);
         [NonSerialized] public Pen NormalStroke = new Pen(Brushes.Black, 2);
         [NonSerialized] public Pen HighlightStroke = new Pen(Brushes.Red, 3);
-        [NonSerialized] public SolidBrush Fill = new SolidBrush(Color.Blue);
+        [NonSerialized] public SolidBrush Fill = new SolidBrush(Color.White);
 
         public long ID
         {
@@ -167,7 +167,7 @@ namespace SgxMap.Objects
         }
 
 
-        public bool IsVisible
+        public virtual bool IsVisible
         {
             get { return m_isVisible; }
             set
