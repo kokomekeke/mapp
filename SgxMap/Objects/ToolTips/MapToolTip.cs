@@ -13,14 +13,14 @@ namespace SgxMap.Objects.ToolTips
     {
         protected readonly MapBaseMarker m_marker;
         protected Point Offset;
-        protected Size TextPadding = new Size(20, 21);  // text padding
+        protected Size TextPadding = new Size(20, 5);  // text padding
 
         protected readonly StringFormat m_Format = new StringFormat();
 
         protected Font TextFont = new Font(FontFamily.GenericSansSerif, 11, FontStyle.Regular, GraphicsUnit.Pixel);
         protected Font TitleFont = new Font(FontFamily.GenericSansSerif, 11, FontStyle.Bold, GraphicsUnit.Pixel);
         protected SolidBrush TitleFill = new SolidBrush(Color.LightGray);  // title text foreground  (use Fill for text background)
-
+        protected Brush TextColor = new SolidBrush(Color.Black); 
 
         public MapBaseMarker Marker
         {
@@ -64,11 +64,16 @@ namespace SgxMap.Objects.ToolTips
                 st.Width + TextPadding.Width,
                 st.Height + TextPadding.Height);
             rect.Offset(Offset.X, Offset.Y);
-            rectText.Offset(Offset.X + 7, Offset.Y + 7);
-            g.DrawLine(Stroke, Marker.ToolTipPosition.X, Marker.ToolTipPosition.Y, rect.X, rect.Y + rect.Height / 2);
-            g.DrawLine(Stroke, Marker.ToolTipPosition.X, Marker.ToolTipPosition.Y, rect.X, rect.Y + rect.Height);
-            g.FillRectangle(Fill, rect);
+            rectText.Offset(Offset.X + 7, Offset.Y + 2);
             DrawRoundRectangle(g, Stroke, rect.X, rect.Y, rect.Width, rect.Height, 8);
+
+            var p1 = new Point((int)(rect.X + +rect.Width / 8), (int)(rect.Y + rect.Height-1));  
+            var p2 = new Point((int)(rect.X + rect.Width/4), (int)(rect.Y + rect.Height-1));
+            var pnts = new Point[] { Marker.ToolTipPosition, p1, p2, Marker.ToolTipPosition };
+            g.FillPolygon(Fill, pnts);
+            g.DrawLine(Stroke, Marker.ToolTipPosition, p1);
+            g.DrawLine(Stroke, Marker.ToolTipPosition, p2);
+
             //g.DrawString(Marker.ToolTipText, Font, Foreground, rectText, Format);
             WriteString(g, Marker.ToolTipText, rectText);
             g.Flush();
@@ -112,11 +117,11 @@ namespace SgxMap.Objects.ToolTips
                     if (vec2.Length > 0)
                     {
                         var st = g.MeasureString(vec2[0], TitleFont).ToSize();
-                        g.DrawString(string.Format("{0}", vec2[0]), TitleFont, TitleFill, rectText, m_Format);
+                        g.DrawString(string.Format("{0}", vec2[0]), TitleFont, TextColor, rectText, m_Format);
                         rectText.X += st.Width + 2;
                         if (vec2.Length > 1)
                         {
-                            g.DrawString(vec2[1], TextFont, Fill, rectText, m_Format);
+                            g.DrawString(vec2[1], TextFont, TextColor, rectText, m_Format);
                         }
 
                         rectText.X -= st.Width + 2;

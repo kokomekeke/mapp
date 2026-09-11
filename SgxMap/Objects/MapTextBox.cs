@@ -21,6 +21,7 @@ namespace SgxMap.Objects
         //[NonSerialized] public Brush FillColor = new SolidBrush(Color.White);    // background color
 
         public Size TextPadding = new Size(3, 3);
+        protected Size m_size; 
 
         public MapTextBox()
         {
@@ -74,6 +75,7 @@ namespace SgxMap.Objects
                 st.Width + 2 * TextPadding.Width,
                 st.Height + TextPadding.Height);
 
+            m_size = new Size(rect.Width, rect.Height);
             var rectText = rect;
             rectText.Offset(TextPadding.Width, TextPadding.Height); //Inflate(-TextPadding.Width, -TextPadding.Height);
 
@@ -81,6 +83,27 @@ namespace SgxMap.Objects
             g.DrawRectangle(Stroke, rect);
             g.DrawString(Text, Font, TextColor, rectText);
             g.Flush();
+        }
+
+
+        public override bool IsInside(int x, int y)
+        {
+            if (!m_size.IsEmpty)
+                return (x >= LocalPosition.X) && (x <= (LocalPosition.X + m_size.Width)) &&
+                        (y <= LocalPosition.Y) && (y >= (LocalPosition.Y - m_size.Height));
+            return false;
+        }
+
+        public override bool IsInside(PointLatLng p)
+        {
+            if (m_graphicsPath != null)
+            {
+                var d = m_layer?.FromLatLngToLocalPosition(p);
+                if (d != null)
+                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, NormalStroke);
+            }
+
+            return false;
         }
 
 
