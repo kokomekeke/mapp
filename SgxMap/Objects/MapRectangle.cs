@@ -47,13 +47,35 @@ namespace SgxMap.Objects
         }
 
 
+        public float LocalWidth
+        { 
+            get { return m_localWidth; } 
+        }
+
+        public float LocalHeight
+        {
+            get { return m_localHeight; }
+        }
+
+
+
+        //---------------------------------------------------------------------------------------------
+
+        public MapRectangle()
+            : base()
+        {
+
+        }
+
         public MapRectangle(PointLatLng center, float width, float height, System.Drawing.Color color )
         {
             Position = center;
             m_width = width;
             m_height = height;
             Color = color;
+            Position2 = PointLatLng.Add(Position, new SizeLatLng((int)width, (int)height));
         }
+
 
         public MapRectangle(PointLatLng topleft, PointLatLng bottomright, System.Drawing.Color color)
         {
@@ -70,6 +92,7 @@ namespace SgxMap.Objects
             m_width = width;
             m_height = height;
             Color = color;
+            Position2 = PointLatLng.Add(Position, new SizeLatLng((int)width, (int)height));
         }
 
 

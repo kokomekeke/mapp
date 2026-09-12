@@ -5,7 +5,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
-*          Last modification                                       02-Sep-2026.
+*          Last modification                                       12-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET;
+using GMap.NET.Internals;
 using GMap.NET.MapProviders;
+using SgxMap.Objects;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static GMap.NET.Entity.OpenStreetMapGraphHopperGeocodeEntity;
 //using GMap.NET;
 //using GMap.NET.Internals;
 
@@ -26,6 +30,8 @@ namespace SgxMap
     public partial class SgxMapControl : UserControl
     {
         private object m_monitor = new object();
+
+        private MapTextBox m_textbox;
 
         public bool ShowToolbar
         {
@@ -82,8 +88,8 @@ namespace SgxMap
             MainMap.MouseDown += MainMap_MouseDown;
             MainMap.OnShowPlaceInfo += MainMap_ShowPlaceInfo;
             MainMap.OnShowPlaceInfoEx += MainMap_ShowPlaceInfoEx;
+            MainMap.OnTextBoxEdit += MainMap_OnTextBoxEdit;
         }
-
 
 
         public void LoadControls()
@@ -198,7 +204,7 @@ namespace SgxMap
             };
             m.Items.Add(m5);
 
-            m.Show(DrawPanel, new Point(btn_draw.Left, btn_draw.Bottom));
+            m.Show(DrawPanel, new System.Drawing.Point(btn_draw.Left, btn_draw.Bottom));
         } /* btn_draw_Click */
 
         private void btn_drtaw_line_Click(object sender, EventArgs e)
@@ -273,33 +279,64 @@ namespace SgxMap
 
         private void MainMap_MouseClick(object sender, MouseEventArgs e)
         {
-            if (MainMap.MouseMoveStatus == MouseMoveStatusType.Textbox)
-            {
-                if (textBox_editor.Visible)
-                {
-                    if (textBox_editor.Focused)
-                        return;
-                    textBox_editor.Visible = false;
-                    MainMap.MouseMoveStatus = MouseMoveStatusType.None;
-                    var t = MainMap.Layers[0].AddTextBox("", textBox_editor.Location.X, textBox_editor.Location.Y - MainMap.Location.Y + textBox_editor.Height, textBox_editor.Text, DefaultFont);
-                    if (t != null)
-                    {
-                        t.Color = Color.Red;
-                        t.Thickness = 1;
-                    }
-                    return;
-                }
-                textBox_editor.Visible = true;
-                textBox_editor.Text = string.Empty;
-                textBox_editor.Location = new Point(e.X, e.Y + MainMap.Location.Y);
-                textBox_editor.Focus();
-                Monitor.Enter(m_monitor);
-            }
+            //if (MainMap.MouseMoveStatus == MouseMoveStatusType.Textbox)
+            //{
+            //    if (textBox_editor.Visible)
+            //    {
+            //        if (textBox_editor.Focused)
+            //            return;
+            //        textBox_editor.Visible = false;
+            //        MainMap.MouseMoveStatus = MouseMoveStatusType.None;
+            //        var t = MainMap.Layers[0].AddTextBox("", textBox_editor.Location.X, textBox_editor.Location.Y - MainMap.Location.Y + textBox_editor.Height, textBox_editor.Text, DefaultFont);
+            //        if (t != null)
+            //        {
+            //            t.Color = Color.Red;
+            //            t.Thickness = 1;
+            //        }
+            //        return;
+            //    }
+            //    textBox_editor.Visible = true;
+            //    textBox_editor.Text = string.Empty;
+            //    textBox_editor.Location = new Point(e.X, e.Y + MainMap.Location.Y);
+            //    textBox_editor.Focus();
+            //    Monitor.Enter(m_monitor);
+            //}
+
+            //var pos = MainMap.FromLocalToLatLng(e.X, e.Y);
+            //var loc = MainMap.FromLatLngToLocal(pos);
+            //var l2 = MainMap.FromLatLngToLocalPosition(pos);
+            //var l3 = MainMap.Core.FromLatLngToLocal(pos);
+            //var g1 = MainMap.FromLatLngToPixel(pos);
+            //var g2 = g1;
+            //g2.Offset(MainMap.Core.RenderOffset);
+
+
+            if (m_textbox != null)
+                m_textbox.Text = textBox_editor.Text;
+            if (textBox_editor.Visible)
+                textBox_editor.Visible = false;
+        }
+
+
+        private void MainMap_OnTextBoxEdit(MapTextBox textbox)
+        {
+            m_textbox = textbox;
+            var g = MainMap.FromLatLngToLocal(textbox.Position);
+            textBox_editor.Location = new System.Drawing.Point((int)g.X, (int)(g.Y + MainMap.Location.Y));
+            //textBox_editor.Location = new System.Drawing.Point(textbox.mouse_x, textbox.mouse_y + MainMap.Location.Y);
+            textBox_editor.Width = (int)textbox.LocalWidth;
+            textBox_editor.Height = (int)textbox.LocalHeight;
+            textBox_editor.Visible = true;
+            textBox_editor.Text = textbox.Text;
+            textBox_editor.Focus();
+            Monitor.Enter(m_monitor);
         }
 
         private void btn_newMap_Click(object sender, EventArgs e)
         {
             MainMap.ClearAll();
+            if (textBox_editor.Visible)
+                textBox_editor.Visible = false;
         }
 
     } /* class SgxMapControl */

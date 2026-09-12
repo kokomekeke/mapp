@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
-*          Last modification                                       04-Sep-2026.
+*          Last modification                                       12-Sep-2026.
 =============================================================================*/
 using System.Runtime.Serialization;
 using GMap.NET;
@@ -310,7 +310,7 @@ namespace SgxMap
 
         public MapTextBox AddTextBox(string name, PointLatLng point, string text, System.Drawing.Font font)
         {
-            var label = new MapTextBox(name, point, text, font);
+            var label = new MapTextBox(name, point, 5, 5, text, font);
             AddObject(label);
             return label;
         }
@@ -320,7 +320,7 @@ namespace SgxMap
             var p1 = MapPanel.FromLocalToLatLng(x, y);
             if (!p1.IsEmpty)
             {
-                var label = new MapTextBox(name, p1, text, font);
+                var label = new MapTextBox(name, p1, 5, 5, text, font);
                 AddObject(label);
                 return label;
             }
@@ -334,7 +334,7 @@ namespace SgxMap
             {
                 var marker = new MapBaseMarker("", p, size, color);
                 AddObject(marker);
-                AddToolTip(marker, "Próba");
+                marker.TooltipTextType = MarketTooltipTextType.Location;
                 return marker;
             }
             return null;
@@ -346,7 +346,8 @@ namespace SgxMap
             {
                 var marker = new MapBaseMarker(name, p, size, color);
                 AddObject(marker);
-                AddToolTip(marker, "Próba");
+                marker.TooltipTextType = MarketTooltipTextType.Location;
+                //AddToolTip(marker, "Próba");
                 return marker;
             }
             return null;
@@ -415,6 +416,18 @@ namespace SgxMap
             AddObject(rec);
             return rec;
         }
+
+        public MapTextBox AddTextBox(int x, int y, Color color)
+        {
+            var p = MapPanel.FromLocalToLatLng(x, y);
+            var rec = new MapTextBox(p, 0.1f, 0.1f, string.Empty);
+            rec.mouse_x = x;
+            rec.mouse_y = y;
+            AddObject(rec);
+            return rec;
+        }
+
+
 
 
         public MapLinePoint AddLinePoint(BasePoint parent, PointLatLng point, MovementType movement,  Color color)

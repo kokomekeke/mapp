@@ -18,6 +18,7 @@ namespace SgxMap.Objects
             Name = Parent.Name;
             Fill = new SolidBrush(color);
             Stroke = new Pen(Color.Red);
+            ToolTipMode = MarkerTooltipMode.Never;
         }
 
         public MapLinePoint(string name, BasePoint parent, PointLatLng p, Color color, MovementType movement)
@@ -27,6 +28,7 @@ namespace SgxMap.Objects
             m_movement = movement;
             Fill = new SolidBrush(color);
             Stroke = new Pen(Color.Red);
+            ToolTipMode = MarkerTooltipMode.Never;
         }
 
         public override void OnRender(Graphics g)

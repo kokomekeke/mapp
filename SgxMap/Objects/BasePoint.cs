@@ -234,7 +234,7 @@ namespace SgxMap.Objects
             get { return m_isfilled; }
             set
             {
-                if (value = m_isfilled)
+                if (value != m_isfilled)
                 {
                     m_isfilled = value;
                     UpdateLocalPosition();
@@ -377,7 +377,7 @@ namespace SgxMap.Objects
             { 
                 if (m_isfilled)
                      g.FillPath(Fill, m_graphicsPath);
-                else g.DrawPath(Stroke, m_graphicsPath);
+                g.DrawPath(Stroke, m_graphicsPath);
             }
         }
 

@@ -7,13 +7,16 @@
 =============================================================================*/
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
 using GMap.NET.MapProviders;
+using Newtonsoft.Json.Linq;
 using SgxMap.Objects.ToolTips;
+using Extensions = GMap.NET.Extensions;
 
 namespace SgxMap.Objects
 {
@@ -30,6 +33,7 @@ namespace SgxMap.Objects
 
         protected MapToolTip m_toolTip;
         protected MarkerTooltipMode m_toolTipMode = MarkerTooltipMode.Always;
+        protected MarketTooltipTextType m_toolTipTextType = MarketTooltipTextType.Location;
         string m_toolTipText;
 
 
@@ -122,6 +126,7 @@ namespace SgxMap.Objects
                 }
 
                 m_toolTipText = value;
+                m_toolTipTextType = MarketTooltipTextType.Custom;
                 Layer?.RefreshObject(this);
             }
         }
@@ -140,6 +145,17 @@ namespace SgxMap.Objects
             }
         }
 
+
+        public MarketTooltipTextType TooltipTextType
+        {
+            get { return m_toolTipTextType; }
+            set
+            {
+                m_toolTipTextType = value;
+                ChangeTooltipText(Position);
+                Layer?.RefreshObject(this);
+            }
+        }
 
         public override bool IsVisible
         {
@@ -165,6 +181,7 @@ namespace SgxMap.Objects
         {
             Size = size;
             Fill = new SolidBrush(color);
+            SetTooltipText(pos);
         }
 
         public MapBaseMarker(string name, PointLatLng pos, int size, Color color)
@@ -172,6 +189,7 @@ namespace SgxMap.Objects
         {
             Size = new Size(size, size);
             Fill = new SolidBrush(color);
+            SetTooltipText(pos);
         }
 
 
@@ -229,7 +247,7 @@ namespace SgxMap.Objects
         { 
             var t = new MapToolTip(this);
             Layer.AddToolTip(t);
-            t.IsVisible = IsVisible && m_toolTipMode != MarkerTooltipMode.Never;
+            SetTooltipText(Position);
             return t;
         }
 
@@ -244,6 +262,33 @@ namespace SgxMap.Objects
             Stroke = new Pen(color, Stroke.Width);
         }
 
+        public void ChangeTooltipText(PointLatLng point)
+        {
+            if (m_toolTip == null)
+            {
+                m_toolTip = AddToolTip();
+            }
+            else SetTooltipText(point);
+
+            m_toolTip.IsVisible = IsVisible && m_toolTipMode != MarkerTooltipMode.Never &&
+                                (!string.IsNullOrEmpty(m_toolTipText) || (m_toolTipTextType == MarketTooltipTextType.Custom));
+        }
+
+        public void SetTooltipText(PointLatLng point)
+        {
+            switch (m_toolTipTextType)
+            {
+                case MarketTooltipTextType.MarkerName: m_toolTipText = Name; break;
+                case MarketTooltipTextType.Location: m_toolTipText = point.ToGeoString(); break;
+                case MarketTooltipTextType.Address: m_toolTipText = Layer.MapPanel.GetPlaceAddress(point); break;
+                case MarketTooltipTextType.LocationAdderss: m_toolTipText = point.ToGeoString() + "   " + Layer.MapPanel.GetPlaceAddress(point); break;
+                case MarketTooltipTextType.None: m_toolTipText = string.Empty; break;
+            }
+
+        }
+
+
+
         protected override void MoveTo(PointLatLng pos)
         {
             if (pos == m_position)
@@ -251,6 +296,8 @@ namespace SgxMap.Objects
 
             m_oldposition = m_position;
             base.MoveTo(pos);
+
+            ChangeTooltipText(pos);
 
             if (IsVisible)
             {

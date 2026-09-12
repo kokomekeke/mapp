@@ -47,6 +47,7 @@
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
             DrawPanel = new Panel();
+            label2 = new Label();
             btn_draw_rayline = new Button();
             label1 = new Label();
             button1 = new Button();
@@ -65,7 +66,6 @@
             MainMap = new SgxMapPanel();
             toolTip_draw = new ToolTip(components);
             textBox_editor = new TextBox();
-            label2 = new Label();
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
@@ -89,6 +89,7 @@
             TopPanel.Name = "TopPanel";
             TopPanel.Size = new Size(669, 33);
             TopPanel.TabIndex = 0;
+            TopPanel.MouseClick += MainMap_MouseClick;
             // 
             // btn_printMap
             // 
@@ -276,6 +277,15 @@
             DrawPanel.Name = "DrawPanel";
             DrawPanel.Size = new Size(669, 49);
             DrawPanel.TabIndex = 4;
+            // 
+            // label2
+            // 
+            label2.BackColor = Color.Black;
+            label2.Location = new Point(589, 2);
+            label2.Name = "label2";
+            label2.Size = new Size(4, 41);
+            label2.TabIndex = 15;
+            label2.Text = "label2";
             // 
             // btn_draw_rayline
             // 
@@ -486,20 +496,11 @@
             textBox_editor.Multiline = true;
             textBox_editor.Name = "textBox_editor";
             textBox_editor.ScrollBars = ScrollBars.Both;
-            textBox_editor.Size = new Size(100, 23);
+            textBox_editor.Size = new Size(100, 46);
             textBox_editor.TabIndex = 6;
             textBox_editor.Visible = false;
             textBox_editor.VisibleChanged += textBox_editor_VisibleChanged;
             textBox_editor.Leave += textBox_editor_Leave;
-            // 
-            // label2
-            // 
-            label2.BackColor = Color.Black;
-            label2.Location = new Point(589, 2);
-            label2.Name = "label2";
-            label2.Size = new Size(4, 41);
-            label2.TabIndex = 15;
-            label2.Text = "label2";
             // 
             // SgxMapControl
             // 
@@ -513,6 +514,7 @@
             Controls.Add(TopPanel);
             Name = "SgxMapControl";
             Size = new Size(669, 339);
+            MouseClick += MainMap_MouseClick;
             TopPanel.ResumeLayout(false);
             BottomPanel.ResumeLayout(false);
             BottomPanel.PerformLayout();

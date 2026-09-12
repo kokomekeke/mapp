@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
-*          Last modification                                       04-Sep-2026.
+*          Last modification                                       12-Sep-2026.
 =============================================================================*/
 using System.ComponentModel;
 using System.Diagnostics;
@@ -104,6 +104,7 @@ namespace SgxMap
         public GeoCircle? m_MapCircle = null;
         public MapBaseMarker? m_MapMarker = null;
         public MapRayLine? m_MapRayLine = null;
+        public MapTextBox? m_MapTextBox = null;
 
         //.. selected objects
         public BasePoint? m_selected_object = null; 
@@ -1306,6 +1307,10 @@ namespace SgxMap
                             m_MapRayLine = Layers[0].AddRayLine(e.X, e.Y, Color.Black);
                             break;
 
+                        case MouseMoveStatusType.Textbox:
+                            m_MapTextBox = Layers[0].AddTextBox(e.X, e.Y, Color.Black);
+                            break;
+
                     } /* switch */
                 }
 
@@ -1379,6 +1384,12 @@ namespace SgxMap
                 m_MapRayLine = null;
             }
 
+            if (m_MapTextBox != null)
+            {
+                OnTextBoxEdit?.Invoke(m_MapTextBox);
+                m_MapTextBox = null;
+            }
+
             if (m_selected_linepoint != null)
             {
                 m_selected_linepoint.Parent?.UpdateLinePoints();
@@ -1388,6 +1399,7 @@ namespace SgxMap
                 MouseMoveStatus = MouseMoveStatusType.None;
                 return;
             }
+
 
             if (m_isSelecting)          // selecting an area
             {
@@ -1441,7 +1453,7 @@ namespace SgxMap
                 }
             }
 
-            if (MouseMoveStatus != MouseMoveStatusType.Textbox)
+            //if (MouseMoveStatus != MouseMoveStatusType.Textbox)
                 MouseMoveStatus = MouseMoveStatusType.None;
         }  /* OnMouseUp */
 
@@ -1493,6 +1505,13 @@ namespace SgxMap
                 return;
             }
 
+            if (m_MapTextBox != null)
+            {
+                m_MapTextBox.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
+                return;
+            }
+
             if (!Core.IsDragging && !Core.MouseDown.IsEmpty)
             {
                 var p = ApplyRotationInversion(e.X, e.Y);
@@ -1514,6 +1533,7 @@ namespace SgxMap
             {
                 SelectedObject.Shift(m_lastpoint, FromLocalToLatLng(e.X, e.Y));
                 m_lastpoint = FromLocalToLatLng(e.X, e.Y);
+                OnShowPlaceInfo?.Invoke(e.X, e.Y);
             }
 
             if (Core.IsDragging)
@@ -1575,16 +1595,16 @@ namespace SgxMap
 
             if (!Core.IsDragging)
             {
-                bool overlayObject = FindSelectedLinePoint(e);
+                //bool overlayObject = FindSelectedLinePoint(e);
 
-                if (!overlayObject && Core.MouseDown != GPoint.Empty)
-                    OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
-                if (overlayObject)
-                    return;
+                //if (!overlayObject && Core.MouseDown != GPoint.Empty)
+                //    OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
+                //if (overlayObject)
+                //    return;
 
-                overlayObject = FindSelectedObject(e);
+                //overlayObject = FindSelectedObject(e);
 
-                if (!overlayObject && Core.MouseDown != GPoint.Empty)
+                //if (!overlayObject && Core.MouseDown != GPoint.Empty)
                     OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
             }
         } /* OnMouseClick */
@@ -1595,7 +1615,11 @@ namespace SgxMap
 
             if (!Core.IsDragging)
             {
-                bool overlayObjet = false;
+                bool overlayObjet = FindSelectedObject(e);
+                if (m_selected_object is MapTextBox)
+                {
+                    OnTextBoxEdit?.Invoke(m_selected_object as MapTextBox);
+                }
 
                 if (!overlayObjet && Core.MouseDown != GPoint.Empty)
                     OnMapDoubleClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
@@ -1876,11 +1900,7 @@ namespace SgxMap
         /// </summary>
         public event SelectionChange? OnSelectionChange;
 
-        /// <summary>
-        ///     occurs on mouse enters marker area
-        /// </summary>
-
-
+        public event TextBoxEdit? OnTextBoxEdit;
 
         /// <summary>
         ///     Import From Kmz
@@ -4004,6 +4024,17 @@ namespace SgxMap
         Always,
     }
 
+    public enum MarketTooltipTextType
+    {
+        None,
+        MarkerName,
+        Location,
+        Address,
+        LocationAdderss,
+        DF,
+        Custom,
+    }
+
 
     #endregion Enums
 
@@ -4015,8 +4046,9 @@ namespace SgxMap
     public delegate void MapDoubleClick(PointLatLng pointClick, MouseEventArgs e);
 
     public delegate void ShowPlaceInfo(int x, int y);
-
     public delegate void ShowPlaceInfoEx(int x, int y, double bearing, double distance);
+
+    public delegate void TextBoxEdit(MapTextBox textbox);
 
     #endregion Delegates
 
