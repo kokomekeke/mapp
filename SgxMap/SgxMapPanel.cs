@@ -17,7 +17,7 @@ using GMap.NET.Internals;
 using GMap.NET.MapProviders;
 using GMap.NET.Projections;
 using SgxMap.ObjectModel;
-using SgxMap.Objects;
+using SgxMap.Shapes;
 
 
 namespace SgxMap
@@ -582,9 +582,9 @@ namespace SgxMap
             {
                 if (string.IsNullOrEmpty(name) && l.IsZoomSignificant || l.Name == name)
                 {
-                    if (l.IsVisible && l.Objects.Count > 0)
+                    if (l.IsVisible && l.Shapes.Count > 0)
                     {
-                        foreach (var o in l.Objects)
+                        foreach (var o in l.Shapes)
                         {
                             if (o.IsVisible)
                             {

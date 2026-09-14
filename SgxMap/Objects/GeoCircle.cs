@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using GMap.NET;
 using GMap.NET.Internals;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     public class GeoCircle: MapPolyLine, ISerializable, IDeserializationCallback, IDisposable
     {

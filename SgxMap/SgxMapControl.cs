@@ -5,7 +5,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
-*          Last modification                                       12-Sep-2026.
+*          Last modification                                       14-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ using System.Windows.Forms;
 using GMap.NET;
 using GMap.NET.Internals;
 using GMap.NET.MapProviders;
-using SgxMap.Objects;
+using SgxMap.Shapes;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static GMap.NET.Entity.OpenStreetMapGraphHopperGeocodeEntity;
 //using GMap.NET;
@@ -32,6 +32,12 @@ namespace SgxMap
         private object m_monitor = new object();
 
         private MapTextBox m_textbox;
+
+        private Color m_selected_fillcolor = Color.Blue;
+        private Color m_selected_linecolor = Color.Green;
+        private Color m_selected_textcolor = Color.Red;
+        private int m_selected_linewidth = 1;
+        private int selected_arrowstale = 0;
 
         public bool ShowToolbar
         {
@@ -337,6 +343,135 @@ namespace SgxMap
             MainMap.ClearAll();
             if (textBox_editor.Visible)
                 textBox_editor.Visible = false;
+        }
+
+        private void btn_fill_down_Click(object sender, EventArgs e)
+        {
+            var dlg = new ColorDialog();
+            dlg.Color = m_selected_fillcolor;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                m_selected_fillcolor = dlg.Color;
+
+                if (MainMap.SelectedObject != null)
+                    MainMap.SelectedObject.FillColor = m_selected_fillcolor;
+            }
+        }
+
+        private void btn_fill_color_Click(object sender, EventArgs e)
+        {
+            if (MainMap.SelectedObject != null)
+                MainMap.SelectedObject.FillColor = m_selected_fillcolor;
+        }
+
+        private void btn_linecolor_down_Click(object sender, EventArgs e)
+        {
+            var dlg = new ColorDialog();
+            dlg.Color = m_selected_linecolor;
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                m_selected_linecolor = dlg.Color;
+                btn_draw_linecolor_Click(sender, e);
+            }
+        }
+
+        private void btn_draw_linecolor_Click(object sender, EventArgs e)
+        {
+            if (MainMap.SelectedObject == null)
+                return;
+
+            if (MainMap.SelectedObject is MapLine)
+                (MainMap.SelectedObject as MapLine).LineColor = m_selected_linecolor;
+
+            if (MainMap.SelectedObject is MapPolyLine)
+                (MainMap.SelectedObject as MapPolyLine).LineColor = m_selected_linecolor;
+        }
+
+        private void btn_textcolor_down_Click(object sender, EventArgs e)
+        {
+            var dlg = new ColorDialog();
+            dlg.Color = m_selected_textcolor;
+            if (dlg.ShowDialog(this) == DialogResult.OK)
+            {
+                m_selected_textcolor = dlg.Color;
+                btn_draw_textcolor_Click(sender, e);
+            }
+
+        }
+
+        private void btn_draw_textcolor_Click(object sender, EventArgs e)
+        {
+            if (MainMap.SelectedObject == null)
+                return;
+
+            if (MainMap.SelectedObject is MapTextBox)
+            {
+                (MainMap.SelectedObject as MapTextBox).TextColor = m_selected_textcolor;
+            }
+        }
+
+        private void btn_draw_linewidth_Click(object sender, EventArgs e)
+        {
+            menu_linewidth.Enabled = true;
+            menu_linewidth.Show(DrawPanel, new System.Drawing.Point(btn_draw_linewidth.Left, btn_draw_linewidth.Bottom));
+        }
+
+        private void btn_draw_linearrow_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void SetSelectedLineWidth(int width)
+        {
+            m_selected_linewidth = width;
+            if (MainMap.SelectedObject == null)
+                return;
+
+            if (MainMap.SelectedObject is MapLine)
+            {
+                (MainMap.SelectedObject as MapLine).Thickness = width;
+            }
+
+            if (MainMap.SelectedObject is MapPolyLine)
+            {
+                (MainMap.SelectedObject as MapPolyLine).Thickness = width;
+            }
+
+        }
+
+        private void ptToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineWidth(1);
+        }
+
+        private void ptToolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineWidth(2);
+        }
+
+        private void ptToolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineWidth(3);
+        }
+
+        private void ptToolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineWidth(4);
+        }
+
+        private void ptToolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineWidth(5);
+        }
+
+        private void ptToolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineWidth(6);
+        }
+
+        private void ptToolStripMenuItem8_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineWidth(8);
         }
 
     } /* class SgxMapControl */

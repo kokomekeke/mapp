@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using GMap.NET;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     [Serializable]
     public class MapLabel : BasePoint, ISerializable, IDeserializationCallback, IDisposable

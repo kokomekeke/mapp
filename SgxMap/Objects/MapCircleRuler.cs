@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     public class MapCircleRuler: MapRuler, ISerializable, IDisposable
     {

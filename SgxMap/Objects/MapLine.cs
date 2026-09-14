@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 using GMap.NET;
 using GMap.NET.MapProviders;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     public class MapLine: BasePoint, ISerializable, IDeserializationCallback, IDisposable
     {

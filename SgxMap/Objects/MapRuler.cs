@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     public class MapRuler : MapLine, ISerializable, IDisposable
     {
@@ -88,7 +88,7 @@ namespace SgxMap.Objects
             {
                 m_label = new MapTextBox(Position2, Length.ToString("F1") + " km ");
                 m_label.Layer = this.Layer;
-                m_label.Font = new Font("Arial", 8);
+                m_label.m_Font = new Font("Arial", 8);
             }
             else m_label.Text = Length.ToString("F1") + " km";
 

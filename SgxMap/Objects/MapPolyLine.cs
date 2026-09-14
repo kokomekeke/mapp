@@ -16,7 +16,7 @@ using GMap.NET;
 using GMap.NET.MapProviders;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     [Serializable]
     public class MapPolyLine : BasePoint, ISerializable, IDeserializationCallback, IDisposable

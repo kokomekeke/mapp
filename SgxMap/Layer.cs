@@ -9,8 +9,8 @@
 using System.Runtime.Serialization;
 using GMap.NET;
 using SgxMap.ObjectModel;
-using SgxMap.Objects;
-using SgxMap.Objects.ToolTips;
+using SgxMap.Shapes;
+using SgxMap.Shapes.ToolTips;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace SgxMap
@@ -27,9 +27,9 @@ namespace SgxMap
 
 
         /// <summary>
-        ///     list of objects, should be thread safe
+        ///     list of shapes, should be thread safe
         /// </summary>
-        public readonly ObservableCollectionThreadSafe<BasePoint> Objects =
+        public readonly ObservableCollectionThreadSafe<BasePoint> Shapes =
             new ObservableCollectionThreadSafe<BasePoint>();
 
 
@@ -125,7 +125,7 @@ namespace SgxMap
         public void AddObject(BasePoint obj)
         {
             if (obj == null) return;
-            Objects.Add(obj);
+            Shapes.Add(obj);
             obj.Layer = this;
             obj.UpdateObject();
         }
@@ -135,7 +135,7 @@ namespace SgxMap
             if (obj == null) return;
             try
             {
-                Objects.Remove(obj);
+                Shapes.Remove(obj);
                 obj.Layer = null;
             }
             catch { };
@@ -143,11 +143,11 @@ namespace SgxMap
 
         public void ClearObjects()
         {
-            foreach (var obj in Objects)
+            foreach (var obj in Shapes)
             {
                 obj.Layer = null;
             }
-            Objects.Clear();
+            Shapes.Clear();
         }
 
         public void Clear()
@@ -181,24 +181,24 @@ namespace SgxMap
 
         public BasePoint? GetBasePointbyName(string name)
         {
-            return Objects.FirstOrDefault(obj => obj.Name == name);
+            return Shapes.FirstOrDefault(obj => obj.Name == name);
         }
 
         public BasePoint? GetBasePointbyID(long id)
         {
-            return Objects.FirstOrDefault(obj => obj.ID == id);
+            return Shapes.FirstOrDefault(obj => obj.ID == id);
         }
 
         public BasePoint? GetBasePointbyPosition(PointLatLng position)
         {
-            return Objects.FirstOrDefault(obj => obj.Position == position);
+            return Shapes.FirstOrDefault(obj => obj.Position == position);
         }
 
         public BasePoint? GetObjectbyLocalPosition(int x, int y)
         {
             var p = new GPoint(x, y);
             p.OffsetNegative(MapPanel.Core.RenderOffset);
-            return Objects.FirstOrDefault(obj => obj.IsInside((int)p.X, (int)p.Y));
+            return Shapes.FirstOrDefault(obj => obj.IsInside((int)p.X, (int)p.Y));
         }
 
 
@@ -206,7 +206,7 @@ namespace SgxMap
         {
             if (MapPanel != null)
             {
-                foreach (var obj in Objects)
+                foreach (var obj in Shapes)
                 {
                     if (obj.IsVisible)
                     {
@@ -226,7 +226,7 @@ namespace SgxMap
         {
             if (MapPanel != null)
             {
-                foreach (var o in Objects)
+                foreach (var o in Shapes)
                 {
                     if (o.IsVisible)
                        o.OnRender(g);
@@ -240,9 +240,9 @@ namespace SgxMap
         {
             if (overlay != null)
             {
-                foreach (var m in overlay.Objects)
+                foreach (var m in overlay.Shapes)
                 {
-                    Objects.Add(m);
+                    Shapes.Add(m);
                 }
             }
         }
@@ -250,7 +250,7 @@ namespace SgxMap
 
         public void RefreshObjects()
         {
-            foreach (var obj in Objects)
+            foreach (var obj in Shapes)
             {
                 obj.UpdateObject();
             }
@@ -421,8 +421,8 @@ namespace SgxMap
         {
             var p = MapPanel.FromLocalToLatLng(x, y);
             var rec = new MapTextBox(p, 0.1f, 0.1f, string.Empty);
-            rec.mouse_x = x;
-            rec.mouse_y = y;
+            rec.m_mouse_x = x;
+            rec.m_mouse_y = y;
             AddObject(rec);
             return rec;
         }
@@ -463,8 +463,8 @@ namespace SgxMap
             info.AddValue("Name", Name);
             info.AddValue("IsVisible", IsVisible);
 
-            var objectArray = new BasePoint[Objects.Count];
-            Objects.CopyTo(objectArray, 0);
+            var objectArray = new BasePoint[Shapes.Count];
+            Shapes.CopyTo(objectArray, 0);
             info.AddValue("Objects", objectArray);
         }
 
@@ -494,7 +494,7 @@ namespace SgxMap
 
                 //ClearEvents();
 
-                foreach (var m in Objects)
+                foreach (var m in Shapes)
                 {
                     m.Dispose();
                 }

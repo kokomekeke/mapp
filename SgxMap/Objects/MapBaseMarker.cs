@@ -15,10 +15,10 @@ using System.Threading.Tasks;
 using GMap.NET;
 using GMap.NET.MapProviders;
 using Newtonsoft.Json.Linq;
-using SgxMap.Objects.ToolTips;
+using SgxMap.Shapes.ToolTips;
 using Extensions = GMap.NET.Extensions;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     public class MapBaseMarker: BasePoint, ISerializable
     {
@@ -34,7 +34,8 @@ namespace SgxMap.Objects
         protected MapToolTip m_toolTip;
         protected MarkerTooltipMode m_toolTipMode = MarkerTooltipMode.Always;
         protected MarketTooltipTextType m_toolTipTextType = MarketTooltipTextType.Location;
-        string m_toolTipText;
+        string m_toolTipText = string.Empty;
+        string m_toolTipHeader = string.Empty;
 
 
         public BasePoint? Parent
@@ -131,6 +132,26 @@ namespace SgxMap.Objects
             }
         }
 
+        public virtual string ToolTipHeader
+        {
+            get
+            {
+                return m_toolTipHeader;
+            }
+
+            set
+            {
+                if (m_toolTip == null && !string.IsNullOrEmpty(value))
+                {
+                    m_toolTip = new MapPointToolTip(this);
+                }
+
+                m_toolTipHeader = value;
+                m_toolTipTextType = MarketTooltipTextType.Custom;
+                Layer?.RefreshObject(this);
+            }
+        }
+
 
         public MarkerTooltipMode ToolTipMode
         {
@@ -182,6 +203,7 @@ namespace SgxMap.Objects
             Size = size;
             Fill = new SolidBrush(color);
             SetTooltipText(pos);
+            ToolTipHeader = name;
         }
 
         public MapBaseMarker(string name, PointLatLng pos, int size, Color color)
@@ -190,6 +212,7 @@ namespace SgxMap.Objects
             Size = new Size(size, size);
             Fill = new SolidBrush(color);
             SetTooltipText(pos);
+            ToolTipHeader = name;
         }
 
 
@@ -245,9 +268,13 @@ namespace SgxMap.Objects
 
         public MapToolTip AddToolTip()
         { 
-            var t = new MapToolTip(this);
+            var t = new MapPointToolTip(this);
             Layer.AddToolTip(t);
             SetTooltipText(Position);
+            if (string.IsNullOrEmpty(ToolTipHeader))
+            {
+                ToolTipHeader = "Untitled " + ID;
+            }
             return t;
         }
 

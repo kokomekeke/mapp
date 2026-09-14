@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using GMap.NET;
 using Newtonsoft.Json.Linq;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     public class BasePoint: ISerializable, IDeserializationCallback, IDisposable
     {

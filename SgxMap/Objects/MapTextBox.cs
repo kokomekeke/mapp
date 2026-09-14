@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         04-Sep-2026.
-*           Last update                                            12-Sep-2026.
+*           Last update                                            14-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -14,18 +14,18 @@ using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
 
-namespace SgxMap.Objects
+namespace SgxMap.Shapes
 {
     public class MapTextBox: MapRectangle, ISerializable, IDisposable
     {
-        [NonSerialized] public Brush BorderColor = new SolidBrush(Color.Black);  // border color 
-        public Size TextPadding = new Size(3, 3);
-        public Brush TextColor = new SolidBrush(Color.Black);
+        [NonSerialized] protected SolidBrush m_borderColor = new SolidBrush(Color.Black);  // border color 
+        public Size m_textPadding = new Size(3, 3);
+        protected SolidBrush m_textColor = new SolidBrush(Color.Black);
         protected string? m_text;
-        public Font Font = new Font("Arial", 12);
+        public Font m_Font = new Font("Arial", 12);
 
-        public int mouse_x = 0;
-        public int mouse_y = 0;
+        public int m_mouse_x = 0;
+        public int m_mouse_y = 0;
 
 
         public string? Text
@@ -38,6 +38,24 @@ namespace SgxMap.Objects
                 if (Layer != null && Layer.MapPanel != null)
                 {
                     m_layer?.RefreshObject(this);
+                }
+            }
+        }
+
+
+        public Color TextColor
+        {
+            get { return m_textColor.Color; }
+            set
+            {
+                if (m_textColor.Color != value)
+                {
+                    m_textColor.Color = value;
+                    if (Layer != null && Layer.MapPanel != null)
+                    {
+                        m_layer?.RefreshObject(this);
+                    }
+
                 }
             }
         }
@@ -71,7 +89,7 @@ namespace SgxMap.Objects
         {
             Name = name;
             FillColor = Color.White;
-            Font = font;
+            m_Font = font;
             Text = text;
             m_isfilled = true;
         }
@@ -90,7 +108,7 @@ namespace SgxMap.Objects
         {
             Name = name;
             FillColor = Color.White;
-            Font = font;
+            m_Font = font;
             Text = text;
             m_isfilled = true;
         }
@@ -135,15 +153,15 @@ namespace SgxMap.Objects
             if (!string.IsNullOrEmpty(Text))
             {
 
-                var st = g.MeasureString(Text, Font).ToSize();
+                var st = g.MeasureString(Text, m_Font).ToSize();
 
                 var rect = new Rectangle(LocalPosition.X,
                     LocalPosition.Y,// - st.Height,
-                    st.Width + 2 * TextPadding.Width,
-                    st.Height + TextPadding.Height);
+                    st.Width + 2 * m_textPadding.Width,
+                    st.Height + m_textPadding.Height);
 
                 var rectText = rect;
-                rectText.Offset(TextPadding.Width, TextPadding.Height); //Inflate(-TextPadding.Width, -TextPadding.Height);
+                rectText.Offset(m_textPadding.Width, m_textPadding.Height); //Inflate(-TextPadding.Width, -TextPadding.Height);
 
                 //LocalPosition2 = LocalPosition + new Size(rectText.Width, rectText.Height);
                 //Position2 = Layer.MapPanel.FromLocalToLatLng(LocalPosition2.X, LocalPosition2.Y);
@@ -151,7 +169,7 @@ namespace SgxMap.Objects
 
                 g.FillRectangle(Fill, rect);
                 g.DrawRectangle(Stroke, rect);
-                g.DrawString(Text, Font, TextColor, rectText);
+                g.DrawString(Text, m_Font, m_textColor, rectText);
                 g.Flush();
             }
             else
@@ -191,9 +209,9 @@ namespace SgxMap.Objects
             Position  = (PointLatLng)info.GetValue("Position", typeof(PointLatLng));
             Color     = (Color)info.GetValue("Color", typeof(Color));
             Text     = info.GetString("text");
-            Font      = (Font)info.GetValue("font", typeof(Font));
-            TextColor = new SolidBrush(Color);
-            BorderColor = (SolidBrush)info.GetValue("bordercolor", typeof(Brush)); 
+            m_Font      = (Font)info.GetValue("font", typeof(Font));
+            m_textColor = new SolidBrush(Color);
+            m_borderColor = (SolidBrush)info.GetValue("bordercolor", typeof(Brush)); 
             //FillColor = (SolidBrush)info.GetValue("fillcolor", typeof(Brush)); 
         }
 
@@ -201,8 +219,8 @@ namespace SgxMap.Objects
         {
             base.GetObjectData(info, context);
             info.AddValue("text", Text);
-            info.AddValue("font", Font);
-            info.AddValue("bordercolor", BorderColor);
+            info.AddValue("font", m_Font);
+            info.AddValue("bordercolor", m_borderColor);
             //info.AddValue("fillcolor", FillColor);
         }
 
@@ -213,8 +231,8 @@ namespace SgxMap.Objects
         public override void Dispose()
         {
             base.Dispose();
-            TextColor.Dispose();
-            Font.Dispose();
+            m_textColor.Dispose();
+            m_Font.Dispose();
         }
 
         #endregion serialization

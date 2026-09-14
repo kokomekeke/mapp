@@ -47,6 +47,14 @@
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
             DrawPanel = new Panel();
+            btn_draw_linearrow = new Button();
+            btn_draw_linewidth = new Button();
+            btn_textcolor_down = new Button();
+            btn_draw_textcolor = new Button();
+            btn_linecolor_down = new Button();
+            btn_draw_linecolor = new Button();
+            btn_fill_down = new Button();
+            btn_fill_color = new Button();
             label2 = new Label();
             btn_draw_rayline = new Button();
             label1 = new Label();
@@ -66,11 +74,21 @@
             MainMap = new SgxMapPanel();
             toolTip_draw = new ToolTip(components);
             textBox_editor = new TextBox();
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            menu_linewidth = new ContextMenuStrip(components);
+            ptToolStripMenuItem1 = new ToolStripMenuItem();
+            ptToolStripMenuItem2 = new ToolStripMenuItem();
+            ptToolStripMenuItem3 = new ToolStripMenuItem();
+            ptToolStripMenuItem4 = new ToolStripMenuItem();
+            ptToolStripMenuItem5 = new ToolStripMenuItem();
+            ptToolStripMenuItem6 = new ToolStripMenuItem();
+            ptToolStripMenuItem8 = new ToolStripMenuItem();
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)trackBar_Zoom).BeginInit();
             DrawPanel.SuspendLayout();
+            menu_linewidth.SuspendLayout();
             SuspendLayout();
             // 
             // TopPanel
@@ -87,7 +105,7 @@
             TopPanel.ForeColor = SystemColors.ControlDarkDark;
             TopPanel.Location = new Point(0, 0);
             TopPanel.Name = "TopPanel";
-            TopPanel.Size = new Size(669, 33);
+            TopPanel.Size = new Size(955, 33);
             TopPanel.TabIndex = 0;
             TopPanel.MouseClick += MainMap_MouseClick;
             // 
@@ -158,9 +176,9 @@
             BottomPanel.BorderStyle = BorderStyle.Fixed3D;
             BottomPanel.Controls.Add(label_status);
             BottomPanel.Dock = DockStyle.Bottom;
-            BottomPanel.Location = new Point(0, 310);
+            BottomPanel.Location = new Point(0, 583);
             BottomPanel.Name = "BottomPanel";
-            BottomPanel.Size = new Size(669, 29);
+            BottomPanel.Size = new Size(955, 29);
             BottomPanel.TabIndex = 2;
             // 
             // label_status
@@ -186,7 +204,7 @@
             SearchPanel.Dock = DockStyle.Top;
             SearchPanel.Location = new Point(0, 33);
             SearchPanel.Name = "SearchPanel";
-            SearchPanel.Size = new Size(669, 35);
+            SearchPanel.Size = new Size(955, 35);
             SearchPanel.TabIndex = 3;
             // 
             // comboBoxMapType
@@ -256,6 +274,14 @@
             // 
             DrawPanel.BackColor = SystemColors.ControlDarkDark;
             DrawPanel.BorderStyle = BorderStyle.Fixed3D;
+            DrawPanel.Controls.Add(btn_draw_linearrow);
+            DrawPanel.Controls.Add(btn_draw_linewidth);
+            DrawPanel.Controls.Add(btn_textcolor_down);
+            DrawPanel.Controls.Add(btn_draw_textcolor);
+            DrawPanel.Controls.Add(btn_linecolor_down);
+            DrawPanel.Controls.Add(btn_draw_linecolor);
+            DrawPanel.Controls.Add(btn_fill_down);
+            DrawPanel.Controls.Add(btn_fill_color);
             DrawPanel.Controls.Add(label2);
             DrawPanel.Controls.Add(btn_draw_rayline);
             DrawPanel.Controls.Add(label1);
@@ -275,8 +301,102 @@
             DrawPanel.Dock = DockStyle.Top;
             DrawPanel.Location = new Point(0, 68);
             DrawPanel.Name = "DrawPanel";
-            DrawPanel.Size = new Size(669, 49);
+            DrawPanel.Size = new Size(955, 49);
             DrawPanel.TabIndex = 4;
+            // 
+            // btn_draw_linearrow
+            // 
+            btn_draw_linearrow.Image = (Image)resources.GetObject("btn_draw_linearrow.Image");
+            btn_draw_linearrow.Location = new Point(825, 3);
+            btn_draw_linearrow.Name = "btn_draw_linearrow";
+            btn_draw_linearrow.Size = new Size(37, 37);
+            btn_draw_linearrow.TabIndex = 23;
+            toolTip_draw.SetToolTip(btn_draw_linearrow, "Arrow style");
+            btn_draw_linearrow.UseVisualStyleBackColor = true;
+            btn_draw_linearrow.Click += btn_draw_linearrow_Click;
+            // 
+            // btn_draw_linewidth
+            // 
+            btn_draw_linewidth.Image = (Image)resources.GetObject("btn_draw_linewidth.Image");
+            btn_draw_linewidth.Location = new Point(782, 3);
+            btn_draw_linewidth.Name = "btn_draw_linewidth";
+            btn_draw_linewidth.Size = new Size(37, 37);
+            btn_draw_linewidth.TabIndex = 22;
+            toolTip_draw.SetToolTip(btn_draw_linewidth, "Line style");
+            btn_draw_linewidth.UseVisualStyleBackColor = true;
+            btn_draw_linewidth.Click += btn_draw_linewidth_Click;
+            // 
+            // btn_textcolor_down
+            // 
+            btn_textcolor_down.BackColor = SystemColors.ActiveCaptionText;
+            btn_textcolor_down.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btn_textcolor_down.ForeColor = Color.White;
+            btn_textcolor_down.Location = new Point(756, 3);
+            btn_textcolor_down.Name = "btn_textcolor_down";
+            btn_textcolor_down.Size = new Size(20, 37);
+            btn_textcolor_down.TabIndex = 21;
+            btn_textcolor_down.Text = "V";
+            btn_textcolor_down.UseVisualStyleBackColor = false;
+            btn_textcolor_down.Click += btn_textcolor_down_Click;
+            // 
+            // btn_draw_textcolor
+            // 
+            btn_draw_textcolor.Image = (Image)resources.GetObject("btn_draw_textcolor.Image");
+            btn_draw_textcolor.Location = new Point(721, 3);
+            btn_draw_textcolor.Name = "btn_draw_textcolor";
+            btn_draw_textcolor.Size = new Size(37, 37);
+            btn_draw_textcolor.TabIndex = 20;
+            toolTip_draw.SetToolTip(btn_draw_textcolor, "Text color");
+            btn_draw_textcolor.UseVisualStyleBackColor = true;
+            btn_draw_textcolor.Click += btn_draw_textcolor_Click;
+            // 
+            // btn_linecolor_down
+            // 
+            btn_linecolor_down.BackColor = SystemColors.ActiveCaptionText;
+            btn_linecolor_down.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btn_linecolor_down.ForeColor = Color.White;
+            btn_linecolor_down.Location = new Point(695, 3);
+            btn_linecolor_down.Name = "btn_linecolor_down";
+            btn_linecolor_down.Size = new Size(20, 37);
+            btn_linecolor_down.TabIndex = 19;
+            btn_linecolor_down.Text = "V";
+            btn_linecolor_down.UseVisualStyleBackColor = false;
+            btn_linecolor_down.Click += btn_linecolor_down_Click;
+            // 
+            // btn_draw_linecolor
+            // 
+            btn_draw_linecolor.Image = (Image)resources.GetObject("btn_draw_linecolor.Image");
+            btn_draw_linecolor.Location = new Point(660, 3);
+            btn_draw_linecolor.Name = "btn_draw_linecolor";
+            btn_draw_linecolor.Size = new Size(37, 37);
+            btn_draw_linecolor.TabIndex = 18;
+            toolTip_draw.SetToolTip(btn_draw_linecolor, "Fill color");
+            btn_draw_linecolor.UseVisualStyleBackColor = true;
+            btn_draw_linecolor.Click += btn_draw_linecolor_Click;
+            // 
+            // btn_fill_down
+            // 
+            btn_fill_down.BackColor = SystemColors.ActiveCaptionText;
+            btn_fill_down.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btn_fill_down.ForeColor = Color.White;
+            btn_fill_down.Location = new Point(634, 3);
+            btn_fill_down.Name = "btn_fill_down";
+            btn_fill_down.Size = new Size(20, 37);
+            btn_fill_down.TabIndex = 17;
+            btn_fill_down.Text = "V";
+            btn_fill_down.UseVisualStyleBackColor = false;
+            btn_fill_down.Click += btn_fill_down_Click;
+            // 
+            // btn_fill_color
+            // 
+            btn_fill_color.Image = (Image)resources.GetObject("btn_fill_color.Image");
+            btn_fill_color.Location = new Point(599, 3);
+            btn_fill_color.Name = "btn_fill_color";
+            btn_fill_color.Size = new Size(37, 37);
+            btn_fill_color.TabIndex = 16;
+            toolTip_draw.SetToolTip(btn_fill_color, "Fill color");
+            btn_fill_color.UseVisualStyleBackColor = true;
+            btn_fill_color.Click += btn_fill_color_Click;
             // 
             // label2
             // 
@@ -485,7 +605,7 @@
             MainMap.ShowGeoGridLines = false;
             MainMap.ShowMapScaleInfo = false;
             MainMap.ShowTileGridLines = false;
-            MainMap.Size = new Size(669, 193);
+            MainMap.Size = new Size(955, 466);
             MainMap.TabIndex = 5;
             MainMap.Zoom = 0D;
             MainMap.MouseClick += MainMap_MouseClick;
@@ -502,6 +622,66 @@
             textBox_editor.VisibleChanged += textBox_editor_VisibleChanged;
             textBox_editor.Leave += textBox_editor_Leave;
             // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(61, 4);
+            // 
+            // menu_linewidth
+            // 
+            menu_linewidth.Items.AddRange(new ToolStripItem[] { ptToolStripMenuItem1, ptToolStripMenuItem2, ptToolStripMenuItem3, ptToolStripMenuItem4, ptToolStripMenuItem5, ptToolStripMenuItem6, ptToolStripMenuItem8 });
+            menu_linewidth.Name = "menu_linewidth";
+            menu_linewidth.Size = new Size(181, 180);
+            // 
+            // ptToolStripMenuItem1
+            // 
+            ptToolStripMenuItem1.Name = "ptToolStripMenuItem1";
+            ptToolStripMenuItem1.Size = new Size(180, 22);
+            ptToolStripMenuItem1.Text = "1 pt.";
+            ptToolStripMenuItem1.Click += ptToolStripMenuItem1_Click;
+            // 
+            // ptToolStripMenuItem2
+            // 
+            ptToolStripMenuItem2.Name = "ptToolStripMenuItem2";
+            ptToolStripMenuItem2.Size = new Size(180, 22);
+            ptToolStripMenuItem2.Text = "2  pt";
+            ptToolStripMenuItem2.Click += ptToolStripMenuItem2_Click;
+            // 
+            // ptToolStripMenuItem3
+            // 
+            ptToolStripMenuItem3.Name = "ptToolStripMenuItem3";
+            ptToolStripMenuItem3.Size = new Size(180, 22);
+            ptToolStripMenuItem3.Text = "3 pt";
+            ptToolStripMenuItem3.Click += ptToolStripMenuItem3_Click;
+            // 
+            // ptToolStripMenuItem4
+            // 
+            ptToolStripMenuItem4.Name = "ptToolStripMenuItem4";
+            ptToolStripMenuItem4.Size = new Size(180, 22);
+            ptToolStripMenuItem4.Text = "4 pt";
+            ptToolStripMenuItem4.Click += ptToolStripMenuItem4_Click;
+            // 
+            // ptToolStripMenuItem5
+            // 
+            ptToolStripMenuItem5.Name = "ptToolStripMenuItem5";
+            ptToolStripMenuItem5.Size = new Size(180, 22);
+            ptToolStripMenuItem5.Text = "5 pt.";
+            ptToolStripMenuItem5.Click += ptToolStripMenuItem5_Click;
+            // 
+            // ptToolStripMenuItem6
+            // 
+            ptToolStripMenuItem6.Name = "ptToolStripMenuItem6";
+            ptToolStripMenuItem6.Size = new Size(180, 22);
+            ptToolStripMenuItem6.Text = "6 pt";
+            ptToolStripMenuItem6.Click += ptToolStripMenuItem6_Click;
+            // 
+            // ptToolStripMenuItem8
+            // 
+            ptToolStripMenuItem8.Name = "ptToolStripMenuItem8";
+            ptToolStripMenuItem8.Size = new Size(180, 22);
+            ptToolStripMenuItem8.Text = "8 pt";
+            ptToolStripMenuItem8.Click += ptToolStripMenuItem8_Click;
+            // 
             // SgxMapControl
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -513,7 +693,7 @@
             Controls.Add(BottomPanel);
             Controls.Add(TopPanel);
             Name = "SgxMapControl";
-            Size = new Size(669, 339);
+            Size = new Size(955, 612);
             MouseClick += MainMap_MouseClick;
             TopPanel.ResumeLayout(false);
             BottomPanel.ResumeLayout(false);
@@ -522,6 +702,7 @@
             SearchPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)trackBar_Zoom).EndInit();
             DrawPanel.ResumeLayout(false);
+            menu_linewidth.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -564,5 +745,22 @@
         private Label label1;
         private Button btn_draw_rayline;
         private Label label2;
+        private Button btn_fill_color;
+        private Button btn_linecolor_down;
+        private Button btn_draw_linecolor;
+        private Button btn_fill_down;
+        private Button btn_draw_linewidth;
+        private Button btn_textcolor_down;
+        private Button btn_draw_textcolor;
+        private Button btn_draw_linearrow;
+        private ContextMenuStrip contextMenuStrip1;
+        private ContextMenuStrip menu_linewidth;
+        private ToolStripMenuItem ptToolStripMenuItem1;
+        private ToolStripMenuItem ptToolStripMenuItem2;
+        private ToolStripMenuItem ptToolStripMenuItem4;
+        private ToolStripMenuItem ptToolStripMenuItem5;
+        private ToolStripMenuItem ptToolStripMenuItem6;
+        private ToolStripMenuItem ptToolStripMenuItem8;
+        private ToolStripMenuItem ptToolStripMenuItem3;
     }
 }

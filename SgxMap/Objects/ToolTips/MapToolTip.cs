@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
 
-namespace SgxMap.Objects.ToolTips
+namespace SgxMap.Shapes.ToolTips
 {
     public class MapToolTip: BasePoint, ISerializable
     {
@@ -17,10 +17,10 @@ namespace SgxMap.Objects.ToolTips
 
         protected readonly StringFormat m_Format = new StringFormat();
 
-        protected Font TextFont = new Font(FontFamily.GenericSansSerif, 11, FontStyle.Regular, GraphicsUnit.Pixel);
-        protected Font TitleFont = new Font(FontFamily.GenericSansSerif, 11, FontStyle.Bold, GraphicsUnit.Pixel);
+        protected Font TextFont = new Font(FontFamily.GenericSansSerif, 9, FontStyle.Regular, GraphicsUnit.Pixel);
+        protected Brush TextColor = new SolidBrush(Color.Black);
+
         protected SolidBrush TitleFill = new SolidBrush(Color.LightGray);  // title text foreground  (use Fill for text background)
-        protected Brush TextColor = new SolidBrush(Color.Black); 
 
         public MapBaseMarker Marker
         {
@@ -108,32 +108,34 @@ namespace SgxMap.Objects.ToolTips
 
         protected virtual void WriteString(Graphics g, string text, RectangleF rectText)
         {
-            string[] vec1 = text.Split('\n');
-            for (int i = 0; i < vec1.Length; i++)
-            {
-                if (vec1[i] != "")
-                {
-                    string[] vec2 = vec1[i].Split('|');
-                    if (vec2.Length > 0)
-                    {
-                        var st = g.MeasureString(vec2[0], TitleFont).ToSize();
-                        g.DrawString(string.Format("{0}", vec2[0]), TitleFont, TextColor, rectText, m_Format);
-                        rectText.X += st.Width + 2;
-                        if (vec2.Length > 1)
-                        {
-                            g.DrawString(vec2[1], TextFont, TextColor, rectText, m_Format);
-                        }
+            g.DrawString(text, TextFont, TextColor, rectText, m_Format);
 
-                        rectText.X -= st.Width + 2;
-                        rectText.Y += st.Height;
-                    }
-                }
-                else
-                {
-                    var st = g.MeasureString("\n", TitleFont).ToSize();
-                    rectText.Y += st.Height;
-                }
-            }
+            //string[] vec1 = text.Split('\n');
+            //for (int i = 0; i < vec1.Length; i++)
+            //{
+            //    if (vec1[i] != "")
+            //    {
+            //        string[] vec2 = vec1[i].Split('|');
+            //        if (vec2.Length > 0)
+            //        {
+            //            var st = g.MeasureString(vec2[0], TitleFont).ToSize();
+            //            g.DrawString(string.Format("{0}", vec2[0]), TitleFont, TextColor, rectText, m_Format);
+            //            rectText.X += st.Width + 2;
+            //            if (vec2.Length > 1)
+            //            {
+            //                g.DrawString(vec2[1], TextFont, TextColor, rectText, m_Format);
+            //            }
+
+            //            rectText.X -= st.Width + 2;
+            //            rectText.Y += st.Height;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        var st = g.MeasureString("\n", TitleFont).ToSize();
+            //        rectText.Y += st.Height;
+            //    }
+            //}
         }
 
 
@@ -172,7 +174,6 @@ namespace SgxMap.Objects.ToolTips
             info.AddValue("TextPadding", TextPadding);
             info.AddValue("TitleFill", Fill.Color.ToArgb());
             info.AddValue("Font", TextFont);
-            info.AddValue("TitleFont", TitleFont);
         }
 
         #endregion
