@@ -4,6 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         05-Sep-2026.
+*          Last modification                                       15-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -22,17 +23,15 @@ namespace SgxMap.Shapes
     public class MapPolyLine : BasePoint, ISerializable, IDeserializationCallback, IDisposable
     {
         protected bool m_isClosed = false;
-        /// <summary>
-        ///     background color
-        /// </summary>
-        //[NonSerialized] public Brush Fill = new SolidBrush(Color.FromArgb(155, Color.AliceBlue));
+        protected ArrowPositions m_arrowPosition = ArrowPositions.None;
+        private Color m_lastcolor = Color.Black;
 
         public readonly List<PointLatLng> Points = new List<PointLatLng>(); // points of route in geo coordinates
         public readonly List<Point> LocalPoints = new List<Point>();      // List of points in map  (x,y)
 
+        protected CustomLineCap? m_endCap;
+        protected CustomLineCap? m_startCap;
 
-
-        private Color m_lastcolor = Color.Black;
         public Color LastColor
         {
             get { return m_lastcolor; }
@@ -58,6 +57,83 @@ namespace SgxMap.Shapes
             }
         }
 
+
+        public ArrowPositions ArrowPosition
+        {
+            get { return m_arrowPosition; }
+            set
+            {
+                //if (m_arrowPosition != value)
+                {
+                    m_arrowPosition = value;
+                    // TODO: apply arror position
+                    switch (m_arrowPosition)
+                    {
+                        case ArrowPositions.None:
+                            Stroke.StartCap = LineCap.NoAnchor;
+                            Stroke.EndCap = LineCap.NoAnchor;
+                            break;
+                        case ArrowPositions.AtBegin:
+                            if (m_startCap != null)
+                                Stroke.CustomStartCap = m_startCap;
+                            else Stroke.StartCap = LineCap.NoAnchor;
+                            Stroke.EndCap = LineCap.NoAnchor;
+                            break;
+                        case ArrowPositions.AtEnd:
+                            Stroke.StartCap = LineCap.NoAnchor;
+                            if (m_endCap != null)
+                                Stroke.CustomEndCap = m_endCap;
+                            else Stroke.EndCap = LineCap.NoAnchor;
+                            break;
+                        case ArrowPositions.Both:
+                            if (m_startCap != null)
+                                Stroke.CustomStartCap = m_startCap;
+                            else Stroke.StartCap = LineCap.NoAnchor;
+                            if (m_endCap != null)
+                                Stroke.CustomEndCap = m_endCap;
+                            else Stroke.EndCap = LineCap.NoAnchor;
+                            break;
+                    }
+
+                    if (Layer != null && Layer.MapPanel != null)
+                    {
+                        m_layer?.RefreshObject(this);
+                    }
+
+                }
+            }
+        }
+
+        public bool IsClosed
+        {
+            get { return m_isClosed; }
+            set
+            {
+                if (value != m_isClosed)
+                {
+                    m_isClosed = value;
+                    if (m_graphicsPath != null)
+                    {
+                        if (m_isClosed)
+                        {
+                            Points.Add(Points[0]);
+                        }
+                        else
+                        {
+                            Points.RemoveAt(Points.Count - 1);
+                        }
+                    }
+
+                    if (Layer != null && Layer.MapPanel != null)
+                    {
+                        Layer?.RefreshObject(this);
+                    }
+                }
+            }
+        }
+
+
+        //---------------------------------------------------------------------------------------
 
         public MapPolyLine()
             : base()
@@ -118,6 +194,31 @@ namespace SgxMap.Shapes
         }
 
 
+        public void CreateCap()
+        {
+            var hPath = new GraphicsPath();
+
+            // Create the outline for our custom end cap.
+            hPath.AddLine(new Point(0, 0), new Point(3, -5));
+            hPath.AddLine(new Point(3, -5), new Point(-3, -5));
+            hPath.AddLine(new Point(-3, -5), new Point(0, 0));
+
+            m_endCap = new CustomLineCap(hPath, null);
+
+            hPath = new GraphicsPath();
+
+            // Create the outline for our custom end cap.
+            hPath.AddLine(new Point(0, 0), new Point(3, -5));
+            hPath.AddLine(new Point(3, -5), new Point(-3, -5));
+            hPath.AddLine(new Point(-3, -5), new Point(0, 0));
+
+            m_startCap = new CustomLineCap(hPath, null);
+
+        }
+
+
+
+
         /// <summary>
         ///     clears points and sets tag and name to null
         /// </summary>
@@ -127,33 +228,6 @@ namespace SgxMap.Shapes
         }
 
 
-        public bool IsClosed
-        {
-            get { return m_isClosed; }
-            set
-            {
-                if (value != m_isClosed)
-                {
-                    m_isClosed = value;
-                    if (m_graphicsPath != null)
-                    {
-                        if (m_isClosed)
-                        {
-                            Points.Add(Points[0]);
-                        }
-                        else
-                        {
-                            Points.RemoveAt(Points.Count - 1);
-                        }
-                    }
-
-                    if (Layer != null && Layer.MapPanel != null)
-                    {
-                        Layer?.RefreshObject(this);
-                    }
-                }
-            }
-        }
 
 
         /// <summary>
@@ -214,6 +288,18 @@ namespace SgxMap.Shapes
                 if (m_graphicsPath != null)
                 {
                     if (Points.Count < 2) return;
+
+                    if (IsHighlighted)
+                    {
+                        if (Points.Count > 2)
+                            g.DrawPath(HighlightStroke, m_graphicsPath);
+                        else g.DrawLine(HighlightStroke, LocalPoints[0].X, LocalPoints[0].Y, LocalPoints[1].X, LocalPoints[1].Y);
+                    }
+
+                    if (IsFilled)
+                    {
+                        g.FillPath(Fill, m_graphicsPath);
+                    }
 
                     if (Points.Count > 2)
                          g.DrawPath(Stroke, m_graphicsPath);

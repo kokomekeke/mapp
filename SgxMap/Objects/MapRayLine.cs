@@ -4,6 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         09-Sep-2026.
+*          Last modification                                       15-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -58,6 +59,8 @@ namespace SgxMap.Shapes
             }
         }
 
+        //------------------------------------------------------------------------------------
+
         public MapRayLine()
             : base()
         {
@@ -70,6 +73,7 @@ namespace SgxMap.Shapes
             Direction = degree;
             ArrowPosition = ArrowPositions.AtEnd;
             m_isEditable = false;
+            Fill = new SolidBrush(color);
             //ToolTipText = string.IsNullOrEmpty(Name) ? point1.ToGeoString() : Name;
         }
 
@@ -80,6 +84,7 @@ namespace SgxMap.Shapes
             Distance = length;
             ArrowPosition = ArrowPositions.AtEnd;
             m_isEditable = false;
+            Fill = new SolidBrush(color);
             //ToolTipText = string.IsNullOrEmpty(Name) ? point1.ToGeoString() : Name;
         }
 
@@ -90,6 +95,7 @@ namespace SgxMap.Shapes
             Direction = degree;
             ArrowPosition = ArrowPositions.AtEnd;
             m_isEditable = false;
+            Fill = new SolidBrush(color);
             //ToolTipText = string.IsNullOrEmpty(Name) ? point1.ToGeoString() : Name;
         }
 
@@ -100,6 +106,7 @@ namespace SgxMap.Shapes
             Distance += length;
             ArrowPosition = ArrowPositions.AtEnd;
             m_isEditable = false;
+            Fill = new SolidBrush(color);
             //ToolTipText = string.IsNullOrEmpty(Name) ? point1.ToGeoString() : Name;
         }
 
@@ -180,8 +187,11 @@ namespace SgxMap.Shapes
 
                     var p2 = Layer.FromLatLngToLocalPosition(new PointLatLng(newLat, newLng));
                     //pnts[i] = (Point)p2;
-                    points.Add((Point)p2);
-                    length += dl;
+                    if (p2 != null)
+                    {
+                        points.Add((Point)p2);
+                        length += dl;
+                    }
                     //startRadLat = newLato;
                     //startRadLng = newLngo;
                     i++;
@@ -199,8 +209,12 @@ namespace SgxMap.Shapes
             {
                 if (Layer != null && Layer.MapPanel != null)
                 {
-                    if (m_graphicsPath != null) 
+                    if (m_graphicsPath != null)
+                    {
+                        if (IsHighlighted)
+                            g.DrawPath(HighlightStroke, m_graphicsPath);
                         g.DrawPath(Stroke, m_graphicsPath);
+                    }
                     g.FillEllipse(Fill, new Rectangle(LocalPosition.X - _r, LocalPosition.Y - _r, 2 * _r, 2 * _r));
                 }
             }
@@ -209,7 +223,7 @@ namespace SgxMap.Shapes
         }
 
 
-        public virtual void UpdateEndPoint(int x, int y)
+        public override void UpdateEndPoint(int x, int y)
         {
             var point = Layer.MapPanel.FromLocalToLatLng(x, y);
             m_distance = Layer.MapPanel.GetDistance(Position, point);

@@ -167,6 +167,9 @@ namespace SgxMap.Shapes
                 //Position2 = Layer.MapPanel.FromLocalToLatLng(LocalPosition2.X, LocalPosition2.Y);
                 //BuildPoints();
 
+                if (IsHighlighted)
+                    g.DrawRectangle(HighlightStroke, rect);
+
                 g.FillRectangle(Fill, rect);
                 g.DrawRectangle(Stroke, rect);
                 g.DrawString(Text, m_Font, m_textColor, rectText);
@@ -186,7 +189,7 @@ namespace SgxMap.Shapes
                 if (m_isSelected)
                     return;
                 Layer.MapPanel.ClearLinePoints();
-                Stroke.Width = 4;
+                Stroke.Width = 2;
             }
             else
             {

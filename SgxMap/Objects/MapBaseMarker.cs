@@ -310,6 +310,11 @@ namespace SgxMap.Shapes
                 case MarketTooltipTextType.Address: m_toolTipText = Layer.MapPanel.GetPlaceAddress(point); break;
                 case MarketTooltipTextType.LocationAdderss: m_toolTipText = point.ToGeoString() + "   " + Layer.MapPanel.GetPlaceAddress(point); break;
                 case MarketTooltipTextType.None: m_toolTipText = string.Empty; break;
+                case MarketTooltipTextType.DF:
+                    m_toolTipHeader = $"[ {ID}] DF";
+                    m_toolTipText = $",, 21 000 000 Hz\r\n{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\r\n{Position.ToGeoString()},";
+                    break;
+
             }
 
         }
@@ -370,8 +375,14 @@ namespace SgxMap.Shapes
 
         public override void OnRender(Graphics g)
         {
+            if (IsHighlighted)
+            {
+                g.FillEllipse(HighlightFill, Rectangle.Inflate(m_area, 4, 4));
+            }
+
             if (IsSelected)
-                g.DrawRectangle(BorderPen, m_area);
+            g.DrawRectangle(BorderPen, m_area);
+
             if (m_area.Width > 2)
             {
                 var rec = Rectangle.Inflate(m_area, -1, -1);
@@ -453,7 +464,7 @@ namespace SgxMap.Shapes
             {
                 var d = m_layer?.FromLatLngToLocalPosition(p);
                 if (d != null)
-                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, NormalStroke);
+                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, Stroke);
             }
 
             return false;

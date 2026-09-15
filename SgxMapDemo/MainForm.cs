@@ -40,6 +40,10 @@ namespace SgxMapDemo
                 sgxMapControl1.MainMap.Zoom = Program.initialZoom;
                 sgxMapControl1.MainMap.ScaleMode = ScaleModes.Fractional;
                 sgxMapControl1.MapProvider = Program.mapProvider;
+
+#if !SQLite
+                casheToolStripMenuItem.Visible = false;
+#endif
             }
         }
 
@@ -63,14 +67,91 @@ namespace SgxMapDemo
             Program.initialLongitude = sgxMapControl1.MainMap.Position.Lng;
         }
 
+
+        public bool ShowExportDialog()
+        {
+            using (FileDialog dlg = new SaveFileDialog())
+            {
+                dlg.CheckPathExists = true;
+                dlg.CheckFileExists = false;
+                dlg.AddExtension = true;
+                dlg.DefaultExt = "gmdb";
+                dlg.ValidateNames = true;
+                dlg.Title = "GMap.NET: Export map to db, if file exsist only new data will be added";
+                dlg.FileName = "DataExp";
+                dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                dlg.Filter = "GMap.NET DB files (*.gmdb)|*.gmdb";
+                dlg.FilterIndex = 1;
+                dlg.RestoreDirectory = true;
+
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    bool ok = sgxMapControl1.MainMap.ExportToGMDB(dlg.FileName);
+                    if (ok)
+                    {
+                        MessageBox.Show("Complete!", "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed!", "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+
+                    return ok;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        ///     shows map dbimport dialog
+        /// </summary>
+        /// <returns></returns>
+        public bool ShowImportDialog()
+        {
+            using (FileDialog dlg = new OpenFileDialog())
+            {
+                dlg.CheckPathExists = true;
+                dlg.CheckFileExists = false;
+                dlg.AddExtension = true;
+                dlg.DefaultExt = "gmdb";
+                dlg.ValidateNames = true;
+                dlg.Title = "GMap.NET: Import to db, only new data will be added";
+                dlg.FileName = "DataImport";
+                dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                dlg.Filter = "GMap.NET DB files (*.gmdb)|*.gmdb";
+                dlg.FilterIndex = 1;
+                dlg.RestoreDirectory = true;
+
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    bool ok = sgxMapControl1.MainMap.ImportFromGMDB(dlg.FileName);
+                    if (ok)
+                    {
+                        MessageBox.Show("Complete!", "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        sgxMapControl1.MainMap.ReloadMap();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed!", "GMap.NET", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+
+                    return ok;
+                }
+            }
+
+            return false;
+        }
+
+
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dlg = new OpenFileDialog();
             dlg.CheckFileExists = true;
             dlg.CheckPathExists = true;
             dlg.DefaultExt = "gmc";
-            dlg.Filter = "GMap macro file (*.gmc)|*.gmc|All file (*.*)|*.*";
-            dlg.Title = "Select GMAP Macro file";
+            dlg.Filter = "SgxMap macro file (*.gmc)|*.gmc|All file (*.*)|*.*";
+            dlg.Title = "Select SGXMAP Macro file";
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
@@ -91,6 +172,5 @@ namespace SgxMapDemo
                 frm.TopLevel = true;
             }
         }
-
     } /* class MainForm */
 } /* namespace SgxMapDemo */

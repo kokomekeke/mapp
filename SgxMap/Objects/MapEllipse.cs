@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         04-Sep-2026.
-*         Last modification                                        09-Sep-2026.
+*         Last modification                                        15-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -34,6 +34,26 @@ namespace SgxMap.Shapes
         {
         }
 
+        public static MapEllipse CreateEllipse(string[] ls, out string errorstring)
+        {
+            try
+            {
+                // 0: "circle", 1: name,  2: lat1, 3: lng1, 4: radius, 5: radiusx, 6: color
+                errorstring = string.Empty;
+                var p1 = new PointLatLng(double.Parse(ls[2]), double.Parse(ls[3]));
+                float radiusx = float.Parse(ls[4]);
+                float radiusy = float.Parse(ls[5]);
+                var color = ColorTranslator.FromHtml(ls[6]);
+                return new MapEllipse(ls[1], p1, radiusx, radiusy, color);
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.ToString();
+                return null;
+            }
+        }
+
+
         public override void BuildGraphicsPath()
         {
             int posx = LocalPosition.X;
@@ -55,10 +75,29 @@ namespace SgxMap.Shapes
             m_graphicsPath?.AddEllipse(new Rectangle(posx, posy, w, h));
         }
 
+
+        public override void OnRender(Graphics g)
+        {
+            if (m_graphicsPath == null)
+            {
+                UpdateGraphicsPath();
+            }
+            if (m_graphicsPath != null)
+            {
+                if (IsHighlighted)
+                    g.DrawPath(HighlightStroke, m_graphicsPath);
+                if (IsFilled)
+                    g.FillPath(Fill, m_graphicsPath);
+                g.DrawPath(Stroke, m_graphicsPath);
+            }
+        }
+
+
         public override void Shift(PointLatLng oldpoint, PointLatLng newpoint)
         {
             Position = newpoint;
         }
+
 
 
         /// <summary>

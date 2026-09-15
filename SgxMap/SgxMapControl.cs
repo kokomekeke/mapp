@@ -5,12 +5,13 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
-*          Last modification                                       14-Sep-2026.
+*          Last modification                                       15-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,7 @@ using GMap.NET.MapProviders;
 using SgxMap.Shapes;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static GMap.NET.Entity.OpenStreetMapGraphHopperGeocodeEntity;
+using static GMap.NET.Entity.OpenStreetMapRouteEntity;
 //using GMap.NET;
 //using GMap.NET.Internals;
 
@@ -37,7 +39,9 @@ namespace SgxMap
         private Color m_selected_linecolor = Color.Green;
         private Color m_selected_textcolor = Color.Red;
         private int m_selected_linewidth = 1;
-        private int selected_arrowstale = 0;
+        private ArrowPositions m_selected_linestyle = ArrowPositions.None;
+        private string m_lastFileName = string.Empty;
+
 
         public bool ShowToolbar
         {
@@ -87,6 +91,9 @@ namespace SgxMap
             }
         }
 
+
+        //---------------------------------------------------------------------------------
+
         public SgxMapControl()
         {
             InitializeComponent();
@@ -108,6 +115,7 @@ namespace SgxMap
             if ((MainMap.Zoom >= MainMap.MinZoom) && (MainMap.Zoom <= MainMap.MaxZoom))
                 trackBar_Zoom.Value = (int)MainMap.Zoom;
         }
+
 
         private void comboBoxMapType_SelectedValueChanged(object sender, EventArgs e)
         {
@@ -213,7 +221,7 @@ namespace SgxMap
             m.Show(DrawPanel, new System.Drawing.Point(btn_draw.Left, btn_draw.Bottom));
         } /* btn_draw_Click */
 
-        private void btn_drtaw_line_Click(object sender, EventArgs e)
+        private void btn_draw_line_Click(object sender, EventArgs e)
         {
             MainMap.MouseMoveStatus = MouseMoveStatusType.Line;
         }
@@ -345,6 +353,111 @@ namespace SgxMap
                 textBox_editor.Visible = false;
         }
 
+
+        private void btn_openMap_Click(object sender, EventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.CheckPathExists = true;
+            dlg.CheckFileExists = true;
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                LoadFromFile(dlg.FileName);
+            }
+
+        }
+
+        private void btn_saveMap_Click(object sender, EventArgs e)
+        {
+            var dlg = new SaveFileDialog();
+            dlg.CheckPathExists = true;
+            dlg.DefaultExt = "";
+            dlg.ValidateNames = true;
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+                SaveToFile(dlg.FileName);
+            }
+        }
+
+
+        private void SaveToFile(string filename)
+        {
+            try
+            {
+                using (var fs = new FileStream(filename, FileMode.Create))
+                {
+                    //var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    //var layers = new LayerGroup();
+                    //layers.Objects = Objects;
+                    //layers.Routes = Routes;
+                    //layers.Polygons = Polygons;
+                    //layers.MapProvider = MainMap.MapProvider.ToString();
+                    //layers.Center = MainMap.Position;
+                    //layers.Zoom = MainMap.Zoom;
+                    //formatter.Serialize(fs, layers);
+                    m_lastFileName = filename;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("SaveToFile: " + ex);
+                MessageBox.Show("Error  in SaveToFile: " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private void LoadFromFile(string filename)
+        {
+            try
+            {
+                Cursor.Current = Cursors.WaitCursor;
+                using (var fs = new FileStream(filename, FileMode.Open))
+                {
+                    //var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    //Objects.Clear();
+                    //Routes.Clear();
+                    //Polygons.Clear();
+                    //var layers = (LayerGroup)formatter.Deserialize(fs);
+                    //Objects.AddFrom(layers.Objects);
+                    //foreach (var o in Objects.Markers)
+                    //{
+                    //    if (o is GMapMarkerRect)
+                    //    {
+                    //        var rc = o as GMapMarkerRect;
+                    //        if (rc.InnerMarker == null)
+                    //        {
+                    //            foreach (var m in Objects.Markers)
+                    //            {
+                    //                if (m.Position == rc.Position && m != rc)
+                    //                {
+                    //                    rc.InnerMarker = (GMarkerGoogle)m;
+                    //                    break;
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    //Routes.AddFrom(layers.Routes);
+                    //Polygons.AddFrom(layers.Polygons);
+                    //var provider = GMapProviders.TryGetProvider(layers.MapProvider);
+                    //if (provider != null)
+                    //{
+                    //    MainMap.MapProvider = provider;
+                    //}
+                    //MainMap.Position = layers.Center;
+                    //MainMap.Zoom = layers.Zoom;
+                    m_lastFileName = filename;
+                }
+            }
+            catch (Exception ex)
+            {
+                //Debug.WriteLine("LoadFromFile: " + ex);
+                MessageBox.Show("Error  in LoadFromFile: " + ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            Cursor.Current = Cursors.Default;
+        }
+
+
         private void btn_fill_down_Click(object sender, EventArgs e)
         {
             var dlg = new ColorDialog();
@@ -361,8 +474,12 @@ namespace SgxMap
         private void btn_fill_color_Click(object sender, EventArgs e)
         {
             if (MainMap.SelectedObject != null)
+            {
                 MainMap.SelectedObject.FillColor = m_selected_fillcolor;
+                MainMap.SelectedObject.IsFilled = true;
+            }
         }
+
 
         private void btn_linecolor_down_Click(object sender, EventArgs e)
         {
@@ -418,7 +535,8 @@ namespace SgxMap
 
         private void btn_draw_linearrow_Click(object sender, EventArgs e)
         {
-
+            menu_linestyle.Enabled = true;
+            menu_linestyle.Show(DrawPanel, new System.Drawing.Point(btn_draw_linearrow.Left, btn_draw_linearrow.Bottom));
         }
 
         private void SetSelectedLineWidth(int width)
@@ -474,5 +592,78 @@ namespace SgxMap
             SetSelectedLineWidth(8);
         }
 
+
+        private void SetSelectedLineStyle(ArrowPositions position)
+        {
+            m_selected_linestyle = position;
+
+            if (MainMap.SelectedObject == null)
+                return;
+
+            if (MainMap.SelectedObject is MapLine)
+            {
+                (MainMap.SelectedObject as MapLine).ArrowPosition = position;
+            }
+
+            if (MainMap.SelectedObject is MapPolyLine)
+            {
+                (MainMap.SelectedObject as MapPolyLine).ArrowPosition = position;
+            }
+
+        }
+
+        private void mi_noarrow_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineStyle(ArrowPositions.None);
+        }
+
+        private void mi_arrow_atbegin_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineStyle(ArrowPositions.AtBegin);
+        }
+
+        private void mi_arrow_atend_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineStyle(ArrowPositions.AtEnd);
+        }
+
+        private void mi_arrow_both_Click(object sender, EventArgs e)
+        {
+            SetSelectedLineStyle(ArrowPositions.Both);
+        }
+
+        private void btn_copyMap_Click(object sender, EventArgs e)
+        {
+            MainMap.Copy();
+        }
+
+        private void btn_exprtMap_Click(object sender, EventArgs e)
+        {
+            using (FileDialog dlg = new SaveFileDialog())
+            {
+                dlg.CheckPathExists = true;
+                dlg.CheckFileExists = false;
+                dlg.AddExtension = true;
+                dlg.DefaultExt = "jpeg";
+                dlg.ValidateNames = true;
+                dlg.FileName = "";
+                dlg.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                dlg.Filter = "Jpeg file (*.jpeg)|*.jpeg";
+                dlg.FilterIndex = 1;
+                dlg.RestoreDirectory = true;
+
+                if (dlg.ShowDialog() == DialogResult.OK)
+                {
+                    MainMap.Save(dlg.FileName);
+                }
+            }
+        }
+
+        private void btn_draw_highlight_Click(object sender, EventArgs e)
+        {
+            if (MainMap.SelectedObject == null) 
+                    return;
+            MainMap.SelectedObject.IsHighlighted = !MainMap.SelectedObject.IsHighlighted;
+        }
     } /* class SgxMapControl */
 } /* namespace SgxMap */

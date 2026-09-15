@@ -58,8 +58,8 @@ namespace SgxMap.Shapes
         /// specifies how the outline is painted
         /// </summary>
         [NonSerialized] public Pen Stroke = new Pen(Brushes.Black, 2);
-        [NonSerialized] public Pen NormalStroke = new Pen(Brushes.Black, 2);
-        [NonSerialized] public Pen HighlightStroke = new Pen(Brushes.Red, 3);
+        [NonSerialized] public Pen HighlightStroke = new Pen(Brushes.Yellow, 6);
+        [NonSerialized] public SolidBrush HighlightFill = new SolidBrush(Color.Yellow);
         [NonSerialized] public SolidBrush Fill = new SolidBrush(Color.White);
 
         public long ID
@@ -86,13 +86,12 @@ namespace SgxMap.Shapes
 
         public Color Color
         {
-            get { return NormalStroke.Color; }
+            get { return Stroke.Color; }
             set
             {
-                if (NormalStroke.Color != value)
+                if (Stroke.Color != value)
                 {
-                    NormalStroke.Color = value;
-                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
+                    Stroke.Color = value;
                     m_layer?.RefreshObject(this);
                 }
             }
@@ -106,7 +105,8 @@ namespace SgxMap.Shapes
                 if (HighlightStroke.Color != value)
                 {
                     HighlightStroke.Color = value;
-                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
+                    HighlightFill = new SolidBrush(value);
+                    m_layer?.RefreshObject(this);
                 }
             }
         }
@@ -133,8 +133,8 @@ namespace SgxMap.Shapes
                 if (m_thickness != value)
                 {
                     m_thickness = value;
-                    NormalStroke.Width = m_thickness;
-                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
+                    Stroke.Width = m_thickness;
+                    HighlightStroke.Width = m_thickness + 4;
                     m_layer?.RefreshObject(this);
                 }
             }
@@ -189,7 +189,6 @@ namespace SgxMap.Shapes
                 if (m_isHighlighted != value)
                 {
                     m_isHighlighted = value;
-                    Stroke = m_isHighlighted ? HighlightStroke : NormalStroke;
                     m_layer?.RefreshObject(this);
                 }
             }
@@ -265,7 +264,6 @@ namespace SgxMap.Shapes
             m_id = ++LastID;
             m_position = position;
             m_name = name;
-            NormalStroke.Color = color;
             Stroke.Color = color;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
         }
@@ -275,7 +273,6 @@ namespace SgxMap.Shapes
             m_id = ++LastID;
             m_position = position;
             m_name = "name-" + m_id;
-            NormalStroke.Color = color;
             Stroke.Color = color;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
         }
@@ -286,7 +283,6 @@ namespace SgxMap.Shapes
             if (string.IsNullOrEmpty(name))
                  name = "Object-" + m_id.ToString();
             else m_name = name;
-            NormalStroke.Color = color;
             Stroke.Color = color;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
             if ((points != null) && (points.Count > 0))
@@ -418,7 +414,7 @@ namespace SgxMap.Shapes
             {
                 var d = m_layer?.FromLatLngToLocalPosition(p);
                 if (d != null)
-                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, NormalStroke);
+                    return m_graphicsPath.IsOutlineVisible(d.Value.X, d.Value.Y, Stroke);
             }
 
             return false;
@@ -454,7 +450,7 @@ namespace SgxMap.Shapes
             info.AddValue("ID", ID);
             info.AddValue("Name", m_name);
             info.AddValue("Position", Position);
-            info.AddValue("Color", NormalStroke.Color);
+            info.AddValue("Color", Stroke.Color);
         }
 
         protected BasePoint(SerializationInfo info, StreamingContext context)
@@ -476,10 +472,10 @@ namespace SgxMap.Shapes
         public virtual void Dispose()
         {
             Remove();
-            if (NormalStroke != null)
+            if (Stroke != null)
             {
-                NormalStroke.Dispose();
-                NormalStroke = null;
+                Stroke.Dispose();
+                Stroke = null;
             }
         }
 

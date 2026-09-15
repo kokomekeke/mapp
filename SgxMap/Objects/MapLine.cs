@@ -93,6 +93,12 @@ namespace SgxMap.Shapes
                             else Stroke.EndCap= LineCap.NoAnchor;
                             break;
                     }
+
+                    if (Layer != null && Layer.MapPanel != null)
+                    {
+                        m_layer?.RefreshObject(this);
+                    }
+
                 }
             }
         }
@@ -315,7 +321,19 @@ namespace SgxMap.Shapes
             base.Remove();
         }
 
-
+        public override void OnRender(Graphics g)
+        {
+            if (m_graphicsPath == null)
+            {
+                UpdateGraphicsPath();
+            }
+            if (m_graphicsPath != null)
+            {
+                if (IsHighlighted)
+                    g.DrawLine(HighlightStroke, LocalPosition, LocalPosition2);
+                g.DrawLine(Stroke, LocalPosition, LocalPosition2);
+            }
+        }
 
         #region serialization
 

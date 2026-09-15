@@ -672,6 +672,69 @@ namespace SgxMap
             return ret;
         } /* ToImage */
 
+
+
+        /// <summary>
+        ///     Call it to empty tile cache & reload tiles
+        /// </summary>
+        public void ReloadMap()
+        {
+            Core.ReloadMap();
+        }
+
+        #region Cash
+
+        /// <summary>
+        ///     exports current map cache to GMDB file
+        ///     if file exsist only new records will be added
+        ///     otherwise file will be created and all data exported
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public bool ExportToGMDB(string file)
+        {
+#if SQLite
+            if (PrimaryCache is SQLitePureImageCache)
+            {
+                var db = new StringBuilder((PrimaryCache as SQLitePureImageCache).GtileCache);
+                db.AppendFormat(CultureInfo.InvariantCulture,
+                    "{0}{1}Data.gmdb",
+                    GMapProvider.LanguageStr,
+                    Path.DirectorySeparatorChar);
+
+                return SQLitePureImageCache.ExportMapDataToDB(db.ToString(), file);
+            }
+#endif
+            return false;
+        }
+
+        /// <summary>
+        ///     imports GMDB file to current map cache
+        ///     only new records will be added
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        public bool ImportFromGMDB(string file)
+        {
+#if SQLite
+            if (PrimaryCache is SQLitePureImageCache)
+            {
+                var db = new StringBuilder((PrimaryCache as SQLitePureImageCache).GtileCache);
+                db.AppendFormat(CultureInfo.InvariantCulture,
+                    "{0}{1}Data.gmdb",
+                    GMapProvider.LanguageStr,
+                    Path.DirectorySeparatorChar);
+
+                return SQLitePureImageCache.ExportMapDataToDB(file, db.ToString());
+            }
+#endif
+            return false;
+        }
+
+        #endregion Cash
+
+
+
         #endregion Export/Import
 
 
@@ -1300,7 +1363,7 @@ namespace SgxMap
                             break;
 
                         case MouseMoveStatusType.Marker:
-                            m_MapMarker = Layers[0].AddBaseMarker(e.X, e.Y, 14, Color.Red);
+                            m_MapMarker = Layers[0].AddBaseMarker(e.X, e.Y, 14, Color.Red, MarketTooltipTextType.DF);
                             break;
 
                         case MouseMoveStatusType.Ray:
@@ -1787,16 +1850,151 @@ namespace SgxMap
                         break;
 
                     case "line":                        // draw line: "line", name, lat1, lng1, lat2, lng2, color
-                    case "ray":                         // draw ray: "ray", name, lat, lng, degree, color
+                        if (ls.Length > 6)
+                        {
+                            var l = MapLine.CreateLine(ls, out errorstring);
+                            if (l == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(l);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
                     case "polyline":                    // draw poliline: "polyline", name, lat1, lng1, lat2, lng2, lat3, lng3, ..., color
-                    case "circle":                       // draw circle "circle name lat, long, radius, color
-                    case "ellipse":                       // draw ellipse "ellipse name lat, long, radius1, radius2, color
-                    case "rectangle":                       // draw rectangle "rectangle name lat, long, width, height, color
-                    case "label":                       // draw label: "label", name, lat,lng, text
-                    case "route":
-                    case "marker":                      // draw marker: "marker", type, name, lat,lng, color
-                    case "gmarker":                      // draw google marker: "marker", name, lat,lng, color
-                    case "hmarker":                      // draw HFsystem marker: "marker", name, lat,lng, color
+                        if (ls.Length > 6)
+                        {
+                            var p = MapPolyLine.CreatePolyline(ls, out errorstring);
+                            if (p == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(p);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
+                    case "ray":                         // draw ray: "ray", name, lat, lng, degree, distance, color
+                        if (ls.Length > 6)
+                        {
+                            var r = MapRayLine.CreateRay(ls, out errorstring);
+                            if (r == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(r);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
+                    case "circle":                      // draw circle "circle name lat, long, radius, color
+                        if (ls.Length > 5)
+                        {
+                            var p = GeoCircle.CreateCircle(ls, out errorstring);
+                            if (p == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(p);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
+                    case "ellipse":                     // draw ellipse "ellipse name lat, long, radius1, radius2, color
+                        if (ls.Length > 6)
+                        {
+                            var p = MapEllipse.CreateEllipse(ls, out errorstring);
+                            if (p == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(p);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
+                    case "rectangle":                   // draw rectangle "rectangle name lat, long, width, height, color
+                        if (ls.Length > 6)
+                        {
+                            var p = MapRectangle.CreateRectangle(ls, out errorstring);
+                            if (p == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(p);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
+                    case "label":                       // draw label: "label", name, "lat", "lng", "text", "fontname", "fontsize", "fontstyle"
+                        if (ls.Length > 8)
+                        {
+                            var g = MapLabel.CreateLabelExt(ls, out errorstring);
+                            if (g == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(g);
+                            Invalidate();
+                            return true;
+                        }
+                        else if (ls.Length > 4)                         // draw label: "label", name, lat,lng, text
+                        {
+                            var g = MapLabel.CreateLabel(ls, out errorstring);
+                            if (g == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(g);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
+                    case "marker":                      // draw marker: "marker", name, lat,lng, size, color
+                        if (ls.Length > 6)
+                        {
+                            var g = MapBaseMarker.CreateMarker(ls, out errorstring);
+                            if (g == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(g);
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
+
+                    case "bmarker":                // draw bitmap marker: "bmarker", name, lat, lng, imagename, color
+                        if (ls.Length > 4)
+                        {
+                            var g = MapBitmapMarker.CreateBitmapMarker(ls, out errorstring);
+                            if (g == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+                            currentLayer?.AddObject(g);
+                            Invalidate();
+                            return true;
+                        }
                         break;
 
                     default:
@@ -3017,14 +3215,6 @@ namespace SgxMap
 
 
         #region IGControl Members
-
-        /// <summary>
-        ///     Call it to empty tile cache & reload tiles
-        /// </summary>
-        public void ReloadMap()
-        {
-            Core.ReloadMap();
-        }
 
 
         public PointLatLng GetPositionBySettlement(string keys)

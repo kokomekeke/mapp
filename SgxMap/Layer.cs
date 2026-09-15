@@ -327,27 +327,52 @@ namespace SgxMap
             return null;
         }
 
-        public MapBaseMarker? AddBaseMarker(int x, int y, int size, Color color)
+        public MapBaseMarker? AddBaseMarker(int x, int y, int size, Color color, MarketTooltipTextType texttype)
         {
             var p = MapPanel.FromLocalToLatLng(x, y);
             if (!p.IsEmpty)
             {
                 var marker = new MapBaseMarker("", p, size, color);
                 AddObject(marker);
-                marker.TooltipTextType = MarketTooltipTextType.Location;
+                marker.TooltipTextType = texttype;
                 return marker;
             }
             return null;
         }
 
-        public MapBaseMarker? AddBaseMarker(string name, PointLatLng p, int size, Color color)
+        public MapBaseMarker? AddBaseMarker(string name, PointLatLng p, int size, Color color, MarketTooltipTextType texttype)
         {
             if (!p.IsEmpty)
             {
                 var marker = new MapBaseMarker(name, p, size, color);
                 AddObject(marker);
-                marker.TooltipTextType = MarketTooltipTextType.Location;
+                marker.TooltipTextType = texttype;
                 //AddToolTip(marker, "Próba");
+                return marker;
+            }
+            return null;
+        }
+
+        public MapBitmapMarker? AddGoogleMarker(int x, int y, MarkerBitmapType type, MarketTooltipTextType texttype)
+        {
+            var p = MapPanel.FromLocalToLatLng(x, y);
+            if (!p.IsEmpty)
+            {
+                var marker = new MapBitmapMarker("", p,type);
+                AddObject(marker);
+                marker.TooltipTextType = texttype;
+                return marker;
+            }
+            return null;
+        }
+
+        public MapBitmapMarker? AddGoogleMarker(string name, PointLatLng p, MarkerBitmapType type, MarketTooltipTextType texttype)
+        {
+            if (!p.IsEmpty)
+            {
+                var marker = new MapBitmapMarker(name, p, type);
+                AddObject(marker);
+                marker.TooltipTextType = texttype;
                 return marker;
             }
             return null;

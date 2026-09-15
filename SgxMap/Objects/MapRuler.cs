@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         03-Sep-2026.
-*           Last modification                                      04-Sep-2026.
+*           Last modification                                      15-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -61,6 +61,12 @@ namespace SgxMap.Shapes
                 return;
 
             Position2 = point;
+            UpdatePosition2();
+        }
+
+
+        protected void UpdatePosition2()
+        {
             if (m_label == null)
                 m_label = Layer.AddTextBox("", Position2, Length.ToString("F1") + " km", new Font("Arial", 12));
             else
@@ -68,11 +74,12 @@ namespace SgxMap.Shapes
                 if (m_label.Layer == null)
                     m_label.Layer = this.Layer;
 
-                m_label.Position = point;
+                m_label.Position = Position2;
                 m_label.Text = Length.ToString("F1") + " km";
                 Layer?.RefreshObject(m_label);
             }
             Layer?.RefreshObject(this);
+
         }
 
         public override void UpdateEndPoint(int x, int y)

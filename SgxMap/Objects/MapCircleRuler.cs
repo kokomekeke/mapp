@@ -4,6 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         04-Sep-2026.
+*          last modification                                       15-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace SgxMap.Shapes
 {
     public class MapCircleRuler: MapRuler, ISerializable, IDisposable
     {
+        protected Rectangle m_area;
 
         public MapCircleRuler(PointLatLng p1, PointLatLng p2, Color color)
             : base(p1, p2, color)
@@ -33,11 +35,34 @@ namespace SgxMap.Shapes
             int r = (int)Math.Sqrt(w1*w1 + w2*w2);
             if (r > 0)
             {
-                var rec = new Rectangle(LocalPosition.X - r, LocalPosition.Y - r, 2 * r, 2 * r);
-                m_graphicsPath?.AddEllipse(rec);
+                m_area = new Rectangle(LocalPosition.X - r, LocalPosition.Y - r, 2 * r, 2 * r);
+                m_graphicsPath?.AddEllipse(m_area);
+            }
+        }
+
+        public override void OnRender(Graphics g)
+        {
+            if (m_graphicsPath == null)
+            {
+                UpdateGraphicsPath();
+            }
+            if (m_graphicsPath != null)
+            {
+                if (IsHighlighted)
+                    g.DrawPath(HighlightStroke, m_graphicsPath);
+                g.DrawPath(Stroke, m_graphicsPath);
+            }
+        }
+
+        public override void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
+        {
+            //if (oldpoint == Position2)
+            {
+                base.MovePoint(oldpoint, newpoint);
+                UpdatePosition2();
             }
         }
 
 
-    }
-}
+    } /* class MapCircleRuler */
+} /* namespace SgxMap.Shapes */

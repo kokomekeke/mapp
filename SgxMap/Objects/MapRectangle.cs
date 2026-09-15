@@ -4,7 +4,7 @@
 * (c) Kótai 2026
 *
 * ver 1.00                                                         04-Sep-2026.
-*          Last modification                                       09-Sep-2026.
+*          Last modification                                       15-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -23,6 +23,7 @@ namespace SgxMap.Shapes
 
         protected float m_localWidth;
         protected float m_localHeight;
+        protected Rectangle m_area;
 
         protected PointLatLng[] Points = new PointLatLng[8];
 
@@ -96,6 +97,26 @@ namespace SgxMap.Shapes
         }
 
 
+        public static MapRectangle CreateRectangle(string[] ls, out string errorstring)
+        {
+            try
+            {
+                // 0: "circle", 1: name,  2: lat1, 3: lng1, 4: radius, 5: Width, 6: color
+                errorstring = string.Empty;
+                var p1 = new PointLatLng(double.Parse(ls[2]), double.Parse(ls[3]));
+                float Width = float.Parse(ls[4]);
+                float Height = float.Parse(ls[5]);
+                var color = ColorTranslator.FromHtml(ls[6]);
+
+                return new MapRectangle(ls[1], p1, Width, Height, color);
+            }
+            catch (Exception ex)
+            {
+                errorstring = ex.ToString();
+                return null;
+            }
+        }
+
 
         public override void UpdateLocalPosition()
         {
@@ -130,7 +151,23 @@ namespace SgxMap.Shapes
                 h = -h;
             }
 
-            m_graphicsPath?.AddRectangle(new Rectangle(posx, posy, w, h));
+            m_area = new Rectangle(posx, posy, w, h);
+            m_graphicsPath?.AddRectangle(m_area);
+        }
+
+
+        public override void OnRender(Graphics g)
+        {
+            if (m_graphicsPath == null)
+            {
+                UpdateGraphicsPath();
+            }
+            if (m_graphicsPath != null)
+            {
+                if (IsHighlighted)
+                    g.DrawRectangle(HighlightStroke, Rectangle.Inflate(m_area, 4,4));
+                g.DrawPath(Stroke, m_graphicsPath);
+            }
         }
 
 

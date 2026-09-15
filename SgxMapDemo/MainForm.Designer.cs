@@ -36,12 +36,17 @@
             loadToolStripMenuItem = new ToolStripMenuItem();
             editToolStripMenuItem = new ToolStripMenuItem();
             sgxMapControl1 = new SgxMap.SgxMapControl();
+            casheToolStripMenuItem = new ToolStripMenuItem();
+            mi_importCash = new ToolStripMenuItem();
+            mi_exportcash = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripSeparator();
+            mi_use_cash_only = new ToolStripMenuItem();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // menuStrip1
             // 
-            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, macroToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { fileToolStripMenuItem, macroToolStripMenuItem, casheToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(800, 24);
@@ -58,7 +63,7 @@
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(92, 22);
+            exitToolStripMenuItem.Size = new Size(180, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -72,14 +77,14 @@
             // loadToolStripMenuItem
             // 
             loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(100, 22);
+            loadToolStripMenuItem.Size = new Size(180, 22);
             loadToolStripMenuItem.Text = "Load";
             loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
             // 
             // editToolStripMenuItem
             // 
             editToolStripMenuItem.Name = "editToolStripMenuItem";
-            editToolStripMenuItem.Size = new Size(100, 22);
+            editToolStripMenuItem.Size = new Size(180, 22);
             editToolStripMenuItem.Text = "Edit";
             editToolStripMenuItem.Click += editToolStripMenuItem_Click;
             // 
@@ -94,6 +99,39 @@
             sgxMapControl1.Size = new Size(800, 616);
             sgxMapControl1.TabIndex = 1;
             sgxMapControl1.Zoom = 0D;
+            // 
+            // casheToolStripMenuItem
+            // 
+            casheToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mi_importCash, mi_exportcash, toolStripMenuItem1, mi_use_cash_only });
+            casheToolStripMenuItem.Name = "casheToolStripMenuItem";
+            casheToolStripMenuItem.Size = new Size(51, 20);
+            casheToolStripMenuItem.Text = "Cashe";
+            // 
+            // mi_importCash
+            // 
+            mi_importCash.Name = "mi_importCash";
+            mi_importCash.Size = new Size(180, 22);
+            mi_importCash.Text = "&Import";
+            mi_importCash.ToolTipText = "Load saved cached map from file";
+            // 
+            // mi_exportcash
+            // 
+            mi_exportcash.Name = "mi_exportcash";
+            mi_exportcash.Size = new Size(180, 22);
+            mi_exportcash.Text = "&Export";
+            mi_exportcash.ToolTipText = "Save cashed map in file";
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(177, 6);
+            // 
+            // mi_use_cash_only
+            // 
+            mi_use_cash_only.Name = "mi_use_cash_only";
+            mi_use_cash_only.Size = new Size(180, 22);
+            mi_use_cash_only.Text = "Cach only";
+            mi_use_cash_only.ToolTipText = "Use cashed map only";
             // 
             // MainForm
             // 
@@ -122,5 +160,10 @@
         private ToolStripMenuItem macroToolStripMenuItem;
         private ToolStripMenuItem loadToolStripMenuItem;
         private ToolStripMenuItem editToolStripMenuItem;
+        private ToolStripMenuItem casheToolStripMenuItem;
+        private ToolStripMenuItem mi_importCash;
+        private ToolStripMenuItem mi_exportcash;
+        private ToolStripSeparator toolStripMenuItem1;
+        private ToolStripMenuItem mi_use_cash_only;
     }
 }
