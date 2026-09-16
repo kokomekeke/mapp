@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         05-Sep-2026.
-*          Last modification                                       15-Sep-2026.
+*          Last modification                                       16-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -146,7 +146,7 @@ namespace SgxMap.Shapes
             : base(name, points, Color.Black)
         {
             Stroke.LineJoin = LineJoin.Round;
-            Stroke.Width = 5;
+            Stroke.Width = 2;
             LocalPoints.Capacity = Points.Count;
         }
 
@@ -154,18 +154,19 @@ namespace SgxMap.Shapes
             : base(name, points, color)
         {
             Stroke.LineJoin = LineJoin.Round;
-            Stroke.Width = 5;
+            Stroke.Width = 2;
             LocalPoints.Capacity = Points.Count;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
             LastColor = Stroke.Color;
         }
 
-        public MapPolyLine(string name, PointLatLng point, Color color)
-                : base(name, point, color)
+        public MapPolyLine(string name, PointLatLng point1, PointLatLng point2, Color color)
+                : base(name, point1, color)
         {
-            Points.Add(point);
+            Points.Add(point1);
+            Points.Add(point2);
             Stroke.LineJoin = LineJoin.Round;
-            Stroke.Width = 5;
+            Stroke.Width = 2;
             LocalPoints.Capacity = Points.Count;
             Stroke.SetLineCap(LineCap.NoAnchor, LineCap.ArrowAnchor, DashCap.Flat);
             LastColor = Stroke.Color;
@@ -228,23 +229,12 @@ namespace SgxMap.Shapes
         }
 
 
-
-
-        /// <summary>
-        ///     Indicates whether the specified point is contained within this System.Drawing.Drawing2D.GraphicsPath
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        internal bool IsInsideLocal(int x, int y)
+        public override void Remove()
         {
-            if (m_graphicsPath != null)
-            {
-                return m_graphicsPath.IsVisible(x, y);
-            }
-
-            return false;
+            Layer?.MapPanel.RemoveLinePoints(this);
+            base.Remove();
         }
+
 
         public override void UpdateLocalPosition()
         {
@@ -310,6 +300,22 @@ namespace SgxMap.Shapes
 
 
 
+        /// <summary>
+        ///     Indicates whether the specified point is contained within this System.Drawing.Drawing2D.GraphicsPath
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public  bool IsInsideLocal(int x, int y)
+        {
+            if (m_graphicsPath != null)
+            {
+                return m_graphicsPath.IsVisible(x, y);
+            }
+
+            return false;
+        }
+
 
         /// <summary>
         ///     checks if point is inside the polygon,
@@ -363,9 +369,10 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
                     {
-                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.04)
                         {
-                            result = !result;
+                            //result = !result;
+                            return true;
                         }
                     }
                 }
@@ -373,9 +380,10 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
                     {
-                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.04)
                         {
-                            result = !result;
+                            //result = !result;
+                            return true;
                         }
                     }
                 }
@@ -660,6 +668,16 @@ namespace SgxMap.Shapes
             Layer.RefreshObject(this);
         }
 
+
+        public virtual void UpdateEndPoint(int x, int y)
+        {
+            var point = Layer.MapPanel.FromLocalToLatLng(x, y);
+            if (Points.Count > 0)
+            {
+                Points[Points.Count - 1] = point;
+                UpdateLinePoints();
+            }
+        }
 
 
         #region ISerializable Members

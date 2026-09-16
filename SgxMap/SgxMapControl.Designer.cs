@@ -47,6 +47,7 @@
             btn_findAddress = new Button();
             controlBox_address = new ComboBox();
             DrawPanel = new Panel();
+            btn_draw_highlight = new Button();
             btn_draw_linearrow = new Button();
             btn_draw_linewidth = new Button();
             btn_textcolor_down = new Button();
@@ -87,7 +88,56 @@
             ptToolStripMenuItem5 = new ToolStripMenuItem();
             ptToolStripMenuItem6 = new ToolStripMenuItem();
             ptToolStripMenuItem8 = new ToolStripMenuItem();
-            btn_draw_highlight = new Button();
+            menu_marker = new ContextMenuStrip(components);
+            mi_marker_showInformation = new ToolStripMenuItem();
+            mi_marke_showName = new ToolStripMenuItem();
+            mi_marker_hideAllInformation = new ToolStripMenuItem();
+            mi_marker_rename = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripSeparator();
+            mi_marker_center = new ToolStripMenuItem();
+            mi_marker_zoomTo = new ToolStripMenuItem();
+            mi_marker_change_color = new ToolStripMenuItem();
+            toolStripMenuItem2 = new ToolStripSeparator();
+            mi_marker_copy = new ToolStripMenuItem();
+            toolStripMenuItem4 = new ToolStripSeparator();
+            mi_marker_highlight = new ToolStripMenuItem();
+            toolStripMenuItem3 = new ToolStripSeparator();
+            mi_marker_remove = new ToolStripMenuItem();
+            menu_line = new ContextMenuStrip(components);
+            mi_line_changeColor = new ToolStripMenuItem();
+            mi_line_highlight = new ToolStripMenuItem();
+            mi_line_length = new ToolStripMenuItem();
+            toolStripMenuItem6 = new ToolStripSeparator();
+            mi_line_copy = new ToolStripMenuItem();
+            toolStripMenuItem5 = new ToolStripSeparator();
+            mi_line_remove = new ToolStripMenuItem();
+            menu_polyline = new ContextMenuStrip(components);
+            mi_polyline_addPoint = new ToolStripMenuItem();
+            mi_polyline_removePoint = new ToolStripMenuItem();
+            toolStripMenuItem18 = new ToolStripSeparator();
+            mi_polyline_change_color = new ToolStripMenuItem();
+            mi_polyline_highlight = new ToolStripMenuItem();
+            mi_polyline_close = new ToolStripMenuItem();
+            mi_polyline_length = new ToolStripMenuItem();
+            toolStripSeparator1 = new ToolStripSeparator();
+            mi_polyline_copy = new ToolStripMenuItem();
+            toolStripSeparator2 = new ToolStripSeparator();
+            mi_polyline__remove = new ToolStripMenuItem();
+            menu_rectangle = new ContextMenuStrip(components);
+            mi_rectangle_changeColor = new ToolStripMenuItem();
+            mi_rectangle_highlight = new ToolStripMenuItem();
+            toolStripMenuItem17 = new ToolStripSeparator();
+            mi_rectangle_copy = new ToolStripMenuItem();
+            toolStripMenuItem16 = new ToolStripSeparator();
+            mi_rectangle_remove = new ToolStripMenuItem();
+            menu_textbox = new ContextMenuStrip(components);
+            mi_textbox_editText = new ToolStripMenuItem();
+            mi_textbox_change_color = new ToolStripMenuItem();
+            mi_textbox_hightlight = new ToolStripMenuItem();
+            toolStripMenuItem14 = new ToolStripSeparator();
+            mi_textbox_copy = new ToolStripMenuItem();
+            toolStripMenuItem15 = new ToolStripSeparator();
+            mi_textbox_remove = new ToolStripMenuItem();
             TopPanel.SuspendLayout();
             BottomPanel.SuspendLayout();
             SearchPanel.SuspendLayout();
@@ -95,6 +145,11 @@
             DrawPanel.SuspendLayout();
             menu_linestyle.SuspendLayout();
             menu_linewidth.SuspendLayout();
+            menu_marker.SuspendLayout();
+            menu_line.SuspendLayout();
+            menu_polyline.SuspendLayout();
+            menu_rectangle.SuspendLayout();
+            menu_textbox.SuspendLayout();
             SuspendLayout();
             // 
             // TopPanel
@@ -315,6 +370,17 @@
             DrawPanel.Size = new Size(978, 49);
             DrawPanel.TabIndex = 4;
             // 
+            // btn_draw_highlight
+            // 
+            btn_draw_highlight.BackColor = Color.Yellow;
+            btn_draw_highlight.Location = new Point(868, 2);
+            btn_draw_highlight.Name = "btn_draw_highlight";
+            btn_draw_highlight.Size = new Size(37, 37);
+            btn_draw_highlight.TabIndex = 24;
+            toolTip_draw.SetToolTip(btn_draw_highlight, "Arrow style");
+            btn_draw_highlight.UseVisualStyleBackColor = false;
+            btn_draw_highlight.Click += btn_draw_highlight_Click;
+            // 
             // btn_draw_linearrow
             // 
             btn_draw_linearrow.Image = (Image)resources.GetObject("btn_draw_linearrow.Image");
@@ -525,6 +591,7 @@
             btn_draw_freeform.TabIndex = 5;
             toolTip_draw.SetToolTip(btn_draw_freeform, "Freeform");
             btn_draw_freeform.UseVisualStyleBackColor = true;
+            btn_draw_freeform.Click += btn_draw_freeform_Click;
             // 
             // btn_draw_arrow
             // 
@@ -722,16 +789,311 @@
             ptToolStripMenuItem8.Text = "8 pt";
             ptToolStripMenuItem8.Click += ptToolStripMenuItem8_Click;
             // 
-            // btn_draw_highlight
+            // menu_marker
             // 
-            btn_draw_highlight.BackColor = Color.Yellow;
-            btn_draw_highlight.Location = new Point(868, 2);
-            btn_draw_highlight.Name = "btn_draw_highlight";
-            btn_draw_highlight.Size = new Size(37, 37);
-            btn_draw_highlight.TabIndex = 24;
-            toolTip_draw.SetToolTip(btn_draw_highlight, "Arrow style");
-            btn_draw_highlight.UseVisualStyleBackColor = false;
-            btn_draw_highlight.Click += btn_draw_highlight_Click;
+            menu_marker.Items.AddRange(new ToolStripItem[] { mi_marker_showInformation, mi_marke_showName, mi_marker_hideAllInformation, mi_marker_rename, toolStripMenuItem1, mi_marker_center, mi_marker_zoomTo, mi_marker_change_color, toolStripMenuItem2, mi_marker_copy, toolStripMenuItem4, mi_marker_highlight, toolStripMenuItem3, mi_marker_remove });
+            menu_marker.Name = "contextMenuStrip1";
+            menu_marker.Size = new Size(181, 248);
+            // 
+            // mi_marker_showInformation
+            // 
+            mi_marker_showInformation.Name = "mi_marker_showInformation";
+            mi_marker_showInformation.Size = new Size(180, 22);
+            mi_marker_showInformation.Text = "Show information";
+            // 
+            // mi_marke_showName
+            // 
+            mi_marke_showName.Name = "mi_marke_showName";
+            mi_marke_showName.Size = new Size(180, 22);
+            mi_marke_showName.Text = "Show name";
+            // 
+            // mi_marker_hideAllInformation
+            // 
+            mi_marker_hideAllInformation.Name = "mi_marker_hideAllInformation";
+            mi_marker_hideAllInformation.Size = new Size(180, 22);
+            mi_marker_hideAllInformation.Text = "Hide all information";
+            // 
+            // mi_marker_rename
+            // 
+            mi_marker_rename.Name = "mi_marker_rename";
+            mi_marker_rename.Size = new Size(180, 22);
+            mi_marker_rename.Text = "Rename";
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(177, 6);
+            // 
+            // mi_marker_center
+            // 
+            mi_marker_center.Name = "mi_marker_center";
+            mi_marker_center.Size = new Size(180, 22);
+            mi_marker_center.Text = "Center";
+            // 
+            // mi_marker_zoomTo
+            // 
+            mi_marker_zoomTo.Name = "mi_marker_zoomTo";
+            mi_marker_zoomTo.Size = new Size(180, 22);
+            mi_marker_zoomTo.Text = "Zoom To";
+            // 
+            // mi_marker_change_color
+            // 
+            mi_marker_change_color.Name = "mi_marker_change_color";
+            mi_marker_change_color.Size = new Size(180, 22);
+            mi_marker_change_color.Text = "Change color";
+            mi_marker_change_color.Click += mi_marker_change_color_Click;
+            // 
+            // toolStripMenuItem2
+            // 
+            toolStripMenuItem2.Name = "toolStripMenuItem2";
+            toolStripMenuItem2.Size = new Size(177, 6);
+            // 
+            // mi_marker_copy
+            // 
+            mi_marker_copy.Name = "mi_marker_copy";
+            mi_marker_copy.Size = new Size(180, 22);
+            mi_marker_copy.Text = "Copy";
+            mi_marker_copy.Click += mi_marker_copy_Click;
+            // 
+            // toolStripMenuItem4
+            // 
+            toolStripMenuItem4.Name = "toolStripMenuItem4";
+            toolStripMenuItem4.Size = new Size(177, 6);
+            // 
+            // mi_marker_highlight
+            // 
+            mi_marker_highlight.Name = "mi_marker_highlight";
+            mi_marker_highlight.Size = new Size(180, 22);
+            mi_marker_highlight.Text = "Highlight";
+            mi_marker_highlight.Click += mi_marker_highlight_Click;
+            // 
+            // toolStripMenuItem3
+            // 
+            toolStripMenuItem3.Name = "toolStripMenuItem3";
+            toolStripMenuItem3.Size = new Size(177, 6);
+            // 
+            // mi_marker_remove
+            // 
+            mi_marker_remove.Name = "mi_marker_remove";
+            mi_marker_remove.Size = new Size(180, 22);
+            mi_marker_remove.Text = "Remove";
+            mi_marker_remove.Click += mi_marker_remove_Click;
+            // 
+            // menu_line
+            // 
+            menu_line.Items.AddRange(new ToolStripItem[] { mi_line_changeColor, mi_line_highlight, mi_line_length, toolStripMenuItem6, mi_line_copy, toolStripMenuItem5, mi_line_remove });
+            menu_line.Name = "menu_line";
+            menu_line.Size = new Size(146, 126);
+            menu_line.Opening += menu_line_Opening;
+            // 
+            // mi_line_changeColor
+            // 
+            mi_line_changeColor.Name = "mi_line_changeColor";
+            mi_line_changeColor.Size = new Size(145, 22);
+            mi_line_changeColor.Text = "Change color";
+            mi_line_changeColor.Click += mi_marker_change_color_Click;
+            // 
+            // mi_line_highlight
+            // 
+            mi_line_highlight.Name = "mi_line_highlight";
+            mi_line_highlight.Size = new Size(145, 22);
+            mi_line_highlight.Text = "Highlight";
+            mi_line_highlight.Click += mi_marker_highlight_Click;
+            // 
+            // mi_line_length
+            // 
+            mi_line_length.Name = "mi_line_length";
+            mi_line_length.Size = new Size(145, 22);
+            mi_line_length.Text = "Length";
+            // 
+            // toolStripMenuItem6
+            // 
+            toolStripMenuItem6.Name = "toolStripMenuItem6";
+            toolStripMenuItem6.Size = new Size(142, 6);
+            // 
+            // mi_line_copy
+            // 
+            mi_line_copy.Name = "mi_line_copy";
+            mi_line_copy.Size = new Size(145, 22);
+            mi_line_copy.Text = "Copy";
+            // 
+            // toolStripMenuItem5
+            // 
+            toolStripMenuItem5.Name = "toolStripMenuItem5";
+            toolStripMenuItem5.Size = new Size(142, 6);
+            // 
+            // mi_line_remove
+            // 
+            mi_line_remove.Name = "mi_line_remove";
+            mi_line_remove.Size = new Size(145, 22);
+            mi_line_remove.Text = "Remove";
+            mi_line_remove.Click += mi_marker_remove_Click;
+            // 
+            // menu_polyline
+            // 
+            menu_polyline.Items.AddRange(new ToolStripItem[] { mi_polyline_addPoint, mi_polyline_removePoint, toolStripMenuItem18, mi_polyline_change_color, mi_polyline_highlight, mi_polyline_close, mi_polyline_length, toolStripSeparator1, mi_polyline_copy, toolStripSeparator2, mi_polyline__remove });
+            menu_polyline.Name = "menu_line";
+            menu_polyline.Size = new Size(149, 198);
+            menu_polyline.Opening += menu_polyline_Opening;
+            // 
+            // mi_polyline_addPoint
+            // 
+            mi_polyline_addPoint.Name = "mi_polyline_addPoint";
+            mi_polyline_addPoint.Size = new Size(148, 22);
+            mi_polyline_addPoint.Text = "Add point";
+            // 
+            // mi_polyline_removePoint
+            // 
+            mi_polyline_removePoint.Name = "mi_polyline_removePoint";
+            mi_polyline_removePoint.Size = new Size(148, 22);
+            mi_polyline_removePoint.Text = "Remove point";
+            // 
+            // toolStripMenuItem18
+            // 
+            toolStripMenuItem18.Name = "toolStripMenuItem18";
+            toolStripMenuItem18.Size = new Size(145, 6);
+            // 
+            // mi_polyline_change_color
+            // 
+            mi_polyline_change_color.Name = "mi_polyline_change_color";
+            mi_polyline_change_color.Size = new Size(148, 22);
+            mi_polyline_change_color.Text = "Change color";
+            mi_polyline_change_color.Click += mi_marker_change_color_Click;
+            // 
+            // mi_polyline_highlight
+            // 
+            mi_polyline_highlight.Name = "mi_polyline_highlight";
+            mi_polyline_highlight.Size = new Size(148, 22);
+            mi_polyline_highlight.Text = "Highlight";
+            mi_polyline_highlight.Click += mi_marker_highlight_Click;
+            // 
+            // mi_polyline_close
+            // 
+            mi_polyline_close.Name = "mi_polyline_close";
+            mi_polyline_close.Size = new Size(148, 22);
+            mi_polyline_close.Text = "Close";
+            // 
+            // mi_polyline_length
+            // 
+            mi_polyline_length.Name = "mi_polyline_length";
+            mi_polyline_length.Size = new Size(148, 22);
+            mi_polyline_length.Text = "Length";
+            // 
+            // toolStripSeparator1
+            // 
+            toolStripSeparator1.Name = "toolStripSeparator1";
+            toolStripSeparator1.Size = new Size(145, 6);
+            // 
+            // mi_polyline_copy
+            // 
+            mi_polyline_copy.Name = "mi_polyline_copy";
+            mi_polyline_copy.Size = new Size(148, 22);
+            mi_polyline_copy.Text = "Copy";
+            // 
+            // toolStripSeparator2
+            // 
+            toolStripSeparator2.Name = "toolStripSeparator2";
+            toolStripSeparator2.Size = new Size(145, 6);
+            // 
+            // mi_polyline__remove
+            // 
+            mi_polyline__remove.Name = "mi_polyline__remove";
+            mi_polyline__remove.Size = new Size(148, 22);
+            mi_polyline__remove.Text = "Remove";
+            mi_polyline__remove.Click += mi_marker_remove_Click;
+            // 
+            // menu_rectangle
+            // 
+            menu_rectangle.Items.AddRange(new ToolStripItem[] { mi_rectangle_changeColor, mi_rectangle_highlight, toolStripMenuItem17, mi_rectangle_copy, toolStripMenuItem16, mi_rectangle_remove });
+            menu_rectangle.Name = "menu_rectangle";
+            menu_rectangle.Size = new Size(146, 104);
+            // 
+            // mi_rectangle_changeColor
+            // 
+            mi_rectangle_changeColor.Name = "mi_rectangle_changeColor";
+            mi_rectangle_changeColor.Size = new Size(145, 22);
+            mi_rectangle_changeColor.Text = "Change color";
+            mi_rectangle_changeColor.Click += mi_marker_change_color_Click;
+            // 
+            // mi_rectangle_highlight
+            // 
+            mi_rectangle_highlight.Name = "mi_rectangle_highlight";
+            mi_rectangle_highlight.Size = new Size(145, 22);
+            mi_rectangle_highlight.Text = "Highlight";
+            mi_rectangle_highlight.Click += mi_marker_highlight_Click;
+            // 
+            // toolStripMenuItem17
+            // 
+            toolStripMenuItem17.Name = "toolStripMenuItem17";
+            toolStripMenuItem17.Size = new Size(142, 6);
+            // 
+            // mi_rectangle_copy
+            // 
+            mi_rectangle_copy.Name = "mi_rectangle_copy";
+            mi_rectangle_copy.Size = new Size(145, 22);
+            mi_rectangle_copy.Text = "Copy";
+            // 
+            // toolStripMenuItem16
+            // 
+            toolStripMenuItem16.Name = "toolStripMenuItem16";
+            toolStripMenuItem16.Size = new Size(142, 6);
+            // 
+            // mi_rectangle_remove
+            // 
+            mi_rectangle_remove.Name = "mi_rectangle_remove";
+            mi_rectangle_remove.Size = new Size(145, 22);
+            mi_rectangle_remove.Text = "Remove";
+            mi_rectangle_remove.Click += mi_marker_remove_Click;
+            // 
+            // menu_textbox
+            // 
+            menu_textbox.Items.AddRange(new ToolStripItem[] { mi_textbox_editText, mi_textbox_change_color, mi_textbox_hightlight, toolStripMenuItem14, mi_textbox_copy, toolStripMenuItem15, mi_textbox_remove });
+            menu_textbox.Name = "menu_rectangle";
+            menu_textbox.Size = new Size(146, 126);
+            // 
+            // mi_textbox_editText
+            // 
+            mi_textbox_editText.Name = "mi_textbox_editText";
+            mi_textbox_editText.Size = new Size(145, 22);
+            mi_textbox_editText.Text = "Edit text";
+            mi_textbox_editText.Click += mi_textbox_editText_Click;
+            // 
+            // mi_textbox_change_color
+            // 
+            mi_textbox_change_color.Name = "mi_textbox_change_color";
+            mi_textbox_change_color.Size = new Size(145, 22);
+            mi_textbox_change_color.Text = "Change color";
+            mi_textbox_change_color.Click += mi_marker_change_color_Click;
+            // 
+            // mi_textbox_hightlight
+            // 
+            mi_textbox_hightlight.Name = "mi_textbox_hightlight";
+            mi_textbox_hightlight.Size = new Size(145, 22);
+            mi_textbox_hightlight.Text = "Hightlight";
+            mi_textbox_hightlight.Click += mi_marker_highlight_Click;
+            // 
+            // toolStripMenuItem14
+            // 
+            toolStripMenuItem14.Name = "toolStripMenuItem14";
+            toolStripMenuItem14.Size = new Size(142, 6);
+            // 
+            // mi_textbox_copy
+            // 
+            mi_textbox_copy.Name = "mi_textbox_copy";
+            mi_textbox_copy.Size = new Size(145, 22);
+            mi_textbox_copy.Text = "Copy";
+            // 
+            // toolStripMenuItem15
+            // 
+            toolStripMenuItem15.Name = "toolStripMenuItem15";
+            toolStripMenuItem15.Size = new Size(142, 6);
+            // 
+            // mi_textbox_remove
+            // 
+            mi_textbox_remove.Name = "mi_textbox_remove";
+            mi_textbox_remove.Size = new Size(145, 22);
+            mi_textbox_remove.Text = "Remove";
+            mi_textbox_remove.Click += mi_marker_remove_Click;
             // 
             // SgxMapControl
             // 
@@ -755,6 +1117,11 @@
             DrawPanel.ResumeLayout(false);
             menu_linestyle.ResumeLayout(false);
             menu_linewidth.ResumeLayout(false);
+            menu_marker.ResumeLayout(false);
+            menu_line.ResumeLayout(false);
+            menu_polyline.ResumeLayout(false);
+            menu_rectangle.ResumeLayout(false);
+            menu_textbox.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -819,5 +1186,55 @@
         private ToolStripMenuItem mi_arrow_atend;
         private ToolStripMenuItem mi_arrow_both;
         private Button btn_draw_highlight;
+        private ContextMenuStrip menu_marker;
+        private ToolStripMenuItem mi_marker_center;
+        private ToolStripMenuItem mi_marker_copy;
+        private ToolStripMenuItem mi_marker_remove;
+        private ToolStripMenuItem mi_marker_showInformation;
+        private ToolStripMenuItem mi_marke_showName;
+        private ToolStripMenuItem mi_marker_rename;
+        private ToolStripSeparator toolStripMenuItem1;
+        private ToolStripMenuItem mi_marker_zoomTo;
+        private ToolStripMenuItem mi_marker_hideAllInformation;
+        private ToolStripSeparator toolStripMenuItem2;
+        private ToolStripMenuItem mi_marker_change_color;
+        private ToolStripMenuItem mi_marker_highlight;
+        private ToolStripSeparator toolStripMenuItem4;
+        private ToolStripSeparator toolStripMenuItem3;
+        private ContextMenuStrip menu_line;
+        private ToolStripMenuItem mi_line_changeColor;
+        private ToolStripMenuItem mi_line_length;
+        private ToolStripMenuItem mi_line_remove;
+        private ToolStripMenuItem mi_line_copy;
+        private ToolStripSeparator toolStripMenuItem6;
+        private ToolStripSeparator toolStripMenuItem5;
+        private ContextMenuStrip menu_polyline;
+        private ToolStripMenuItem mi_polyline_addPoint;
+        private ToolStripMenuItem mi_polyline_change_color;
+        private ToolStripMenuItem mi_polyline_length;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripMenuItem mi_polyline_copy;
+        private ToolStripSeparator toolStripSeparator2;
+        private ToolStripMenuItem mi_polyline__remove;
+        private ContextMenuStrip menu_rectangle;
+        private ToolStripMenuItem mi_rectangle_changeColor;
+        private ToolStripSeparator toolStripMenuItem17;
+        private ToolStripMenuItem mi_rectangle_copy;
+        private ToolStripSeparator toolStripMenuItem16;
+        private ToolStripMenuItem mi_rectangle_remove;
+        private ContextMenuStrip menu_textbox;
+        private ToolStripMenuItem mi_textbox_editText;
+        private ToolStripMenuItem mi_textbox_change_color;
+        private ToolStripSeparator toolStripMenuItem14;
+        private ToolStripMenuItem mi_textbox_copy;
+        private ToolStripSeparator toolStripMenuItem15;
+        private ToolStripMenuItem mi_textbox_remove;
+        private ToolStripMenuItem mi_polyline_close;
+        private ToolStripMenuItem mi_polyline_removePoint;
+        private ToolStripSeparator toolStripMenuItem18;
+        private ToolStripMenuItem mi_line_highlight;
+        private ToolStripMenuItem mi_polyline_highlight;
+        private ToolStripMenuItem mi_rectangle_highlight;
+        private ToolStripMenuItem mi_textbox_hightlight;
     }
 }

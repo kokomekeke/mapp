@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
-*          Last modification                                       12-Sep-2026.
+*          Last modification                                       16-Sep-2026.
 =============================================================================*/
 using System.ComponentModel;
 using System.Diagnostics;
@@ -100,6 +100,7 @@ namespace SgxMap
         public MapRuler? m_MapRuler = null;
         public MapRuler? m_MapCircleRuler = null;
         public MapLine? m_MapLine = null;
+        public MapPolyLine? m_MapPolyline = null;
         public MapRectangle? m_MapRectangle = null;
         public GeoCircle? m_MapCircle = null;
         public MapBaseMarker? m_MapMarker = null;
@@ -1338,6 +1339,12 @@ namespace SgxMap
                             Invalidate();
                             return;
 
+                        case MouseMoveStatusType.Polyline:
+                            m_MapPolyline = Layers[0].AddPolyline(e.X, e.Y, Color.Black);
+                            Invalidate();
+                            return;
+
+
                         case MouseMoveStatusType.Ruler:
                             m_MapRuler = Layers[0].AddRuler(e.X, e.Y, Color.Black);
                             Invalidate();
@@ -1416,6 +1423,15 @@ namespace SgxMap
                 m_MapLine.LineColor = Color.Red;
                 m_MapLine = null;
             }
+
+            if (m_MapPolyline != null)
+            {
+                if (m_MapPolyline.ArrowPosition == ArrowPositions.None)
+                    m_MapPolyline.Thickness = 1;
+                m_MapPolyline.LineColor = Color.Red;
+                m_MapPolyline = null;
+            }
+
 
             if (m_MapCircleRuler != null)
             {
@@ -1546,6 +1562,14 @@ namespace SgxMap
                 return;
             }
 
+            if (m_MapPolyline != null)
+            {
+                m_MapPolyline.UpdateEndPoint(e.X, e.Y);
+                Invalidate();
+                return;
+            }
+
+
             if (m_MapRectangle != null)
             {
                 m_MapRectangle.UpdateEndPoint(e.X, e.Y);
@@ -1668,7 +1692,7 @@ namespace SgxMap
                 //overlayObject = FindSelectedObject(e);
 
                 //if (!overlayObject && Core.MouseDown != GPoint.Empty)
-                    OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
+                OnMapClick?.Invoke(FromLocalToLatLng(e.X, e.Y), e);
             }
         } /* OnMouseClick */
 
@@ -1691,7 +1715,7 @@ namespace SgxMap
         } /* OnMouseDoubleClick */
 
 
-        protected bool FindSelectedObject(MouseEventArgs e)
+        public bool FindSelectedObject(MouseEventArgs e)
         {
             bool overlayObject = false;
             if (m_selected_object != null)
@@ -3160,7 +3184,7 @@ namespace SgxMap
             ;
         }
 
-        internal void RemoveLinePoints(MapLine obj)
+        internal void RemoveLinePoints(BasePoint obj)
         {
             if (obj == null) return;
 
@@ -4188,6 +4212,7 @@ namespace SgxMap
         Textbox,
         Marker,
         Ray,
+        Polyline,
         MovePoint,
     }
 

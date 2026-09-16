@@ -5,7 +5,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
-*          Last modification                                       15-Sep-2026.
+*          Last modification                                       16-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -275,6 +275,11 @@ namespace SgxMap
         }
 
 
+        private void btn_draw_freeform_Click(object sender, EventArgs e)
+        {
+            MainMap.MouseMoveStatus = MouseMoveStatusType.Polyline;
+        }
+
 
         private void textBox_editor_VisibleChanged(object sender, EventArgs e)
         {
@@ -293,42 +298,45 @@ namespace SgxMap
 
         private void MainMap_MouseClick(object sender, MouseEventArgs e)
         {
-            //if (MainMap.MouseMoveStatus == MouseMoveStatusType.Textbox)
-            //{
-            //    if (textBox_editor.Visible)
-            //    {
-            //        if (textBox_editor.Focused)
-            //            return;
-            //        textBox_editor.Visible = false;
-            //        MainMap.MouseMoveStatus = MouseMoveStatusType.None;
-            //        var t = MainMap.Layers[0].AddTextBox("", textBox_editor.Location.X, textBox_editor.Location.Y - MainMap.Location.Y + textBox_editor.Height, textBox_editor.Text, DefaultFont);
-            //        if (t != null)
-            //        {
-            //            t.Color = Color.Red;
-            //            t.Thickness = 1;
-            //        }
-            //        return;
-            //    }
-            //    textBox_editor.Visible = true;
-            //    textBox_editor.Text = string.Empty;
-            //    textBox_editor.Location = new Point(e.X, e.Y + MainMap.Location.Y);
-            //    textBox_editor.Focus();
-            //    Monitor.Enter(m_monitor);
-            //}
-
-            //var pos = MainMap.FromLocalToLatLng(e.X, e.Y);
-            //var loc = MainMap.FromLatLngToLocal(pos);
-            //var l2 = MainMap.FromLatLngToLocalPosition(pos);
-            //var l3 = MainMap.Core.FromLatLngToLocal(pos);
-            //var g1 = MainMap.FromLatLngToPixel(pos);
-            //var g2 = g1;
-            //g2.Offset(MainMap.Core.RenderOffset);
-
-
             if (m_textbox != null)
                 m_textbox.Text = textBox_editor.Text;
             if (textBox_editor.Visible)
                 textBox_editor.Visible = false;
+
+            if ((e.Button == MouseButtons.Right) && MainMap.FindSelectedObject(e))
+            {
+                if (MainMap.SelectedObject is MapBaseMarker)
+                {
+                    menu_marker.Enabled = true;
+                    menu_marker.Show(MainMap, new System.Drawing.Point(e.X, e.Y));
+                }
+                else if (MainMap.SelectedObject is GeoCircle)
+                {
+                    menu_rectangle.Enabled = true;
+                    menu_rectangle.Show(MainMap, new System.Drawing.Point(e.X, e.Y));
+                }
+                else if (MainMap.SelectedObject is MapPolyLine)
+                {
+                    menu_polyline.Enabled = true;
+                    menu_polyline.Show(MainMap, new System.Drawing.Point(e.X, e.Y));
+                }
+                else if (MainMap.SelectedObject is MapTextBox)
+                {
+                    menu_textbox.Enabled = true;
+                    menu_textbox.Show(MainMap, new System.Drawing.Point(e.X, e.Y));
+                }
+                else if (MainMap.SelectedObject is MapRectangle)
+                {
+                    menu_rectangle.Enabled = true;
+                    menu_rectangle.Show(MainMap, new System.Drawing.Point(e.X, e.Y));
+                }
+                else if (MainMap.SelectedObject is MapLine)
+                {
+                    menu_line.Enabled = true;
+                    menu_line.Show(MainMap, new System.Drawing.Point(e.X, e.Y));
+                }
+
+            }
         }
 
 
@@ -661,9 +669,58 @@ namespace SgxMap
 
         private void btn_draw_highlight_Click(object sender, EventArgs e)
         {
-            if (MainMap.SelectedObject == null) 
-                    return;
+            if (MainMap.SelectedObject == null)
+                return;
             MainMap.SelectedObject.IsHighlighted = !MainMap.SelectedObject.IsHighlighted;
         }
+
+        private void menu_line_Opening(object sender, CancelEventArgs e)
+        {
+
+        }
+
+        private void menu_polyline_Opening(object sender, CancelEventArgs e)
+        {
+
+        }
+
+        private void mi_marker_remove_Click(object sender, EventArgs e)
+        {
+            MainMap.SelectedObject?.Remove();
+        }
+
+        private void mi_marker_change_color_Click(object sender, EventArgs e)
+        {
+            var lg = new ColorDialog();
+            if (MainMap.SelectedObject != null)
+            {
+                var dlg = new ColorDialog();
+                dlg.Color = MainMap.SelectedObject.Color;
+                if (dlg.ShowDialog(this) == DialogResult.OK)
+                {
+                    MainMap.SelectedObject.Color = dlg.Color;
+                }
+            }
+        }
+
+        private void mi_marker_highlight_Click(object sender, EventArgs e)
+        {
+            if (MainMap.SelectedObject != null)
+                MainMap.SelectedObject.IsHighlighted = !MainMap.SelectedObject.IsHighlighted;
+        }
+
+        private void mi_marker_copy_Click(object sender, EventArgs e)
+        {
+            MainMap.SelectedObject?.CopyToClipboard();
+        }
+
+        private void mi_textbox_editText_Click(object sender, EventArgs e)
+        {
+            if (MainMap.m_selected_object is MapTextBox)
+            {
+                MainMap_OnTextBoxEdit(MainMap.m_selected_object as MapTextBox);
+            }
+        }
+
     } /* class SgxMapControl */
 } /* namespace SgxMap */

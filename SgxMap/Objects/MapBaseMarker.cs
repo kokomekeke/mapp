@@ -93,6 +93,16 @@ namespace SgxMap.Shapes
             }
         }
 
+        public override Color Color
+        {
+            get { return Fill.Color; }
+            set
+            {
+                Fill.Color = value;
+                Layer?.RefreshObject(this);
+            }
+        }
+
 
         public MapToolTip ToolTip
         {
@@ -389,6 +399,14 @@ namespace SgxMap.Shapes
                 g.FillEllipse(Fill, rec);
             }
         }
+
+        public override void Remove()
+        {
+            if (m_toolTip != null)
+                m_layer?.RemoveObject(m_toolTip);
+            base.Remove();
+        }
+
 
 
         #region ISerializable Members

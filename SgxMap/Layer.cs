@@ -136,7 +136,7 @@ namespace SgxMap
             try
             {
                 Shapes.Remove(obj);
-                obj.Layer = null;
+                //obj.Layer = null;
             }
             catch { };
         }
@@ -269,8 +269,16 @@ namespace SgxMap
 
         public void RefreshObject(BasePoint obj)
         {
-             obj.UpdateObject();
+             obj?.UpdateObject();
 
+            if (MapPanel != null && !MapPanel.m_holdInvalidation)
+            {
+                MapPanel.Invalidate();
+            }
+        }
+
+        public void Refresh()
+        {
             if (MapPanel != null && !MapPanel.m_holdInvalidation)
             {
                 MapPanel.Invalidate();
@@ -300,6 +308,18 @@ namespace SgxMap
             return line;
         }
 
+        public MapPolyLine AddPolyline(int x, int y, Color color)
+        {
+            var p1 = MapPanel.FromLocalToLatLng(x, y);
+            if (!p1.IsEmpty)
+            {
+                var line = new MapPolyLine("", p1, p1, color);
+                AddObject(line);
+                return line;
+            }
+            return null;
+
+        }
 
         public MapLabel AddLabel(string name, PointLatLng point, string text, System.Drawing.Font font)
         {

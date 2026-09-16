@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
-*          Last modification                                       04-Sep-2026.
+*          Last modification                                       16-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -84,7 +84,7 @@ namespace SgxMap.Shapes
             }   
         }
 
-        public Color Color
+        public virtual Color Color
         {
             get { return Stroke.Color; }
             set
@@ -424,6 +424,7 @@ namespace SgxMap.Shapes
         public virtual void Remove()
         {
             m_layer?.RemoveObject(this);
+            m_layer?.Refresh();
         }
 
         public virtual void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
@@ -441,6 +442,12 @@ namespace SgxMap.Shapes
         public virtual void UpdateLinePoints()
         {
             //UpdateLocalPosition(); UpdateGraphicsPath();
+        }
+
+        public virtual void CopyToClipboard()
+        {
+            Clipboard.SetText(Position.ToGeoString());
+            //Clipboard.SetDataObject(this);
         }
 
 
