@@ -1,4 +1,12 @@
-﻿using System;
+﻿/*=============================================================================
+*    MapLinePoint: visible point of selected line
+*
+* (c) Kótai 2026.
+*
+* ver 1.00                                                         04-Sep-2025.
+*          Last modification                                       20-Sep-2025.
+=============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -37,6 +45,13 @@ namespace SgxMap.Shapes
             if (IsSelected)
                 g.DrawRectangle(Stroke, Rectangle.Inflate(LocalArea,2,2));
         }
+
+        public override void Select(bool select)
+        {
+            m_isSelected = select;
+            m_layer?.RefreshObject(this);
+        }
+
 
 
         #region ISerializable Members

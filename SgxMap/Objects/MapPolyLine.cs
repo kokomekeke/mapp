@@ -23,6 +23,9 @@ namespace SgxMap.Shapes
     public class MapPolyLine : BasePoint, ISerializable, IDeserializationCallback, IDisposable
     {
         protected bool m_isClosed = false;
+        protected bool m_showLength = false;
+        protected MapLabel m_label;
+
         protected ArrowPositions m_arrowPosition = ArrowPositions.None;
         private Color m_lastcolor = Color.Black;
 
@@ -31,6 +34,9 @@ namespace SgxMap.Shapes
 
         protected CustomLineCap? m_endCap;
         protected CustomLineCap? m_startCap;
+
+        protected const double geo_resolution = 0.1;         // in degree
+        protected const double local_resolution = 100;       // in pixel
 
         public Color LastColor
         {
@@ -133,6 +139,47 @@ namespace SgxMap.Shapes
         }
 
 
+        public bool ShowLength
+        {
+            get { return m_showLength; }
+            set
+            {
+                if (m_showLength != value)
+                {
+                    m_showLength = value;
+                    if (value && (Points.Count > 1))
+                    {
+                        if (m_label == null)
+                            m_label = Layer.AddLabel(Points[Points.Count-1], Length.ToString("F2") + " km", false);
+                        else
+                        {
+                            m_label.Text = Length.ToString("F2") + " km";
+                            m_label.Position = Points[Points.Count - 1];
+                            m_label.IsVisible = true;
+                        }
+                        Layer.RefreshObject(m_label);
+                    }
+                    else if (m_label != null)
+                    {
+                        m_label.IsVisible = false;
+                    }
+                }
+            }
+        }
+
+
+        public double Length
+        {
+            get
+            {
+                double length = 0;
+                for (int i = 1; i < Points.Count; i++)
+                    length += Layer.MapPanel.GetDistance(Points[i - 1], Points[i]);
+                return length;
+            }
+        }
+
+
         //---------------------------------------------------------------------------------------
 
         public MapPolyLine()
@@ -226,6 +273,13 @@ namespace SgxMap.Shapes
         public void Clear()
         {
             Points.Clear();
+        }
+
+
+        protected void RefreshLabel(bool showit)
+        {
+            m_showLength = !showit;
+            ShowLength = showit;
         }
 
 
@@ -336,7 +390,7 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
                     {
-                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < geo_resolution)
                         {
                             return true;
                         }
@@ -346,7 +400,7 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
                     {
-                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < geo_resolution)
                         {
                             return true;
                         }
@@ -369,7 +423,7 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
                     {
-                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.04)
+                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < geo_resolution)
                         {
                             //result = !result;
                             return true;
@@ -380,7 +434,7 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
                     {
-                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.04)
+                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < geo_resolution)
                         {
                             //result = !result;
                             return true;
@@ -396,7 +450,7 @@ namespace SgxMap.Shapes
 
 
         /// <summary>
-        /// Get index of line in lines
+        /// Get index of point in lines
         /// </summary>
         /// <param name="p"></param>
         /// <returns>index of end point of line or 0 or -1</returns>
@@ -419,7 +473,8 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
                     {
-                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        double l = Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng);
+                        if (l < geo_resolution)
                         {
                             return 1;
                         }
@@ -429,7 +484,8 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
                     {
-                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        double l = Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat);
+                        if (l < geo_resolution)
                         {
                             return 1;
                         }
@@ -450,7 +506,8 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
                     {
-                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
+                        double l = Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng);
+                        if ( l < geo_resolution)
                         {
                             return i;
                         }
@@ -460,7 +517,91 @@ namespace SgxMap.Shapes
                 {
                     if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
                     {
-                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
+                        double l = Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat);
+                        if (l < geo_resolution)
+                        {
+                            return i;
+                        }
+                    }
+                }
+
+                p1 = p2;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Get index of point in lines
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns>index of end point of line or 0 or -1</returns>
+        public int IndexOfPoint(int x, int y)
+        {
+            int count = Points.Count;
+            if (count == 0)
+                return -1;
+
+            var lp = Layer.MapPanel.FromLocalToLatLng(x, y);
+            int pos = Points.IndexOf(lp);
+            if (pos >= 0 && pos < LocalPoints.Count)
+                return pos;
+
+            var p1 = LocalPoints[0];
+            var p2 = LocalPoints[1];
+            var p = Layer.MapPanel.FromLatLngToLocalPosition(lp);
+
+            if (count == 2)
+            {
+                if (Math.Abs(p2.Y - p1.Y) > Math.Abs(p2.X - p1.X))
+                {
+                    if (p1.Y < p.Y && p2.Y >= p.Y || p2.Y < p.Y && p1.Y >= p.Y)
+                    {
+                        double l = Math.Abs(p1.X + (p.Y - p1.Y) / (p2.Y - p1.Y) * (p2.X - p1.X) - p.X);
+                        if (l < local_resolution)
+                        {
+                            return 1;
+                        }
+                    }
+                }
+                else
+                {
+                    if (p1.X < p.X && p2.X >= p.X || p2.X < p.X && p1.X >= p.X)
+                    {
+                        double l = Math.Abs(p1.Y + (p.X - p1.X) / (p2.X - p1.X) * (p2.Y - p1.Y) - p.Y);
+                        if (l < local_resolution)
+                        {
+                            return 1;
+                        }
+                    }
+                }
+
+                return -1;
+            }
+            else if (count < 3)
+                return -1;
+
+
+            for (int i = 1; i < count; i++)
+            {
+                p2 = LocalPoints[i];
+
+                if (Math.Abs(p2.Y - p1.Y) > Math.Abs(p2.X - p1.X))
+                {
+                    if (p1.Y < p.Y && p2.Y >= p.Y || p2.Y < p.Y && p1.Y >= p.Y)
+                    {
+                        double l = Math.Abs(p1.X + (p.Y - p1.Y) / (p2.Y - p1.Y) * (p2.X - p1.X) - p.X);
+                        if (l < local_resolution)
+                        {
+                            return i;
+                        }
+                    }
+                }
+                else
+                {
+                    if (p1.X < p.X && p2.X >= p.X || p2.X < p.X && p1.X >= p.X)
+                    {
+                        double l = Math.Abs(p1.Y + (p.X - p1.X) / (p2.X - p1.X) * (p2.Y - p1.Y) - p.Y);
+                        if (l < local_resolution)
                         {
                             return i;
                         }
@@ -473,6 +614,7 @@ namespace SgxMap.Shapes
         }
 
 
+
         public void Append(PointLatLng point)
         {
             if (!m_isEditable || point.IsEmpty)
@@ -480,6 +622,7 @@ namespace SgxMap.Shapes
 
             Points.Add(point);
             LocalPoints.Capacity = Points.Count;
+            UpdateLocalPosition();
 
             //if (IsSelected)
             //{
@@ -501,15 +644,23 @@ namespace SgxMap.Shapes
 
             Points.Insert(index, point);
             LocalPoints.Capacity = Points.Count;
-            //if (IsSelected)
-            //{
-            //    var m = new GMap.NET.WindowsForms.Markers.GMarkerLinePoint(this, point);
-            //    Layer?.Markers.Add(m);
-            //}
+            UpdateLocalPosition();
+            Layer.AddLinePoint(this, point, MovementType.Both, Color.Black);
+
             if (Layer != null && Layer.MapPanel != null)
             {
                 Layer.RefreshObject(this);
             }
+
+            RefreshLabel(m_showLength);
+        }
+
+        public void InsertPoint(PointLatLng point)
+        {
+            var p = Layer.MapPanel.FromLatLngToLocal(point);
+            int index = IndexOfPoint((int)p.X, (int)p.Y);
+            if (index < 0) return;
+            Insert(index, point);
         }
 
 
@@ -521,16 +672,10 @@ namespace SgxMap.Shapes
             if (index >= 0 && index < Points.Count)
             {
                 Points[index] = point;
-                if (IsSelected)
-                {
-                    //for (int i = Layer.Markers.Count - 1; i >= 0; i--)
-                    //{
-                    //    if (Layer.Markers[i].Parent == this && ((GMap.NET.WindowsForms.Markers.GMarkerLinePoint)Layer.Markers[i]).Position == point)
-                    //    {
-                    //        ((GMap.NET.WindowsForms.Markers.GMarkerLinePoint)Layer.Markers[i]).Position = point;
-                    //    }
-                    //}
-                }
+                //if (IsSelected)
+                //{
+                //}
+
                 if (Layer != null && Layer.MapPanel != null)
                 {
                     Layer.RefreshObject(this);
@@ -552,6 +697,7 @@ namespace SgxMap.Shapes
                 {
                     Layer.RefreshObject(this);
                 }
+                RefreshLabel(m_showLength);
             }
         }
 
@@ -570,13 +716,18 @@ namespace SgxMap.Shapes
             {
                 Layer.RefreshObject(this);
             }
+
+            RefreshLabel(m_showLength);
+
         }
 
         public void RemovePoint(PointLatLng point)
         {
-            if (!m_isEditable || !point.IsEmpty)
+            if (!m_isEditable || point.IsEmpty)
                 return;
 
+            if (Points.Count < 3) 
+                return;
             int index = Points.IndexOf(point);
             if (index != -1)
             {
@@ -598,23 +749,11 @@ namespace SgxMap.Shapes
                 {
                     Layer.RefreshObject(this);
                 }
+
+                RefreshLabel(m_showLength);
             }
         }
 
-        public void ShowLength()
-        {
-            if (Points.Count == 0)
-                return;
-
-            //if (label == null)
-            //{
-            //    label = new GMapTextBox(Points[Points.Count - 1], Distance.ToString("F1") + " km ");
-            //    label.Layer = this.Layer;
-            //    label.Font = new Font("Arial", 8);
-            //}
-            //else label.Text = Distance.ToString("F1") + " km ";
-            //label.UpdateLocalPosition();
-        }
 
         public override void Select(bool select)
         {
@@ -653,6 +792,7 @@ namespace SgxMap.Shapes
                         Layer.AddLinePoint(this, Points[i], MovementType.Both, Color.Black);
                 }
             }
+            RefreshLabel(m_showLength);
             Layer.RefreshObject(this);
         }
 
@@ -666,6 +806,7 @@ namespace SgxMap.Shapes
                 Points[i] = Layer.MapPanel.GetPositionFromPoint(Points[i], d, b);
 
             Layer.RefreshObject(this);
+            RefreshLabel(m_showLength);
         }
 
 

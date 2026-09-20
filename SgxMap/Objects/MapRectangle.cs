@@ -4,7 +4,7 @@
 * (c) Kótai 2026
 *
 * ver 1.00                                                         04-Sep-2026.
-*          Last modification                                       15-Sep-2026.
+*          Last modification                                       20-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -185,6 +185,22 @@ namespace SgxMap.Shapes
             Layer?.RefreshObject(this);
         }
 
+
+        public void SortPoints()
+        {
+            double x1 = Position.Lng;
+            double x2 = Position2.Lng;
+            double y1 = Position.Lat;
+            double y2 = Position2.Lat;
+
+            m_position.Lng = Math.Min(x1, x2);
+            m_position2.Lng = Math.Max(x1, x2);
+
+            m_position.Lat = Math.Max(y1, y2);
+            m_position2.Lat = Math.Min(y1, y2);
+
+            UpdateLocalPosition();
+        }
 
 
         public override void UpdateEndPoint(int x, int y)

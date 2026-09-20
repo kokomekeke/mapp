@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         03-Sep-2026.
-*          Last modification                                       04-Sep-2026.
+*          Last modification                                       20-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -22,30 +22,27 @@ namespace SgxMap.Shapes
     [Serializable]
     public class MapLabel : BasePoint, ISerializable, IDeserializationCallback, IDisposable
     {
+        protected string? m_text;
+        protected bool m_isTransparent = true;
 
-        /// <summary>
-        ///     foreground color
-        /// </summary>
         public Brush TextColor = new SolidBrush(Color.Black);
+        public static readonly Font DefaultFont = new Font("Segoe UI", 9f);
+        [NonSerialized] public Font Font = DefaultFont;
 
         public Size Size { get; set; }
 
-        public static readonly Font DefaultFont = new Font("Arial", 12);
-        [NonSerialized] public Font Font = DefaultFont;
 
-
-        protected string? _text;
         public string? Text
         {   
-            get { return _text; }
+            get { return m_text; }
             set
             {
-                _text = value;
-                Size = TextRenderer.MeasureText(_text, Font);
+                m_text = value;
+                Size = TextRenderer.MeasureText(m_text, Font);
 
                 if (Layer != null && Layer.MapPanel != null)
                 {
-                    m_layer?.RefreshObjects();
+                    m_layer?.RefreshObject(this);
                 }
 
             }
@@ -56,10 +53,11 @@ namespace SgxMap.Shapes
         {
         }
 
-        public MapLabel(PointLatLng pointLatLng, string text)
+        public MapLabel(PointLatLng pointLatLng, string text, bool istransparent = true)
             : base (pointLatLng, Color.Black)
         {
             Text = text;
+            m_isTransparent = istransparent;
         }
 
         public MapLabel(string name, PointLatLng pointLatLng, string text)
@@ -138,9 +136,21 @@ namespace SgxMap.Shapes
         {
             base.BuildGraphicsPath();
 
-            if (!string.IsNullOrEmpty(_text))
-                m_graphicsPath?.AddString(_text, Font.FontFamily, (int)Font.Style, Font.Size, LocalPosition, StringFormat.GenericDefault);
+            if (!string.IsNullOrEmpty(m_text))
+                m_graphicsPath?.AddString(m_text, Font.FontFamily, (int)Font.Style, Font.Size, LocalPosition, StringFormat.GenericDefault);
         } /* UpdateGraphicsPath */
+
+
+        public override void OnRender(Graphics g)
+        {
+            //base.OnRender(g);
+            if (!m_isTransparent)
+            {
+                var rect = new Rectangle(LocalPosition, Size);
+                g.FillRectangle(Fill, rect);
+            }
+            g.DrawString(m_text, Font, TextColor, LocalPosition);
+        }
 
 
         #region serialization
@@ -151,7 +161,7 @@ namespace SgxMap.Shapes
             Name      = info.GetString("Name") ?? string.Empty;
             Position  = (PointLatLng)info.GetValue("Position", typeof(PointLatLng));
             Color     = (Color)info.GetValue("Color", typeof(Color));
-            _text     = info.GetString("text");
+            m_text     = info.GetString("text");
             Font      = (Font)info.GetValue("font", typeof(Font));
             TextColor = new SolidBrush(Color);
         }

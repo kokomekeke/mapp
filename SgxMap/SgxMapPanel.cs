@@ -4,7 +4,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         01-Sep-2026.
-*          Last modification                                       16-Sep-2026.
+*          Last modification                                       20-Sep-2026.
 =============================================================================*/
 using System.ComponentModel;
 using System.Diagnostics;
@@ -1370,7 +1370,7 @@ namespace SgxMap
                             break;
 
                         case MouseMoveStatusType.Marker:
-                            m_MapMarker = Layers[0].AddBaseMarker(e.X, e.Y, 14, Color.Red, MarketTooltipTextType.DF);
+                            m_MapMarker = Layers[0].AddBaseMarker(e.X, e.Y, 14, Color.Red, MarkerTooltipTextType.DF);
                             break;
 
                         case MouseMoveStatusType.Ray:
@@ -1444,6 +1444,7 @@ namespace SgxMap
             {
                 m_MapRectangle.Thickness = 1;
                 m_MapRectangle.LineColor = Color.Red;
+                m_MapRectangle.SortPoints();
                 m_MapRectangle = null;
             }
 
@@ -1465,6 +1466,7 @@ namespace SgxMap
 
             if (m_MapTextBox != null)
             {
+                m_MapTextBox.SortPoints();
                 OnTextBoxEdit?.Invoke(m_MapTextBox);
                 m_MapTextBox = null;
             }
@@ -1472,8 +1474,8 @@ namespace SgxMap
             if (m_selected_linepoint != null)
             {
                 m_selected_linepoint.Parent?.UpdateLinePoints();
-                m_selected_linepoint.IsSelected = false;
-                m_selected_linepoint = null;
+                //m_selected_linepoint.IsSelected = false;
+                //m_selected_linepoint = null;
                 Invalidate();
                 MouseMoveStatus = MouseMoveStatusType.None;
                 return;
@@ -1609,7 +1611,7 @@ namespace SgxMap
                 }
             }
 
-            if (SelectedLinePoint != null)
+            if ((SelectedLinePoint != null) && (e.Button == DragButton))
             {
                 SelectedLinePoint.MovePoint(SelectedLinePoint.Position, FromLocalToLatLng(e.X, e.Y));
                 return;
@@ -1733,6 +1735,11 @@ namespace SgxMap
                         overlayObject = true;
                         o.IsSelected = true;
                         m_selected_object = o;
+                        if (m_selected_linepoint != null)
+                        {
+                            m_selected_linepoint.IsSelected = false;
+                            m_selected_linepoint = null;
+                        }
                         break;
                     }
                 }
@@ -1741,7 +1748,7 @@ namespace SgxMap
             return overlayObject;
         }
 
-        protected bool FindSelectedLinePoint(MouseEventArgs e)
+        public bool FindSelectedLinePoint(MouseEventArgs e)
         {
             bool overlayObject = false;
             if (m_selected_linepoint != null)
@@ -1754,6 +1761,11 @@ namespace SgxMap
                 overlayObject = true;
                 o.IsSelected = true;
                 m_selected_linepoint = o;
+                if ((m_selected_object != null) && (m_selected_object != o.Parent))
+                {
+                    m_selected_object.IsSelected = false;
+                    m_selected_object = null;
+                }
             }
 
             return overlayObject;
@@ -4239,7 +4251,7 @@ namespace SgxMap
         Always,
     }
 
-    public enum MarketTooltipTextType
+    public enum MarkerTooltipTextType
     {
         None,
         MarkerName,
@@ -4248,6 +4260,13 @@ namespace SgxMap
         LocationAdderss,
         DF,
         Custom,
+    }
+
+    public enum MarkerToolTipShow
+    {
+        Name,
+        Notes,
+        Both
     }
 
 

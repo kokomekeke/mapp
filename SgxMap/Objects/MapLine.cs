@@ -27,6 +27,9 @@ namespace SgxMap.Shapes
         protected CustomLineCap? m_endCap;
         protected CustomLineCap? m_startCap;
 
+        protected bool m_showLength = false;
+        protected MapLabel m_label;
+
         public PointLatLng Position2
         {
             get { return m_position2; }
@@ -122,6 +125,51 @@ namespace SgxMap.Shapes
                     return 0;
 
                 return Layer.MapPanel.GetBearing2(m_position, m_position2);
+            }
+        }
+
+
+        public bool ShowLength
+        {
+            get {  return m_showLength; }
+            set
+            {
+                if (m_showLength != value)
+                {
+                    m_showLength = value;
+                    if (value)
+                    {
+                        if (m_label == null)
+                            m_label = Layer.AddLabel(Position2, Length.ToString("F2") + " km", false);
+                        else
+                        {
+                            m_label.Text = Length.ToString("F2") + " km";
+                            m_label.Position = Position2;
+                            m_label.IsVisible = true;
+                        }
+                        Layer.RefreshObject(m_label);
+                    }
+                    else if (m_label != null)
+                    {          
+                        m_label.IsVisible = false;
+                   }
+
+                }
+            }
+        }
+
+        public override bool IsVisible
+        {
+            get { return m_isVisible; }
+            set
+            {
+                if (m_isVisible != value)
+                {
+                    if (m_label != null)
+                        m_label.IsVisible = value;
+                    m_isVisible = value;
+                    m_layer?.RefreshObject(this);
+                }
             }
         }
 
@@ -292,6 +340,12 @@ namespace SgxMap.Shapes
                 Position = newpoint;
             else if (Position2 == oldpoint)
                 Position2 = newpoint;
+
+            if (m_showLength)
+            {
+                m_showLength = false;
+                ShowLength = true;
+            }
         }
 
         public override void Shift(PointLatLng oldpoint, PointLatLng newpoint)
@@ -312,11 +366,18 @@ namespace SgxMap.Shapes
         {
             var point = Layer.MapPanel.FromLocalToLatLng(x, y);
             Position2 = point;
+            if (m_showLength)
+            {
+                m_showLength = false;
+                ShowLength = true;
+            }
         }
 
 
         public override void Remove()
         {
+            if (m_label != null)
+                m_label.Remove();
             Layer?.MapPanel.RemoveLinePoints(this);
             base.Remove();
         }

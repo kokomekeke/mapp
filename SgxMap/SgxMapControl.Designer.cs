@@ -589,7 +589,7 @@
             btn_draw_freeform.Name = "btn_draw_freeform";
             btn_draw_freeform.Size = new Size(37, 37);
             btn_draw_freeform.TabIndex = 5;
-            toolTip_draw.SetToolTip(btn_draw_freeform, "Freeform");
+            toolTip_draw.SetToolTip(btn_draw_freeform, "Polyline");
             btn_draw_freeform.UseVisualStyleBackColor = true;
             btn_draw_freeform.Click += btn_draw_freeform_Click;
             // 
@@ -800,18 +800,21 @@
             mi_marker_showInformation.Name = "mi_marker_showInformation";
             mi_marker_showInformation.Size = new Size(180, 22);
             mi_marker_showInformation.Text = "Show information";
+            mi_marker_showInformation.Click += mi_marker_showInformation_Click;
             // 
             // mi_marke_showName
             // 
             mi_marke_showName.Name = "mi_marke_showName";
             mi_marke_showName.Size = new Size(180, 22);
             mi_marke_showName.Text = "Show name";
+            mi_marke_showName.Click += mi_marke_showName_Click;
             // 
             // mi_marker_hideAllInformation
             // 
             mi_marker_hideAllInformation.Name = "mi_marker_hideAllInformation";
             mi_marker_hideAllInformation.Size = new Size(180, 22);
             mi_marker_hideAllInformation.Text = "Hide all information";
+            mi_marker_hideAllInformation.Click += mi_marker_hideAllInformation_Click;
             // 
             // mi_marker_rename
             // 
@@ -829,12 +832,14 @@
             mi_marker_center.Name = "mi_marker_center";
             mi_marker_center.Size = new Size(180, 22);
             mi_marker_center.Text = "Center";
+            mi_marker_center.Click += mi_marker_center_Click;
             // 
             // mi_marker_zoomTo
             // 
             mi_marker_zoomTo.Name = "mi_marker_zoomTo";
             mi_marker_zoomTo.Size = new Size(180, 22);
             mi_marker_zoomTo.Text = "Zoom To";
+            mi_marker_zoomTo.Click += mi_marker_zoomTo_Click;
             // 
             // mi_marker_change_color
             // 
@@ -905,6 +910,7 @@
             mi_line_length.Name = "mi_line_length";
             mi_line_length.Size = new Size(145, 22);
             mi_line_length.Text = "Length";
+            mi_line_length.Click += mi_line_length_Click;
             // 
             // toolStripMenuItem6
             // 
@@ -916,6 +922,7 @@
             mi_line_copy.Name = "mi_line_copy";
             mi_line_copy.Size = new Size(145, 22);
             mi_line_copy.Text = "Copy";
+            mi_line_copy.Click += mi_marker_copy_Click;
             // 
             // toolStripMenuItem5
             // 
@@ -941,12 +948,14 @@
             mi_polyline_addPoint.Name = "mi_polyline_addPoint";
             mi_polyline_addPoint.Size = new Size(148, 22);
             mi_polyline_addPoint.Text = "Add point";
+            mi_polyline_addPoint.Click += mi_polyline_addPoint_Click;
             // 
             // mi_polyline_removePoint
             // 
             mi_polyline_removePoint.Name = "mi_polyline_removePoint";
             mi_polyline_removePoint.Size = new Size(148, 22);
             mi_polyline_removePoint.Text = "Remove point";
+            mi_polyline_removePoint.Click += mi_polyline_removePoint_Click;
             // 
             // toolStripMenuItem18
             // 
@@ -972,12 +981,14 @@
             mi_polyline_close.Name = "mi_polyline_close";
             mi_polyline_close.Size = new Size(148, 22);
             mi_polyline_close.Text = "Close";
+            mi_polyline_close.Click += mi_polyline_close_Click;
             // 
             // mi_polyline_length
             // 
             mi_polyline_length.Name = "mi_polyline_length";
             mi_polyline_length.Size = new Size(148, 22);
             mi_polyline_length.Text = "Length";
+            mi_polyline_length.Click += mi_polyline_length_Click;
             // 
             // toolStripSeparator1
             // 
@@ -989,6 +1000,7 @@
             mi_polyline_copy.Name = "mi_polyline_copy";
             mi_polyline_copy.Size = new Size(148, 22);
             mi_polyline_copy.Text = "Copy";
+            mi_polyline_copy.Click += mi_marker_copy_Click;
             // 
             // toolStripSeparator2
             // 
@@ -1032,6 +1044,7 @@
             mi_rectangle_copy.Name = "mi_rectangle_copy";
             mi_rectangle_copy.Size = new Size(145, 22);
             mi_rectangle_copy.Text = "Copy";
+            mi_rectangle_copy.Click += mi_marker_copy_Click;
             // 
             // toolStripMenuItem16
             // 
@@ -1082,6 +1095,7 @@
             mi_textbox_copy.Name = "mi_textbox_copy";
             mi_textbox_copy.Size = new Size(145, 22);
             mi_textbox_copy.Text = "Copy";
+            mi_textbox_copy.Click += mi_marker_copy_Click;
             // 
             // toolStripMenuItem15
             // 

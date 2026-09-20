@@ -328,6 +328,14 @@ namespace SgxMap
             return label;
         }
 
+        public MapLabel AddLabel(PointLatLng point, string text, bool istransparent = true)
+        {
+            var label = new MapLabel(point, text, istransparent);
+            AddObject(label);
+            return label;
+        }
+
+
         public MapTextBox AddTextBox(string name, PointLatLng point, string text, System.Drawing.Font font)
         {
             var label = new MapTextBox(name, point, 5, 5, text, font);
@@ -347,52 +355,52 @@ namespace SgxMap
             return null;
         }
 
-        public MapBaseMarker? AddBaseMarker(int x, int y, int size, Color color, MarketTooltipTextType texttype)
+        public MapBaseMarker? AddBaseMarker(int x, int y, int size, Color color, MarkerTooltipTextType texttype)
         {
             var p = MapPanel.FromLocalToLatLng(x, y);
             if (!p.IsEmpty)
             {
                 var marker = new MapBaseMarker("", p, size, color);
                 AddObject(marker);
-                marker.TooltipTextType = texttype;
+                marker.ToolTipTextType = texttype;
                 return marker;
             }
             return null;
         }
 
-        public MapBaseMarker? AddBaseMarker(string name, PointLatLng p, int size, Color color, MarketTooltipTextType texttype)
+        public MapBaseMarker? AddBaseMarker(string name, PointLatLng p, int size, Color color, MarkerTooltipTextType texttype)
         {
             if (!p.IsEmpty)
             {
                 var marker = new MapBaseMarker(name, p, size, color);
                 AddObject(marker);
-                marker.TooltipTextType = texttype;
+                marker.ToolTipTextType = texttype;
                 //AddToolTip(marker, "Próba");
                 return marker;
             }
             return null;
         }
 
-        public MapBitmapMarker? AddGoogleMarker(int x, int y, MarkerBitmapType type, MarketTooltipTextType texttype)
+        public MapBitmapMarker? AddGoogleMarker(int x, int y, MarkerBitmapType type, MarkerTooltipTextType texttype)
         {
             var p = MapPanel.FromLocalToLatLng(x, y);
             if (!p.IsEmpty)
             {
                 var marker = new MapBitmapMarker("", p,type);
                 AddObject(marker);
-                marker.TooltipTextType = texttype;
+                marker.ToolTipTextType = texttype;
                 return marker;
             }
             return null;
         }
 
-        public MapBitmapMarker? AddGoogleMarker(string name, PointLatLng p, MarkerBitmapType type, MarketTooltipTextType texttype)
+        public MapBitmapMarker? AddGoogleMarker(string name, PointLatLng p, MarkerBitmapType type, MarkerTooltipTextType texttype)
         {
             if (!p.IsEmpty)
             {
                 var marker = new MapBitmapMarker(name, p, type);
                 AddObject(marker);
-                marker.TooltipTextType = texttype;
+                marker.ToolTipTextType = texttype;
                 return marker;
             }
             return null;

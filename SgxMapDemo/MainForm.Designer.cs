@@ -35,12 +35,12 @@
             macroToolStripMenuItem = new ToolStripMenuItem();
             loadToolStripMenuItem = new ToolStripMenuItem();
             editToolStripMenuItem = new ToolStripMenuItem();
-            sgxMapControl1 = new SgxMap.SgxMapControl();
             casheToolStripMenuItem = new ToolStripMenuItem();
             mi_importCash = new ToolStripMenuItem();
             mi_exportcash = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripSeparator();
             mi_use_cash_only = new ToolStripMenuItem();
+            sgxMapControl1 = new SgxMap.SgxMapControl();
             menuStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -63,7 +63,7 @@
             // exitToolStripMenuItem
             // 
             exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            exitToolStripMenuItem.Size = new Size(180, 22);
+            exitToolStripMenuItem.Size = new Size(92, 22);
             exitToolStripMenuItem.Text = "Exit";
             exitToolStripMenuItem.Click += exitToolStripMenuItem_Click;
             // 
@@ -77,16 +77,49 @@
             // loadToolStripMenuItem
             // 
             loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(180, 22);
+            loadToolStripMenuItem.Size = new Size(100, 22);
             loadToolStripMenuItem.Text = "Load";
             loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
             // 
             // editToolStripMenuItem
             // 
             editToolStripMenuItem.Name = "editToolStripMenuItem";
-            editToolStripMenuItem.Size = new Size(180, 22);
+            editToolStripMenuItem.Size = new Size(100, 22);
             editToolStripMenuItem.Text = "Edit";
             editToolStripMenuItem.Click += editToolStripMenuItem_Click;
+            // 
+            // casheToolStripMenuItem
+            // 
+            casheToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mi_importCash, mi_exportcash, toolStripMenuItem1, mi_use_cash_only });
+            casheToolStripMenuItem.Name = "casheToolStripMenuItem";
+            casheToolStripMenuItem.Size = new Size(51, 20);
+            casheToolStripMenuItem.Text = "Cashe";
+            // 
+            // mi_importCash
+            // 
+            mi_importCash.Name = "mi_importCash";
+            mi_importCash.Size = new Size(127, 22);
+            mi_importCash.Text = "&Import";
+            mi_importCash.ToolTipText = "Load saved cached map from file";
+            // 
+            // mi_exportcash
+            // 
+            mi_exportcash.Name = "mi_exportcash";
+            mi_exportcash.Size = new Size(127, 22);
+            mi_exportcash.Text = "&Export";
+            mi_exportcash.ToolTipText = "Save cashed map in file";
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(124, 6);
+            // 
+            // mi_use_cash_only
+            // 
+            mi_use_cash_only.Name = "mi_use_cash_only";
+            mi_use_cash_only.Size = new Size(127, 22);
+            mi_use_cash_only.Text = "Cach only";
+            mi_use_cash_only.ToolTipText = "Use cashed map only";
             // 
             // sgxMapControl1
             // 
@@ -100,39 +133,6 @@
             sgxMapControl1.TabIndex = 1;
             sgxMapControl1.Zoom = 0D;
             // 
-            // casheToolStripMenuItem
-            // 
-            casheToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mi_importCash, mi_exportcash, toolStripMenuItem1, mi_use_cash_only });
-            casheToolStripMenuItem.Name = "casheToolStripMenuItem";
-            casheToolStripMenuItem.Size = new Size(51, 20);
-            casheToolStripMenuItem.Text = "Cashe";
-            // 
-            // mi_importCash
-            // 
-            mi_importCash.Name = "mi_importCash";
-            mi_importCash.Size = new Size(180, 22);
-            mi_importCash.Text = "&Import";
-            mi_importCash.ToolTipText = "Load saved cached map from file";
-            // 
-            // mi_exportcash
-            // 
-            mi_exportcash.Name = "mi_exportcash";
-            mi_exportcash.Size = new Size(180, 22);
-            mi_exportcash.Text = "&Export";
-            mi_exportcash.ToolTipText = "Save cashed map in file";
-            // 
-            // toolStripMenuItem1
-            // 
-            toolStripMenuItem1.Name = "toolStripMenuItem1";
-            toolStripMenuItem1.Size = new Size(177, 6);
-            // 
-            // mi_use_cash_only
-            // 
-            mi_use_cash_only.Name = "mi_use_cash_only";
-            mi_use_cash_only.Size = new Size(180, 22);
-            mi_use_cash_only.Text = "Cach only";
-            mi_use_cash_only.ToolTipText = "Use cashed map only";
-            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -143,6 +143,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MainMenuStrip = menuStrip1;
             Name = "MainForm";
+            StartPosition = FormStartPosition.WindowsDefaultBounds;
             Text = "SgxMap Demo";
             FormClosing += MainForm_FormClosing;
             menuStrip1.ResumeLayout(false);

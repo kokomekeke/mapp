@@ -5,7 +5,7 @@
 * (c) Kótai 2026.
 *
 * ver 1.00                                                         31-Aug-2026.
-*          Last modification                                       16-Sep-2026.
+*          Last modification                                       20-Sep-2026.
 =============================================================================*/
 using System;
 using System.Collections.Generic;
@@ -41,6 +41,7 @@ namespace SgxMap
         private int m_selected_linewidth = 1;
         private ArrowPositions m_selected_linestyle = ArrowPositions.None;
         private string m_lastFileName = string.Empty;
+        private PointLatLng m_rigthclickpoint;
 
 
         public bool ShowToolbar
@@ -302,6 +303,14 @@ namespace SgxMap
                 m_textbox.Text = textBox_editor.Text;
             if (textBox_editor.Visible)
                 textBox_editor.Visible = false;
+
+            m_rigthclickpoint = MainMap.FromLocalToLatLng(e.X, e.Y);
+
+            if ((e.Button == MouseButtons.Right) && MainMap.FindSelectedLinePoint(e))
+            {
+                
+                return;
+            }
 
             if ((e.Button == MouseButtons.Right) && MainMap.FindSelectedObject(e))
             {
@@ -716,11 +725,89 @@ namespace SgxMap
 
         private void mi_textbox_editText_Click(object sender, EventArgs e)
         {
-            if (MainMap.m_selected_object is MapTextBox)
+            var o = MainMap.m_selected_object as MapTextBox;
+            if (o != null)
             {
-                MainMap_OnTextBoxEdit(MainMap.m_selected_object as MapTextBox);
+                MainMap_OnTextBoxEdit(o);
             }
         }
 
+        private void mi_marker_showInformation_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapBaseMarker;
+            if (o != null)
+            {
+                o.ToolTipMode = MarkerTooltipMode.Always;
+            }
+        }
+
+        private void mi_marke_showName_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapBaseMarker;
+            if (o != null)
+            {
+                o.ToolTipShow = MarkerToolTipShow.Name;
+            }
+        }
+
+        private void mi_marker_center_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapBaseMarker;
+            if (o != null)
+                MainMap.Position = o.Position;
+        }
+
+        private void mi_marker_zoomTo_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapBaseMarker;
+            if (o != null)
+            {
+                MainMap.Position = o.Position;
+                MainMap.Zoom = MainMap.MaxZoom - 1;
+            }
+        }
+
+        private void mi_marker_hideAllInformation_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapBaseMarker;
+            if (o != null)
+                o.ToolTipMode = MarkerTooltipMode.Never;
+        }
+
+        private void mi_line_length_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapLine;
+            if (o != null)
+                o.ShowLength = !o.ShowLength;
+        }
+
+        private void mi_polyline_close_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapPolyLine;
+            if (o != null)
+                o.IsClosed = true;
+        }
+
+        private void mi_polyline_length_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapPolyLine;
+            if (o != null)
+                o.ShowLength = !o.ShowLength;
+
+        }
+
+        private void mi_polyline_addPoint_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapPolyLine;
+            if (o != null)
+                o.InsertPoint(m_rigthclickpoint);
+        }
+
+        private void mi_polyline_removePoint_Click(object sender, EventArgs e)
+        {
+            var o = MainMap.m_selected_object as MapPolyLine;
+            if (o != null)
+                o.RemovePoint(m_rigthclickpoint);
+        }
     } /* class SgxMapControl */
 } /* namespace SgxMap */

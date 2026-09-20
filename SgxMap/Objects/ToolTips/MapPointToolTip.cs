@@ -23,6 +23,7 @@ namespace SgxMap.Shapes.ToolTips
         //public static readonly Pen DefaultStroke = new Pen(Color.FromArgb(140, Color.Navy));
         //[NonSerialized] public SolidBrush HeaderFill = new SolidBrush(Color.LightGray);
 
+
         static MapPointToolTip()
         {
             //DefaultStroke.Width = 3;
@@ -75,25 +76,36 @@ namespace SgxMap.Shapes.ToolTips
             var p2 = new Point((int)(rect.X + rect.Width / 4), (int)(rect.Y + rect.Height - 1));
             var pnts = new Point[] { Marker.ToolTipPosition, p1, p2, Marker.ToolTipPosition };
             g.FillPolygon(Fill, pnts);
+
             g.DrawLine(Stroke, Marker.ToolTipPosition, p1);
             g.DrawLine(Stroke, Marker.ToolTipPosition, p2);
 
             g.FillRectangle(Fill, rect.X, rect.Y, rect.Width, rect.Height);
+            g.DrawRectangle(Stroke, rect);
 
-            st = g.MeasureString(Marker.ToolTipHeader, TextFont).ToSize();
-            var hrect = new Rectangle(rect.X, rect.Y, rect.Width, st.Height + 2* TextPadding.Height);
-            g.FillRectangle(TitleFill, hrect);
+            int h = 0;
+            if ((Marker.ToolTipShow == MarkerToolTipShow.Name) || (Marker.ToolTipShow != MarkerToolTipShow.Both))
+            {
+                st = g.MeasureString(Marker.ToolTipHeader, TextFont).ToSize();
+                var hrect = new Rectangle(rect.X, rect.Y, rect.Width, st.Height + 2 * TextPadding.Height);
+                g.FillRectangle(TitleFill, hrect);
+                g.DrawRectangle(Stroke, hrect);
+                var _hrect = new Rectangle(hrect.X + TextPadding.Width, hrect.Y + TextPadding.Height, hrect.Width - 2 * TextPadding.Width, hrect.Height - TextPadding.Height);
+                WriteString(g, Marker.ToolTipHeader, _hrect);
+                h = hrect.Height;
+            }
 
             if (m_Format.Alignment == StringAlignment.Near)
                 rect.Offset(TextPadding.Width / 2, 0);
             rect.Offset(0, TextPadding.Height / 2);
 
-            g.DrawRectangle(Stroke, rect.X, rect.Y, rect.Width, rect.Height);
 
-            var _hrect = new Rectangle(hrect.X + TextPadding.Width, hrect.Y + TextPadding.Height, hrect.Width - 2*TextPadding.Width, hrect.Height - TextPadding.Height);
-            WriteString(g, Marker.ToolTipHeader, _hrect);
-            var _rect = new Rectangle(rect.X + TextPadding.Width, rect.Y + hrect.Height + TextPadding.Height, rect.Width - 2 * TextPadding.Width, rect.Height - TextPadding.Height - hrect.Height);
-            WriteString(g, Marker.ToolTipText, _rect);
+            if ((Marker.ToolTipShow == MarkerToolTipShow.Notes) || (Marker.ToolTipShow != MarkerToolTipShow.Both))
+            {
+                g.DrawRectangle(Stroke, rect.X, rect.Y, rect.Width, rect.Height);
+                var _rect = new Rectangle(rect.X + TextPadding.Width, rect.Y + h + TextPadding.Height, rect.Width - 2 * TextPadding.Width, rect.Height - TextPadding.Height - h);
+                WriteString(g, Marker.ToolTipText, _rect);
+            }
         }
 
 

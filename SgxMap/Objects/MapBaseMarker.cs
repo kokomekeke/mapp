@@ -33,7 +33,8 @@ namespace SgxMap.Shapes
 
         protected MapToolTip m_toolTip;
         protected MarkerTooltipMode m_toolTipMode = MarkerTooltipMode.Always;
-        protected MarketTooltipTextType m_toolTipTextType = MarketTooltipTextType.Location;
+        protected MarkerTooltipTextType m_toolTipTextType = MarkerTooltipTextType.Location;
+        protected MarkerToolTipShow m_toolTipShow = MarkerToolTipShow.Both;
         string m_toolTipText = string.Empty;
         string m_toolTipHeader = string.Empty;
 
@@ -137,7 +138,7 @@ namespace SgxMap.Shapes
                 }
 
                 m_toolTipText = value;
-                m_toolTipTextType = MarketTooltipTextType.Custom;
+                m_toolTipTextType = MarkerTooltipTextType.Custom;
                 Layer?.RefreshObject(this);
             }
         }
@@ -157,7 +158,7 @@ namespace SgxMap.Shapes
                 }
 
                 m_toolTipHeader = value;
-                m_toolTipTextType = MarketTooltipTextType.Custom;
+                m_toolTipTextType = MarkerTooltipTextType.Custom;
                 Layer?.RefreshObject(this);
             }
         }
@@ -171,13 +172,21 @@ namespace SgxMap.Shapes
                 if (value != m_toolTipMode)
                 {
                     m_toolTipMode = value;
+                    if (m_toolTip != null)
+                    {
+                        switch(m_toolTipMode)
+                        {
+                            case MarkerTooltipMode.Never: m_toolTip.IsVisible = false; break;
+                            case MarkerTooltipMode.Always: m_toolTip.IsVisible = true; break;
+                        }
+                    }
                     Layer?.RefreshObject(this);
                 }
             }
         }
 
 
-        public MarketTooltipTextType TooltipTextType
+        public MarkerTooltipTextType ToolTipTextType
         {
             get { return m_toolTipTextType; }
             set
@@ -185,6 +194,20 @@ namespace SgxMap.Shapes
                 m_toolTipTextType = value;
                 ChangeTooltipText(Position);
                 Layer?.RefreshObject(this);
+            }
+        }
+
+
+        public MarkerToolTipShow ToolTipShow
+        {
+            get { return m_toolTipShow; }
+            set
+            {
+                if (m_toolTipShow != value)
+                {
+                    m_toolTipShow = value;
+                    Layer?.RefreshObject(this);
+                }
             }
         }
 
@@ -308,19 +331,19 @@ namespace SgxMap.Shapes
             else SetTooltipText(point);
 
             m_toolTip.IsVisible = IsVisible && m_toolTipMode != MarkerTooltipMode.Never &&
-                                (!string.IsNullOrEmpty(m_toolTipText) || (m_toolTipTextType == MarketTooltipTextType.Custom));
+                                (!string.IsNullOrEmpty(m_toolTipText) || (m_toolTipTextType == MarkerTooltipTextType.Custom));
         }
 
         public void SetTooltipText(PointLatLng point)
         {
             switch (m_toolTipTextType)
             {
-                case MarketTooltipTextType.MarkerName: m_toolTipText = Name; break;
-                case MarketTooltipTextType.Location: m_toolTipText = point.ToGeoString(); break;
-                case MarketTooltipTextType.Address: m_toolTipText = Layer.MapPanel.GetPlaceAddress(point); break;
-                case MarketTooltipTextType.LocationAdderss: m_toolTipText = point.ToGeoString() + "   " + Layer.MapPanel.GetPlaceAddress(point); break;
-                case MarketTooltipTextType.None: m_toolTipText = string.Empty; break;
-                case MarketTooltipTextType.DF:
+                case MarkerTooltipTextType.MarkerName: m_toolTipText = Name; break;
+                case MarkerTooltipTextType.Location: m_toolTipText = point.ToGeoString(); break;
+                case MarkerTooltipTextType.Address: m_toolTipText = Layer.MapPanel.GetPlaceAddress(point); break;
+                case MarkerTooltipTextType.LocationAdderss: m_toolTipText = point.ToGeoString() + "   " + Layer.MapPanel.GetPlaceAddress(point); break;
+                case MarkerTooltipTextType.None: m_toolTipText = string.Empty; break;
+                case MarkerTooltipTextType.DF:
                     m_toolTipHeader = $"[ {ID}] DF";
                     m_toolTipText = $",, 21 000 000 Hz\r\n{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\r\n{Position.ToGeoString()},";
                     break;
@@ -391,7 +414,7 @@ namespace SgxMap.Shapes
             }
 
             if (IsSelected)
-            g.DrawRectangle(BorderPen, m_area);
+                g.DrawRectangle(BorderPen, m_area);
 
             if (m_area.Width > 2)
             {
