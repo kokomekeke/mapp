@@ -30,6 +30,10 @@ namespace SgxMap.Shapes
         protected bool m_showLength = false;
         protected MapLabel m_label;
 
+        public const double geo_resolution = 0.1;         // in degree
+        public const double local_resolution = 10;       // in pixel
+
+
         public PointLatLng Position2
         {
             get { return m_position2; }
@@ -308,30 +312,9 @@ namespace SgxMap.Shapes
         {
                 var p1 = Position;
                 var p2 = Position2;
-
-                if (Math.Abs(p2.Lat - p1.Lat) > Math.Abs(p2.Lng - p1.Lng))
-                {
-                    if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
-                    {
-                        if (Math.Abs(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) - p.Lng) < 0.02)
-                        {
-                            return true;
-                        }
-                    }
-                }
-                else
-                {
-                    if (p1.Lng < p.Lng && p2.Lng >= p.Lng || p2.Lng < p.Lng && p1.Lng >= p.Lng)
-                    {
-                        if (Math.Abs(p1.Lat + (p.Lng - p1.Lng) / (p2.Lng - p1.Lng) * (p2.Lat - p1.Lat) - p.Lat) < 0.02)
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
+                return MapLine.DistancePointToLine(p.Lat, p.Lng, p1.Lat, p1.Lng, p2.Lat, p2.Lng) < geo_resolution ;
         } /*IsInside */
+
 
 
         public override void MovePoint(PointLatLng oldpoint, PointLatLng newpoint)
@@ -395,6 +378,33 @@ namespace SgxMap.Shapes
                 g.DrawLine(Stroke, LocalPosition, LocalPosition2);
             }
         }
+
+        /// <summary>
+        /// Calculates the shortest distance from point (px,py) to the infinite line defined by (ax,ay)-(bx,by).
+        /// If the two line points are identical the function returns the distance from the point to (ax,ay).
+        /// </summary>
+        /// <returns>Distance as a double.</returns>
+        public static double DistancePointToLine(double px, double py, double ax, double ay, double bx, double by)
+        {
+            const double Epsilon = 1e-12;
+
+            double dx = bx - ax;
+            double dy = by - ay;
+            double denom = Math.Sqrt(dx * dx + dy * dy);
+
+            if (denom < Epsilon)
+            {
+                // Degenerate line: both endpoints equal -> return distance to that single point.
+                double rx = px - ax;
+                double ry = py - ay;
+                return Math.Sqrt(rx * rx + ry * ry);
+            }
+
+            // Cross product magnitude between (b - a) and (p - a)
+            double cross = Math.Abs(dx * (py - ay) - dy * (px - ax));
+            return cross / denom;
+        }
+
 
         #region serialization
 

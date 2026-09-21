@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -294,16 +295,80 @@ namespace SgxMap.Shapes
         } /* CreateMarker */
 
 
+
+        public static MapBaseMarker CreateHFMarker(string[] ls, out string errorstr)
+        {
+            // 0: hmarker, 1:name, 2:lat, 3:long, 4:color, 5: note
+            string name = ls[1];
+            if (name == ".") name = "";
+            double lat = 0;
+            double lng = 0;
+            errorstr = string.Empty;
+
+            if (!double.TryParse(ls[2], out lat))
+            {
+                errorstr = "Invalid latitude";
+                return null;
+            }
+            if (!double.TryParse(ls[3], out lng))
+            {
+                errorstr = "Invalid longitude";
+                return null;
+            }
+            var p = new PointLatLng(lat, lng);
+
+            var color = Color.Black;
+            switch (ls[5])
+            {
+                case "blue": color = Color.Blue; break;
+                case "red": color = Color.Red; break;
+                case "yellow": color = Color.Yellow; break;
+                case "black": color = Color.Black; break;
+                case "green": color = Color.Green; break;
+                case "pink": color = Color.Pink; break;
+                case "brown": color = Color.Brown; break;
+            }
+
+            if (ls.Length > 5)
+            {
+                string infotext = ls[5];
+                int ind = 6;
+                while (ind < ls.Length)
+                    infotext += " " + ls[ind++];
+
+                if (!string.IsNullOrWhiteSpace(infotext))
+                {
+                    infotext = infotext.Replace("\\n", "\n").Replace("{date}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
+
+                    var o = new MapBaseMarker(name, p, new Size(10, 10), color);
+                    o.ToolTipTextType = MarkerTooltipTextType.DF;
+                    if (infotext == "auto")
+                        o.SetTooltipText(p);
+                    else o.ToolTipText = infotext.Replace("{geo}", o.ToGeoString()); ;
+                    o.Name = name;
+                    return o;
+                }
+            }
+
+            return new MapBaseMarker(name, p, new Size(10, 10), color);
+        } /* CreateHFMarker */
+
+
+
         public void Reset()
         {
             Parent = null;
         }
 
         public MapToolTip AddToolTip()
-        { 
+        {
+            if (Layer == null)
+                return null;
             var t = new MapPointToolTip(this);
             Layer.AddToolTip(t);
-            SetTooltipText(Position);
+            if (string.IsNullOrEmpty(ToolTipText))
+                SetTooltipText(Position);
             if (string.IsNullOrEmpty(ToolTipHeader))
             {
                 ToolTipHeader = "Untitled " + ID;

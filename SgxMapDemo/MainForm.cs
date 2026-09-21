@@ -144,7 +144,7 @@ namespace SgxMapDemo
         }
 
 
-        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        private void mi_load_macro_Click(object sender, EventArgs e)
         {
             var dlg = new OpenFileDialog();
             dlg.CheckFileExists = true;
@@ -162,7 +162,7 @@ namespace SgxMapDemo
             }
         }
 
-        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        private void mi_edit_macro_Click(object sender, EventArgs e)
         {
             var frm = MacroEditor.GetInstance();
             if (frm != null)

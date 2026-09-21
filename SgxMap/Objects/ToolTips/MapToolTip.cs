@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*=============================================================================
+*  MapToolTip: tooltip or markers
+*
+* (c) Kótai 2026.
+*
+* ver 1.00                                                         10-Sep-2026.
+=============================================================================*/
+using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
 using System.Linq;

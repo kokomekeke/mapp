@@ -26,6 +26,7 @@ namespace SgxMap.Shapes
         protected Rectangle m_area;
 
         protected PointLatLng[] Points = new PointLatLng[8];
+        protected PointLatLng m_center;
 
         public float Width
         {
@@ -70,11 +71,13 @@ namespace SgxMap.Shapes
 
         public MapRectangle(PointLatLng center, float width, float height, System.Drawing.Color color )
         {
-            Position = center;
+            m_center = center;
             m_width = width;
             m_height = height;
             Color = color;
-            Position2 = PointLatLng.Add(Position, new SizeLatLng((int)width, (int)height));
+            //var p1 = Layer.MapPanel.GetPositionFromPoint(Position, width, 0);
+            //var p2 = Layer.MapPanel.GetPositionFromPoint(Position, height, 90);
+            //Position2 = new PointLatLng(p2.Lng, p1.Lng);
         }
 
 
@@ -89,11 +92,13 @@ namespace SgxMap.Shapes
         public MapRectangle(string name, PointLatLng center, float width, float height, System.Drawing.Color color)
         {
             Name = name;
-            Position = center;
+            m_center = center;
             m_width = width;
             m_height = height;
             Color = color;
-            Position2 = PointLatLng.Add(Position, new SizeLatLng((int)width, (int)height));
+            //var p1 = Layer.MapPanel.GetPositionFromPoint(Position, width, 0);
+            //var p2 = Layer.MapPanel.GetPositionFromPoint(Position, height, 90);
+            //Position2 = new PointLatLng(p2.Lng, p1.Lng);
         }
 
 
@@ -122,6 +127,13 @@ namespace SgxMap.Shapes
         {
             if (Layer != null && Layer.MapPanel != null)
             {
+                if (Position == PointLatLng.Empty)
+                {
+                    SetPosition();
+                }
+
+                if (Position2 == PointLatLng.Empty)
+                    SetPosition2();
                 base.UpdateLocalPosition();
                 m_localWidth = LocalPosition2.X - LocalPosition.X;
                 m_localHeight = LocalPosition2.Y - LocalPosition.Y;
@@ -131,6 +143,24 @@ namespace SgxMap.Shapes
                 p = new PointLatLng(Position2.Lat, Position.Lng);
                 m_height = (float)Math.Abs(Layer.MapPanel.GetDistance(Position, p));
             }
+        }
+
+        public void SetPosition()
+        {
+            var p1 = Layer.MapPanel.GetPositionFromPoint(m_center, m_width/2, 90);
+            var p2 = Layer.MapPanel.GetPositionFromPoint(m_center, m_height/2, 180);
+            var p3 = Layer.MapPanel.GetPositionFromPoint(m_center, m_width / 2, 270);
+            var p4 = Layer.MapPanel.GetPositionFromPoint(m_center, m_height / 2, 0);
+            Position = new PointLatLng(p4.Lat, p3.Lng);
+            Position2 = new PointLatLng(p2.Lat, p1.Lng);
+        }
+
+
+        public void SetPosition2()
+        {
+            var p1 = Layer.MapPanel.GetPositionFromPoint(Position, m_width, 90);
+            var p2 = Layer.MapPanel.GetPositionFromPoint(Position, m_height, 180);
+            Position2 = new PointLatLng(p2.Lat, p1.Lng);
         }
 
         public override void BuildGraphicsPath()

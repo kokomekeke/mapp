@@ -33,8 +33,8 @@
             fileToolStripMenuItem = new ToolStripMenuItem();
             exitToolStripMenuItem = new ToolStripMenuItem();
             macroToolStripMenuItem = new ToolStripMenuItem();
-            loadToolStripMenuItem = new ToolStripMenuItem();
-            editToolStripMenuItem = new ToolStripMenuItem();
+            mi_load_macro = new ToolStripMenuItem();
+            mi_dit_macro = new ToolStripMenuItem();
             casheToolStripMenuItem = new ToolStripMenuItem();
             mi_importCash = new ToolStripMenuItem();
             mi_exportcash = new ToolStripMenuItem();
@@ -69,24 +69,24 @@
             // 
             // macroToolStripMenuItem
             // 
-            macroToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { loadToolStripMenuItem, editToolStripMenuItem });
+            macroToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { mi_load_macro, mi_dit_macro });
             macroToolStripMenuItem.Name = "macroToolStripMenuItem";
             macroToolStripMenuItem.Size = new Size(53, 20);
             macroToolStripMenuItem.Text = "Macro";
             // 
-            // loadToolStripMenuItem
+            // mi_load_macro
             // 
-            loadToolStripMenuItem.Name = "loadToolStripMenuItem";
-            loadToolStripMenuItem.Size = new Size(100, 22);
-            loadToolStripMenuItem.Text = "Load";
-            loadToolStripMenuItem.Click += loadToolStripMenuItem_Click;
+            mi_load_macro.Name = "mi_load_macro";
+            mi_load_macro.Size = new Size(180, 22);
+            mi_load_macro.Text = "Load";
+            mi_load_macro.Click += mi_load_macro_Click;
             // 
-            // editToolStripMenuItem
+            // mi_dit_macro
             // 
-            editToolStripMenuItem.Name = "editToolStripMenuItem";
-            editToolStripMenuItem.Size = new Size(100, 22);
-            editToolStripMenuItem.Text = "Edit";
-            editToolStripMenuItem.Click += editToolStripMenuItem_Click;
+            mi_dit_macro.Name = "mi_dit_macro";
+            mi_dit_macro.Size = new Size(180, 22);
+            mi_dit_macro.Text = "Edit";
+            mi_dit_macro.Click += mi_edit_macro_Click;
             // 
             // casheToolStripMenuItem
             // 
@@ -159,8 +159,8 @@
         private ToolStripMenuItem exitToolStripMenuItem;
         public SgxMap.SgxMapControl sgxMapControl1;
         private ToolStripMenuItem macroToolStripMenuItem;
-        private ToolStripMenuItem loadToolStripMenuItem;
-        private ToolStripMenuItem editToolStripMenuItem;
+        private ToolStripMenuItem mi_load_macro;
+        private ToolStripMenuItem mi_dit_macro;
         private ToolStripMenuItem casheToolStripMenuItem;
         private ToolStripMenuItem mi_importCash;
         private ToolStripMenuItem mi_exportcash;

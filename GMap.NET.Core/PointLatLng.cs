@@ -131,6 +131,10 @@ namespace GMap.NET
             return DegreeToString(Lat) + ", " + DegreeToString(Lng);
         }
 
+        public string ToDegreeString()
+        {
+            return string.Format(CultureInfo.CurrentCulture, "{0:F3},{1:F3}", Lat, Lng);
+        }
 
         public static string DegreeToString(double degree)
         {

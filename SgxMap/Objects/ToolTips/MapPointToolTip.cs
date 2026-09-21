@@ -84,7 +84,7 @@ namespace SgxMap.Shapes.ToolTips
             g.DrawRectangle(Stroke, rect);
 
             int h = 0;
-            if ((Marker.ToolTipShow == MarkerToolTipShow.Name) || (Marker.ToolTipShow != MarkerToolTipShow.Both))
+            if ((Marker.ToolTipShow == MarkerToolTipShow.Name) || (Marker.ToolTipShow == MarkerToolTipShow.Both))
             {
                 st = g.MeasureString(Marker.ToolTipHeader, TextFont).ToSize();
                 var hrect = new Rectangle(rect.X, rect.Y, rect.Width, st.Height + 2 * TextPadding.Height);
@@ -100,7 +100,7 @@ namespace SgxMap.Shapes.ToolTips
             rect.Offset(0, TextPadding.Height / 2);
 
 
-            if ((Marker.ToolTipShow == MarkerToolTipShow.Notes) || (Marker.ToolTipShow != MarkerToolTipShow.Both))
+            if ((Marker.ToolTipShow == MarkerToolTipShow.Notes) || (Marker.ToolTipShow == MarkerToolTipShow.Both))
             {
                 g.DrawRectangle(Stroke, rect.X, rect.Y, rect.Width, rect.Height);
                 var _rect = new Rectangle(rect.X + TextPadding.Width, rect.Y + h + TextPadding.Height, rect.Width - 2 * TextPadding.Width, rect.Height - TextPadding.Height - h);

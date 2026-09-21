@@ -2003,7 +2003,7 @@ namespace SgxMap
                         break;
 
                     case "marker":                      // draw marker: "marker", name, lat,lng, size, color
-                        if (ls.Length > 6)
+                        if (ls.Length > 5)
                         {
                             var g = MapBaseMarker.CreateMarker(ls, out errorstring);
                             if (g == null)
@@ -2032,6 +2032,24 @@ namespace SgxMap
                             return true;
                         }
                         break;
+
+                    case "hmarker":                      // draw HFsystem marker: "hmarker", name, lat,lng, color
+                        if (ls.Length > 4)
+                        {
+                            var g = MapBitmapMarker.CreateHFMarker(ls, out errorstring);
+                            if (g == null)
+                            {
+                                errorstring += ": " + command;
+                                return false;
+                            }
+
+                            currentLayer?.AddObject(g);
+                            g.AddToolTip();
+                            Invalidate();
+                            return true;
+                        }
+                        break;
+
 
                     default:
                         errorstring = "Invalid command : " + command;
