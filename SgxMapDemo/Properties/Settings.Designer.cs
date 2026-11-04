@@ -25,7 +25,7 @@ namespace SgxMapDemo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("BingMap")]
+        [global::System.Configuration.DefaultSettingValueAttribute("OpenStreetMap")]
         public string MapProvider {
             get {
                 return ((string)(this["MapProvider"]));
@@ -73,7 +73,7 @@ namespace SgxMapDemo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("ServerOnly")]
+        [global::System.Configuration.DefaultSettingValueAttribute("ServerAndCache")]
         public string AccessMode {
             get {
                 return ((string)(this["AccessMode"]));

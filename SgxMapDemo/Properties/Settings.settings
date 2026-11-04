@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="MapProvider" Type="System.String" Scope="User">
-      <Value Profile="(Default)">BingMap</Value>
+      <Value Profile="(Default)">OpenStreetMap</Value>
     </Setting>
     <Setting Name="Latitude" Type="System.Double" Scope="User">
       <Value Profile="(Default)">47.4979</Value>
@@ -15,7 +15,7 @@
       <Value Profile="(Default)">Budapest</Value>
     </Setting>
     <Setting Name="AccessMode" Type="System.String" Scope="User">
-      <Value Profile="(Default)">ServerOnly</Value>
+      <Value Profile="(Default)">ServerAndCache</Value>
     </Setting>
     <Setting Name="Ping" Type="System.String" Scope="User">
       <Value Profile="(Default)">google.com</Value>

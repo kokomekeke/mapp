@@ -32,6 +32,7 @@ namespace SgxMapDemo
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+            GMapProvider.UserAgent = "SgxMapDemo/1.0.26.831 (Windows; SAGAX Communications Ltd.)";
             LoadSettings();
             Application.Run(new MainForm());
             SaveSettings();

@@ -16,10 +16,6 @@
 History Release Notes
 https://github.com/judero01col/GMap.NET/blob/master/README.md#release-notes
     </PackageReleaseNotes>
-    
-    <SignAssembly>True</SignAssembly>
-    
-    <AssemblyOriginatorKeyFile>C:\Projects\SAGAX\GMAP-SGX\sn.snk</AssemblyOriginatorKeyFile>    
   </PropertyGroup>
     
     <PropertyGroup Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('$(TargetFramework)', '^net\d'))">
