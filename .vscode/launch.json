@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "SgxMapDemo (Debug)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build SgxMapDemo",
+            "program": "${workspaceFolder}/SgxMapDemo/bin/Debug/net8.0-windows7.0/SgxMapDemo.exe",
+            "cwd": "${workspaceFolder}/SgxMapDemo/bin/Debug/net8.0-windows7.0",
+            "console": "internalConsole",
+            "justMyCode": false,
+            "stopAtEntry": false
+        }
+    ]
+}

@@ -7,6 +7,7 @@ using System.Net;
 using System.Xml;
 using GMap.NET.Entity;
 using GMap.NET.Internals;
+using GMap.NET.MapProviders.HFsystem;
 using GMap.NET.Projections;
 using Newtonsoft.Json;
 
@@ -21,7 +22,8 @@ namespace GMap.NET.MapProviders
 
         HFsystemMapProvider()
         {
-            LoadParameters("HFsystemMap.ini");
+            // Az INI-t az exe mappájából olvassuk, nem az aktuális munkakönyvtárból
+            LoadParameters(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "HFsystemMap.ini"));
         }
 
         static HFsystemMapProvider()
@@ -46,6 +48,76 @@ namespace GMap.NET.MapProviders
 
         public string YoursClientName { get; set; }
 
+        #region szerver paraméterek (HFsystemMap.ini)
+
+        /// <summary>
+        ///     http vagy https. INI kulcs: Protocol
+        /// </summary>
+        public string Protocol { get; set; } = "http";
+
+        /// <summary>
+        ///     A csempeszerver IP címe vagy gépneve. INI kulcs: ServerIp
+        /// </summary>
+        public string ServerIp { get; set; } = "localhost";
+
+        /// <summary>
+        ///     A csempeszerver portja; 0 = nincs megadva (http: 80, https: 443). INI kulcs: ServerPort
+        /// </summary>
+        public int ServerPort { get; set; } = 80;
+
+        /// <summary>
+        ///     A csempék útvonala a szerveren, a {z}/{x}/{y} előtt (pl. data/v3). INI kulcs: TilePath
+        /// </summary>
+        public string TilePath { get; set; } = "data/v3";
+
+        /// <summary>
+        ///     A csempék formátuma (fájlkiterjesztés): pbf / mvt = vektoros, a program rajzolja ki;
+        ///     png / jpg = kész kép a szervertől. INI kulcs: TileFormat
+        /// </summary>
+        public string TileFormat { get; set; } = "pbf";
+
+        /// <summary>
+        ///     IP[:port] egyben (régi INI kulcs: ServerUrl)
+        /// </summary>
+        public string ServerUrl
+        {
+            get { return ServerPort > 0 ? ServerIp + ":" + ServerPort : ServerIp; }
+            set
+            {
+                string v = (value ?? string.Empty).Trim();
+                int colon = v.LastIndexOf(':');
+                if (colon > 0 && int.TryParse(v.Substring(colon + 1), out int port))
+                {
+                    ServerIp = v.Substring(0, colon);
+                    ServerPort = port;
+                }
+                else
+                {
+                    ServerIp = v;
+                    ServerPort = 0;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     A ténylegesen használt URL minta: {0}=IP[:port], {1}=zoom, {2}=x, {3}=y.
+        ///     Ha az INI-ben UrlFormat meg van adva, az felülírja a Protocol/TilePath/TileFormat alapján összeállítottat.
+        /// </summary>
+        public string EffectiveUrlFormat
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(UrlFormat))
+                    return UrlFormat;
+
+                string path = (TilePath ?? string.Empty).Trim().Trim('/');
+                string ext = (TileFormat ?? "pbf").Trim().TrimStart('.');
+                return Protocol + "://{0}" + (path.Length > 0 ? "/" + path : string.Empty) + "/{1}/{2}/{3}." + ext;
+            }
+        }
+
+        #endregion
+
         GMapProvider[] _overlays;
 
         public override GMapProvider[] Overlays
@@ -61,11 +133,70 @@ namespace GMap.NET.MapProviders
             }
         }
 
+        /// <summary>
+        ///     A vektoros csempék legnagyobb zoomszintje a szerveren (OpenMapTiles: 14).
+        ///     Efölött a szülőcsempét töltjük le és nagyítva rajzoljuk ki. INI kulcs: MaxVectorZoom
+        /// </summary>
+        public int MaxVectorZoom { get; set; } = 14;
+
+        /// <summary>
+        ///     true, ha az URL vektoros (.pbf / .mvt) csempére mutat
+        /// </summary>
+        public bool IsVectorTileUrl
+        {
+            get
+            {
+                string u = EffectiveUrlFormat;
+                int q = u.IndexOf('?');
+                if (q >= 0) u = u.Substring(0, q);
+                return u.EndsWith(".pbf", StringComparison.OrdinalIgnoreCase) ||
+                       u.EndsWith(".mvt", StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
         public override PureImage GetTileImage(GPoint pos, int zoom)
         {
+            if (IsVectorTileUrl)
+            {
+                return GetVectorTileImage(pos, zoom);
+            }
+
             string url = MakeTileImageUrl(pos, zoom, string.Empty);
 
             return GetTileImageUsingHttp(url);
+        }
+
+        /// <summary>
+        ///     .pbf letöltése, kirajzolása PNG-be, majd PureImage-dzsé alakítása.
+        ///     A PNG bájtok kerülnek a GMap gyorsítótárába is.
+        /// </summary>
+        PureImage GetVectorTileImage(GPoint pos, int zoom)
+        {
+            int overzoom = Math.Max(0, zoom - MaxVectorZoom);
+            var src = new GPoint(pos.X >> overzoom, pos.Y >> overzoom);
+            long subX = pos.X - (src.X << overzoom);
+            long subY = pos.Y - (src.Y << overzoom);
+
+            string url = MakeTileImageUrl(src, zoom - overzoom, string.Empty);
+            byte[] pbf = GetTileDataUsingHttp(url);
+
+            byte[] png = VectorTileRenderer.RenderToPng(pbf, zoom, overzoom, subX, subY);
+
+            // publiclyVisible: true kell, mert a GMaps a gyorsítótárazáshoz Data.GetBuffer()-t hív,
+            // ami a sima new MemoryStream(byte[]) esetén UnauthorizedAccessException-t dob
+            var data = new MemoryStream(png, 0, png.Length, false, true);
+            var ret = TileImageProxy.FromStream(data);
+            if (ret != null)
+            {
+                data.Position = 0;
+                ret.Data = data;
+            }
+            else
+            {
+                data.Dispose();
+            }
+
+            return ret;
         }
 
         protected override void InitializeWebRequest(WebRequest request)
@@ -82,17 +213,25 @@ namespace GMap.NET.MapProviders
 
         string MakeTileImageUrl(GPoint pos, int zoom, string language)
         {
-            char letter = ServerLetters[GetServerNum(pos, 3)];
-            return string.Format(UrlFormat, letter, zoom, pos.X, pos.Y);
-            //return string.Format(UrlFormat, zoom, pos.X, pos.Y);
+            return string.Format(EffectiveUrlFormat, ServerUrl, zoom, pos.X, pos.Y);
         }
 
-        //static readonly string UrlFormat = "https://{0}.tile.openstreetmap.org/{1}/{2}/{3}.png";
+        /// <summary>
+        ///     Opcionális teljes URL minta; ha üres, a Protocol/ServerIp/ServerPort/TilePath/TileFormat alapján áll össze
+        /// </summary>
         static public string UrlFormat
         {
             get;
             protected set;
-        } = "https://{0}.tile.openstreetmap.org/{1}/{2}/{3}.png";
+        } = null;
+
+        //static readonly string UrlFormat = "https://{0}.tile.openstreetmap.org/{1}/{2}/{3}.png";
+        
+        //static public string UrlFormat
+        //{
+            //get;
+            //protected set;
+        //} = "https://{0}.tile.openstreetmap.org/{1}/{2}/{3}.png";
 
         public void LoadParameters(string inifilename)
         {
@@ -121,6 +260,35 @@ namespace GMap.NET.MapProviders
                     {
                         switch (ls[0].Trim())
                         {
+                            case "ServerUrl":
+                                if (!string.IsNullOrEmpty(ls[1].Trim()))
+                                    ServerUrl = ls[1].Trim();
+                                break;
+                            case "Protocol":
+                                if (!string.IsNullOrEmpty(ls[1].Trim()))
+                                    Protocol = ls[1].Trim().ToLowerInvariant();
+                                break;
+                            case "ServerIp":
+                                if (!string.IsNullOrEmpty(ls[1].Trim()))
+                                    ServerIp = ls[1].Trim();
+                                break;
+                            case "ServerPort":
+                                if (string.IsNullOrEmpty(ls[1].Trim()))
+                                    ServerPort = 0;
+                                else if (int.TryParse(ls[1].Trim(), out int port) && port >= 0 && port <= 65535)
+                                    ServerPort = port;
+                                break;
+                            case "TilePath":
+                                TilePath = ls[1].Trim();
+                                break;
+                            case "TileFormat":
+                                if (!string.IsNullOrEmpty(ls[1].Trim()))
+                                    TileFormat = ls[1].Trim();
+                                break;
+                            case "MaxVectorZoom":
+                                if (int.TryParse(ls[1].Trim(), out int mvz) && mvz >= 0)
+                                    MaxVectorZoom = mvz;
+                                break;
                             case "YoursClientName":
                                 YoursClientName = ls[1].Trim();
                                 break;

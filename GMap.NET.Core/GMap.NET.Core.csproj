@@ -46,6 +46,11 @@ https://github.com/judero01col/GMap.NET/blob/master/README.md#release-notes
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
   </ItemGroup>
 
+  <!-- System.Drawing: a .pbf vektoros csempék PNG-vé rajzolásához (HFsystem/VectorTileRenderer.cs) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Data.SqlClient">
       <Version>4.8.5</Version>

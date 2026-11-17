@@ -53,7 +53,7 @@ namespace GMap.NET.MapProviders
 
         public static readonly HFsystemMapProvider HFsystemMap = HFsystemMapProvider.Instance;
 
-                public static readonly OpenStreetMapProvider OpenStreetMap = OpenStreetMapProvider.Instance;
+        public static readonly OpenStreetMapProvider OpenStreetMap = OpenStreetMapProvider.Instance;
         //public static readonly OpenStreetMapGraphHopperProvider OpenStreetMapGraphHopper = OpenStreetMapGraphHopperProvider.Instance;
         //public static readonly OpenStreet4UMapProvider OpenStreet4UMap = OpenStreet4UMapProvider.Instance;
         //public static readonly OpenStreetMapQuestProvider OpenStreetMapQuest = OpenStreetMapQuestProvider.Instance;
@@ -339,11 +339,49 @@ namespace GMap.NET.MapProviders
 
         protected virtual void InitializeWebRequest(WebRequest request) { }
 
-        protected PureImage GetTileImageUsingHttp(string url)
+        /// <summary>
+        ///     Bináris csempe (pl. .pbf vektoros csempe) letöltése HTTP-n.
+        ///     Nem ellenőrzi a Content-Type-ot, és a gzip/deflate tömörítést kibontja
+        ///     (akkor is, ha a szerver nem küld Content-Encoding fejlécet).
+        /// </summary>
+        /// <returns>a letöltött bájtok; üres tömb, ha a szerver üres választ adott (pl. 204 No Content)</returns>
+        protected byte[] GetTileDataUsingHttp(string url)
         {
-            PureImage ret = null;
+            var request = CreateTileWebRequest(url);
 
-            var request = IsSocksProxy ? SocksHttpWebRequest.Create(url) : 
+            if (request is HttpWebRequest hr)
+            {
+                hr.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            }
+
+            using (var response = request.GetResponse())
+            using (var responseStream = response.GetResponseStream())
+            using (var ms = new MemoryStream())
+            {
+                responseStream.CopyTo(ms);
+                var data = ms.ToArray();
+
+                Debug.WriteLine("Response[" + data.Length + " bytes, " + response.ContentType + "]: " + url);
+
+                // gzip magic (1F 8B): a szerver Content-Encoding nélkül, tömörítve küldte
+                if (data.Length > 2 && data[0] == 0x1F && data[1] == 0x8B)
+                {
+                    using (var gz = new System.IO.Compression.GZipStream(new MemoryStream(data),
+                        System.IO.Compression.CompressionMode.Decompress))
+                    using (var unzipped = new MemoryStream())
+                    {
+                        gz.CopyTo(unzipped);
+                        data = unzipped.ToArray();
+                    }
+                }
+
+                return data;
+            }
+        }
+
+        WebRequest CreateTileWebRequest(string url)
+        {
+            var request = IsSocksProxy ? SocksHttpWebRequest.Create(url) :
                 WebRequestFactory != null ? WebRequestFactory(this, url) : WebRequest.Create(url);
 
             if (WebProxy != null)
@@ -393,6 +431,15 @@ namespace GMap.NET.MapProviders
             }
 
             InitializeWebRequest(request);
+
+            return request;
+        }
+
+        protected PureImage GetTileImageUsingHttp(string url)
+        {
+            PureImage ret = null;
+
+            var request = CreateTileWebRequest(url);
 
             using (var response = request.GetResponse())
             {
@@ -507,6 +554,95 @@ namespace GMap.NET.MapProviders
                         ret = read.ReadToEnd();
                     }
                 }
+
+                response.Close();
+            }
+
+            return ret;
+        }
+
+        protected string GetBitmapUsingHttp(string url)
+        {
+            string ret = string.Empty;
+
+            var request = IsSocksProxy ? SocksHttpWebRequest.Create(url) : 
+                WebRequestFactory != null ? WebRequestFactory(this, url) : WebRequest.Create(url);
+
+            if (WebProxy != null)
+            {
+                request.Proxy = WebProxy;
+            }
+
+            if (Credential != null)
+            {
+                request.PreAuthenticate = true;
+                request.Credentials = Credential;
+            }
+
+
+            if (!string.IsNullOrEmpty(_authorization))
+            {
+                request.Headers.Set("Authorization", _authorization);
+            }
+
+            if (request is HttpWebRequest r)
+            {
+                r.UserAgent = UserAgent;
+                r.ReadWriteTimeout = TimeoutMs * 6;
+                r.Accept = requestAccept;
+                r.Referer = RefererUrl;
+                r.Timeout = TimeoutMs;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(UserAgent))
+                {
+                    request.Headers.Add("User-Agent", UserAgent);
+                }
+
+                if (!string.IsNullOrEmpty(requestAccept))
+                {
+                    request.Headers.Add("Accept", requestAccept);
+                }
+
+                if (!string.IsNullOrEmpty(RefererUrl))
+                {
+                    request.Headers.Add("Referer", RefererUrl);
+                }
+            }
+
+            InitializeWebRequest(request);
+
+            WebResponse response;
+
+            try
+            {
+                response = request.GetResponse();
+            }
+            catch (WebException ex)
+            {
+                response = (HttpWebResponse)ex.Response;
+            }
+            catch (Exception)
+            {
+                response = null;
+            }
+
+            if (response != null)
+            {
+
+                var responseStream = response.GetResponseStream();
+                var data = new MemoryStream();
+                responseStream.CopyTo(data);
+
+                byte[] contentBytes = data.ToArray();
+                // using (var responseStream = response.GetResponseStream())
+                // {
+                //    using (var read = new StreamReader(responseStream, Encoding.UTF8))
+                //    {
+                //        ret = read.ReadToEnd();
+                //    }
+                //}
 
                 response.Close();
             }

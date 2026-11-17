@@ -1,0 +1,18 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build SgxMapDemo",
+            "type": "process",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "${workspaceFolder}/SgxMapDemo/SgxMapDemo.csproj",
+                "-c", "Debug",
+                "-p:AssemblyOriginatorKeyFile=${workspaceFolder}/sn.snk"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": { "kind": "build", "isDefault": true }
+        }
+    ]
+}
