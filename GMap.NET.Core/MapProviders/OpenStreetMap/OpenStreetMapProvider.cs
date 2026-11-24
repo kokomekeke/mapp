@@ -224,16 +224,59 @@ namespace GMap.NET.MapProviders
 
         #region -- internals --
 
+        /// <summary>
+        ///     Címkeresés URL mintája ({0}=keresett szöveg). Leszármazott provider saját címet adhat meg,
+        ///     anélkül, hogy a többi OpenStreetMap provider (közös statikus) beállítását felülírná.
+        /// </summary>
+        protected virtual string GeocoderUrl => GeocoderUrlFormat;
+
+        /// <summary>
+        ///     Részletes címkeresés URL mintája ({0}=utca, {1}=város, {2}=megye, {3}=állam, {4}=ország, {5}=irányítószám)
+        /// </summary>
+        protected virtual string GeocoderDetailedUrl => GeocoderDetailedUrlFormat;
+
+        /// <summary>
+        ///     Fordított címkeresés URL mintája ({0}=lat, {1}=lng)
+        /// </summary>
+        protected virtual string ReverseGeocoderUrl => ReverseGeocoderUrlFormat;
+
+        /// <summary>
+        ///     A keresett szöveg URL-be illesztése. Alapból a szóköz '+' lesz (Nominatim query string).
+        /// </summary>
+        protected virtual string EncodeGeocoderKeywords(string keywords)
+        {
+            return keywords.Replace(' ', '+');
+        }
+
         string MakeGeocoderUrl(string keywords)
         {
-            return string.Format(GeocoderUrlFormat, keywords.Replace(' ', '+'));
+            return string.Format(GeocoderUrl, EncodeGeocoderKeywords(keywords));
+        }
+
+        /// <summary>
+        ///     Geocoder JSON válasz feldolgozása. Elfogadja a Nominatim-féle tömböt ([{...}, ...])
+        ///     és az egyetlen objektumot ({"name":..,"lat":..,"lon":..}) is.
+        /// </summary>
+        static List<OpenStreetMapGeocodeEntity> ParseGeocodeResult(string json)
+        {
+            string trimmed = json.TrimStart();
+            if (trimmed.StartsWith("{"))
+            {
+                var single = JsonConvert.DeserializeObject<OpenStreetMapGeocodeEntity>(json);
+                return single != null
+                    ? new List<OpenStreetMapGeocodeEntity> { single }
+                    : new List<OpenStreetMapGeocodeEntity>();
+            }
+
+            return JsonConvert.DeserializeObject<List<OpenStreetMapGeocodeEntity>>(json)
+                   ?? new List<OpenStreetMapGeocodeEntity>();
         }
 
         string MakeDetailedGeocoderUrl(Placemark placemark)
         {
             string street = String.Join(" ", new[] {placemark.HouseNo, placemark.ThoroughfareName}).Trim();
 
-            return string.Format(GeocoderDetailedUrlFormat,
+            return string.Format(GeocoderDetailedUrl,
                 street.Replace(' ', '+'),
                 placemark.LocalityName.Replace(' ', '+'),
                 placemark.SubAdministrativeAreaName.Replace(' ', '+'),
@@ -244,7 +287,7 @@ namespace GMap.NET.MapProviders
 
         string MakeReverseGeocoderUrl(PointLatLng pt)
         {
-            return string.Format(CultureInfo.InvariantCulture, ReverseGeocoderUrlFormat, pt.Lat, pt.Lng);
+            return string.Format(CultureInfo.InvariantCulture, ReverseGeocoderUrl, pt.Lat, pt.Lng);
         }
 
         GeoCoderStatusCode GetLatLngFromGeocoderUrl(string url, out List<PointLatLng> pointList)
@@ -265,7 +308,7 @@ namespace GMap.NET.MapProviders
 
                     if (!string.IsNullOrEmpty(geo))
                     {
-                        result = JsonConvert.DeserializeObject<List<OpenStreetMapGeocodeEntity>>(geo);
+                        result = ParseGeocodeResult(geo);
 
                         if (GMaps.Instance.UseGeocoderCache && result != null && result.Count > 0)
                         {
@@ -275,10 +318,10 @@ namespace GMap.NET.MapProviders
                 }
                 else
                 {
-                    result = JsonConvert.DeserializeObject<List<OpenStreetMapGeocodeEntity>>(geo);
+                    result = ParseGeocodeResult(geo);
                 }
 
-                if (!string.IsNullOrEmpty(geo))
+                if (!string.IsNullOrEmpty(geo) && result != null)
                 {
                     pointList = new List<PointLatLng>();
 
@@ -287,7 +330,8 @@ namespace GMap.NET.MapProviders
                         pointList.Add(new PointLatLng { Lat = item.lat, Lng = item.lon });
                     }
 
-                    status = GeoCoderStatusCode.OK;
+                    // üres találati lista esetén ne jelezzen sikert (különben a térkép nem mozdul, és hibaüzenet sincs)
+                    status = pointList.Count > 0 ? GeoCoderStatusCode.OK : GeoCoderStatusCode.ZERO_RESULTS;
                 }
             }
             catch (Exception ex)

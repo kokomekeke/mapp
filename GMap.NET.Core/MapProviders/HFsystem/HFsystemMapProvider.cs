@@ -118,6 +118,42 @@ namespace GMap.NET.MapProviders
 
         #endregion
 
+        #region címkeresés (geocoder) - csak erre a providerre vonatkozik
+
+        /// <summary>
+        ///     Címkeresés: HTTP GET erre a címre, {0}=keresett szöveg. Nominatim-kompatibilis JSON választ vár
+        ///     ([{"lat":"..","lon":".."}, ...]). INI kulcs: GeocoderUrlFormat
+        /// </summary>
+        public string HFGeocoderUrlFormat { get; set; } = "http://localhost:537/search?q={0}&format=json";
+
+        /// <summary>
+        ///     INI kulcs: GeocoderDetailedUrlFormat
+        /// </summary>
+        public string HFGeocoderDetailedUrlFormat { get; set; } =
+            "http://localhost:537/search?street={0}&city={1}&county={2}&state={3}&country={4}&postalcode={5}&format=json";
+
+        /// <summary>
+        ///     INI kulcs: ReverseGeocoderUrlFormat
+        /// </summary>
+        public string HFReverseGeocoderUrlFormat { get; set; } =
+            "http://localhost:537/reverse?format=json&lat={0}&lon={1}&zoom=18&addressdetails=1";
+
+        protected override string GeocoderUrl => HFGeocoderUrlFormat;
+        protected override string GeocoderDetailedUrl => HFGeocoderDetailedUrlFormat;
+        protected override string ReverseGeocoderUrl => HFReverseGeocoderUrlFormat;
+
+        /// <summary>
+        ///     A keresett szöveg az URL útvonalába kerül (pl. /settlement/{0}), ezért szabványos
+        ///     URL-kódolás kell: "Szent Endre" → "Szent%20Endre", "Győr" → "Gy%C5%91r".
+        /// </summary>
+        protected override string EncodeGeocoderKeywords(string keywords)
+        {
+            // a SgxMapPanel a '#'-et előre %23-ra cseréli; visszaalakítjuk, hogy ne kódolódjon kétszer
+            return Uri.EscapeDataString(keywords.Replace("%23", "#").Trim());
+        }
+
+        #endregion
+
         GMapProvider[] _overlays;
 
         public override GMapProvider[] Overlays
@@ -308,15 +344,15 @@ namespace GMap.NET.MapProviders
                             break;
                             case "ReverseGeocoderUrlFormat":
                                 if (!string.IsNullOrEmpty(ls[1].Trim()))
-                                    ReverseGeocoderUrlFormat = ls[1].Trim();
+                                    HFReverseGeocoderUrlFormat = ls[1].Trim();
                                 break;
                             case "GeocoderUrlFormat":
                                 if (!string.IsNullOrEmpty(ls[1].Trim()))
-                                    GeocoderUrlFormat = ls[1].Trim();
+                                    HFGeocoderUrlFormat = ls[1].Trim();
                                 break;
                             case "GeocoderDetailedUrlFormat":
                                 if (!string.IsNullOrEmpty(ls[1].Trim()))
-                                    GeocoderDetailedUrlFormat = ls[1].Trim();
+                                    HFGeocoderDetailedUrlFormat = ls[1].Trim();
                                 break;
                         } /* switch */
                     }

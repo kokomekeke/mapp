@@ -1,20 +1,26 @@
 # SgxMapDemo kiadasi build a Build\SgxMapDemo mappaba (exe + HFsystemMap.ini + fuggosegek).
 #
 # Hasznalat (a repo gyokereben):
-#   .\build-sgxmapdemo.ps1                  # .NET 8 Desktop Runtime kell a celgepen
-#   .\build-sgxmapdemo.ps1 -SelfContained   # .NET runtime-mal egyutt, barmely Windows x64 gepen fut
+#   .\build-sgxmapdemo.ps1                      # alapertelmezes: self-contained, a .NET runtime is a mappaba
+#                                               # kerul, barmely Windows 10/11 x64 gepen fut telepites nelkul
+#                                               # (internet nelkuli gepekre is)
+#   .\build-sgxmapdemo.ps1 -FrameworkDependent  # kisebb, de a celgepen kell a .NET 8 Desktop Runtime
+#                                               # (Microsoft.WindowsDesktop.App 8.x)
 #
 # A Build\SgxMapDemo mappa tartalmat a build elott torli, de a meglevo HFsystemMap.ini-t
 # megtartja, igy a mar beallitott szervercim nem vesz el.
 
+#   .\build-sgxmapdemo.ps1 -OutName SgxMapDemo11182  # masik mappanev a Build alatt
+
 param(
-    [switch]$SelfContained,
-    [string]$Configuration = "Release"
+    [switch]$FrameworkDependent,
+    [string]$Configuration = "Release",
+    [string]$OutName = "SgxMapDemo"
 )
 
 $ErrorActionPreference = "Stop"
 $root   = $PSScriptRoot
-$outDir = Join-Path $root "Build\SgxMapDemo"
+$outDir = Join-Path $root "Build\$OutName"
 $ini    = Join-Path $outDir "HFsystemMap.ini"
 $keepIni = $null
 
@@ -34,10 +40,10 @@ $publishArgs = @(
     "-p:AssemblyOriginatorKeyFile=$(Join-Path $root 'sn.snk')"
 )
 
-if ($SelfContained) {
-    $publishArgs += @("--self-contained", "true")
-} else {
+if ($FrameworkDependent) {
     $publishArgs += @("--self-contained", "false")
+} else {
+    $publishArgs += @("--self-contained", "true")
 }
 
 & dotnet @publishArgs
