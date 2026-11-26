@@ -32,7 +32,9 @@ namespace GMap.NET.MapProviders.HFsystem
         /// <param name="overzoom">hány szinttel nagyítunk a forrás csempéhez képest (0 = nincs nagyítás)</param>
         /// <param name="subX">a forrás csempén belüli rész X indexe (0 .. 2^overzoom-1)</param>
         /// <param name="subY">a forrás csempén belüli rész Y indexe (0 .. 2^overzoom-1)</param>
-        public static byte[] RenderToPng(byte[] pbf, int zoom, int overzoom = 0, long subX = 0, long subY = 0)
+        /// <param name="layers">a kirajzolandó rétegek</param>
+        public static byte[] RenderToPng(byte[] pbf, int zoom, int overzoom = 0, long subX = 0, long subY = 0,
+            HFsystemLayers layers = HFsystemLayers.All)
         {
             var tile = pbf != null && pbf.Length > 0 ? VectorTile.Parse(pbf) : new VectorTile();
 
@@ -45,17 +47,42 @@ namespace GMap.NET.MapProviders.HFsystem
                     g.Clear(Background);
 
                     var ctx = new RenderContext(g, zoom, overzoom, subX, subY);
+                    bool On(HFsystemLayers l) => (layers & l) != 0;
 
-                    DrawFills(ctx, tile.GetLayer("landcover"), LandcoverColor);
-                    DrawFills(ctx, tile.GetLayer("landuse"), LanduseColor);
-                    DrawFills(ctx, tile.GetLayer("park"), f => Color.FromArgb(200, 230, 180));
-                    DrawFills(ctx, tile.GetLayer("water"), f => WaterColor);
-                    DrawWaterways(ctx, tile.GetLayer("waterway"));
-                    DrawFills(ctx, tile.GetLayer("aeroway"), f => Color.FromArgb(220, 220, 228));
-                    DrawBuildings(ctx, tile.GetLayer("building"));
-                    DrawRoads(ctx, tile.GetLayer("transportation"));
-                    DrawBoundaries(ctx, tile.GetLayer("boundary"));
-                    DrawPlaceLabels(ctx, tile.GetLayer("place"));
+                    // területek (alulról felfelé)
+                    if (On(HFsystemLayers.Vegetation))
+                        DrawFills(ctx, tile.GetLayer("landcover"), LandcoverColor);
+                    if (On(HFsystemLayers.Landuse))
+                    {
+                        DrawFills(ctx, tile.GetLayer("landuse"), LanduseColor);
+                        DrawFills(ctx, tile.GetLayer("aeroway"), f => Color.FromArgb(220, 220, 228));
+                    }
+                    if (On(HFsystemLayers.Vegetation))
+                        DrawFills(ctx, tile.GetLayer("park"), f => Color.FromArgb(200, 230, 180));
+                    if (On(HFsystemLayers.Water))
+                    {
+                        DrawFills(ctx, tile.GetLayer("water"), f => WaterColor);
+                        DrawWaterways(ctx, tile.GetLayer("waterway"));
+                    }
+                    if (On(HFsystemLayers.Buildings))
+                        DrawBuildings(ctx, tile.GetLayer("building"));
+
+                    // vonalak
+                    DrawTransportation(ctx, tile.GetLayer("transportation"),
+                        On(HFsystemLayers.Roads), On(HFsystemLayers.Paths), On(HFsystemLayers.Railways));
+                    if (On(HFsystemLayers.Boundaries))
+                        DrawBoundaries(ctx, tile.GetLayer("boundary"));
+
+                    // feliratok (legfelül), fontossági sorrendben: amelyik később jönne
+                    // és ütközne egy már kirakottal, az kimarad
+                    if (On(HFsystemLayers.PlaceNames))
+                        DrawPlaceLabels(ctx, tile.GetLayer("place"));
+                    if (On(HFsystemLayers.StreetNames))
+                        DrawStreetNames(ctx, tile.GetLayer("transportation_name"));
+                    if (On(HFsystemLayers.WaterNames))
+                        DrawWaterNames(ctx, tile.GetLayer("water_name"), tile.GetLayer("waterway"));
+                    if (On(HFsystemLayers.HouseNumbers))
+                        DrawHouseNumbers(ctx, tile.GetLayer("housenumber"));
                 }
 
                 using (var ms = new MemoryStream())
@@ -70,6 +97,23 @@ namespace GMap.NET.MapProviders.HFsystem
         {
             public readonly Graphics G;
             public readonly int Zoom;
+
+            /// <summary>
+            ///     a már kirakott feliratok befoglaló téglalapjai (ütközésvizsgálathoz)
+            /// </summary>
+            public readonly List<RectangleF> Occupied = new List<RectangleF>();
+
+            public bool TryOccupy(RectangleF r)
+            {
+                foreach (var o in Occupied)
+                {
+                    if (o.IntersectsWith(r))
+                        return false;
+                }
+
+                Occupied.Add(r);
+                return true;
+            }
             readonly double _factor;
             readonly double _offX;
             readonly double _offY;
@@ -240,9 +284,9 @@ namespace GMap.NET.MapProviders.HFsystem
             }
         }
 
-        static void DrawRoads(RenderContext ctx, VectorTileLayer layer)
+        static void DrawTransportation(RenderContext ctx, VectorTileLayer layer, bool roadsOn, bool pathsOn, bool railOn)
         {
-            if (layer == null)
+            if (layer == null || !(roadsOn || pathsOn || railOn))
                 return;
 
             var roads = new List<KeyValuePair<int, VectorTileFeature>>();
@@ -257,6 +301,8 @@ namespace GMap.NET.MapProviders.HFsystem
                 {
                     case "rail":
                     case "transit":
+                        if (!railOn)
+                            break;
                         using (var pen = new Pen(Color.FromArgb(140, 140, 140), 1.2f * ctx.WidthScale) { DashStyle = DashStyle.Dash })
                         {
                             DrawLines(ctx, f, layer.Extent, pen);
@@ -264,13 +310,15 @@ namespace GMap.NET.MapProviders.HFsystem
                         break;
                     case "track":
                     case "path":
+                        if (!pathsOn)
+                            break;
                         using (var pen = new Pen(Color.FromArgb(170, 120, 80), 0.8f * ctx.WidthScale) { DashStyle = DashStyle.Dot })
                         {
                             DrawLines(ctx, f, layer.Extent, pen);
                         }
                         break;
                     default:
-                        if (TryGetRoadStyle(cls, out _, out _, out float wid))
+                        if (roadsOn && TryGetRoadStyle(cls, out _, out _, out float wid))
                         {
                             // kisebb utak előbb, a fontosabbak felülre kerülnek
                             roads.Add(new KeyValuePair<int, VectorTileFeature>((int)(wid * 10), f));
@@ -372,9 +420,236 @@ namespace GMap.NET.MapProviders.HFsystem
                     using (var path = new GraphicsPath())
                     {
                         path.AddString(name, family, (int)FontStyle.Regular, size, p, format);
+                        var b = path.GetBounds();
+                        b.Inflate(2, 2);
+                        if (!ctx.TryOccupy(b))
+                            continue;
                         ctx.G.DrawPath(halo, path);
                         ctx.G.FillPath(brush, path);
                     }
+                }
+            }
+        }
+
+        static string GetName(VectorTileFeature f)
+        {
+            string n = f.GetString("name:latin");
+            if (string.IsNullOrEmpty(n))
+                n = f.GetString("name");
+            return string.IsNullOrEmpty(n) ? null : n;
+        }
+
+        /// <summary>
+        ///     Felirat egy vonal mentén: a vonal leghosszabb, csempén belül eső szakaszának közepére,
+        ///     a szakasz irányába forgatva (mindig olvasható irányban). Ha a felirat nem fér el, kimarad.
+        /// </summary>
+        static bool DrawLineLabel(RenderContext ctx, VectorTileFeature f, int extent, string text,
+            FontFamily family, FontStyle style, float size, Brush brush, Pen halo)
+        {
+            PointF bestA = PointF.Empty, bestB = PointF.Empty;
+            double bestLen = 0;
+
+            foreach (var part in f.Parts)
+            {
+                if (part.Count < 2)
+                    continue;
+
+                var pts = ctx.ToPixels(part, extent);
+                for (int i = 1; i < pts.Length; i++)
+                {
+                    float mx = (pts[i - 1].X + pts[i].X) / 2;
+                    float my = (pts[i - 1].Y + pts[i].Y) / 2;
+                    if (mx < 0 || my < 0 || mx >= TileSize || my >= TileSize)
+                        continue;
+
+                    double dx = pts[i].X - pts[i - 1].X;
+                    double dy = pts[i].Y - pts[i - 1].Y;
+                    double len = Math.Sqrt(dx * dx + dy * dy);
+                    if (len > bestLen)
+                    {
+                        bestLen = len;
+                        bestA = pts[i - 1];
+                        bestB = pts[i];
+                    }
+                }
+            }
+
+            if (bestLen < 8)
+                return false;
+
+            using (var path = new GraphicsPath())
+            using (var format = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            {
+                path.AddString(text, family, (int)style, size, PointF.Empty, format);
+                var textBounds = path.GetBounds();
+                if (textBounds.Width > bestLen * 1.1)
+                    return false; // nem fér el a szakaszon
+
+                float angle = (float)(Math.Atan2(bestB.Y - bestA.Y, bestB.X - bestA.X) * 180 / Math.PI);
+                if (angle > 90) angle -= 180;
+                if (angle < -90) angle += 180;
+
+                using (var m = new Matrix())
+                {
+                    m.Translate((bestA.X + bestB.X) / 2, (bestA.Y + bestB.Y) / 2);
+                    m.Rotate(angle);
+                    path.Transform(m);
+                }
+
+                var b = path.GetBounds();
+                b.Inflate(1, 1);
+                if (!ctx.TryOccupy(b))
+                    return false;
+
+                ctx.G.DrawPath(halo, path);
+                ctx.G.FillPath(brush, path);
+                return true;
+            }
+        }
+
+        static void DrawStreetNames(RenderContext ctx, VectorTileLayer layer)
+        {
+            if (layer == null || ctx.Zoom < 12)
+                return;
+
+            var done = new HashSet<string>();
+
+            using (var halo = new Pen(Color.FromArgb(230, 255, 255, 255), 3.0f) { LineJoin = LineJoin.Round })
+            using (var brush = new SolidBrush(Color.FromArgb(60, 60, 60)))
+            using (var family = new FontFamily(GenericFontFamilies.SansSerif))
+            {
+                // a fontosabb utak neve kerüljön ki először
+                var features = new List<VectorTileFeature>(layer.Features);
+                features.Sort((a, b) => RoadRank(a.GetString("class")).CompareTo(RoadRank(b.GetString("class"))));
+
+                foreach (var f in features)
+                {
+                    if (f.Type != VectorGeometryType.LineString)
+                        continue;
+
+                    string cls = f.GetString("class");
+                    int rank = RoadRank(cls);
+                    if (ctx.Zoom < 14 && rank > 2)
+                        continue; // kis zoomon csak a főutak neve
+
+                    string name = GetName(f);
+                    if (name == null || done.Contains(name))
+                        continue;
+
+                    float size = ctx.Zoom >= 16 ? 11 : 10;
+                    if (DrawLineLabel(ctx, f, layer.Extent, name, family, FontStyle.Regular, size, brush, halo))
+                        done.Add(name);
+                }
+            }
+        }
+
+        static int RoadRank(string cls)
+        {
+            switch (cls)
+            {
+                case "motorway": return 0;
+                case "trunk": return 1;
+                case "primary": return 2;
+                case "secondary": return 3;
+                case "tertiary": return 4;
+                case "minor": return 5;
+                case "service": return 6;
+                default: return 7;
+            }
+        }
+
+        static void DrawWaterNames(RenderContext ctx, VectorTileLayer waterName, VectorTileLayer waterway)
+        {
+            var color = Color.FromArgb(40, 90, 160);
+            var done = new HashSet<string>();
+
+            using (var halo = new Pen(Color.FromArgb(200, 255, 255, 255), 3.0f) { LineJoin = LineJoin.Round })
+            using (var brush = new SolidBrush(color))
+            using (var family = new FontFamily(GenericFontFamilies.SansSerif))
+            using (var format = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            {
+                // tavak, tengerek: pont feliratok
+                if (waterName != null)
+                {
+                    foreach (var f in waterName.Features)
+                    {
+                        string name = GetName(f);
+                        if (name == null || done.Contains(name) || f.Parts.Count == 0 || f.Parts[0].Count == 0)
+                            continue;
+
+                        if (f.Type == VectorGeometryType.LineString)
+                        {
+                            if (DrawLineLabel(ctx, f, waterName.Extent, name, family, FontStyle.Italic, 11, brush, halo))
+                                done.Add(name);
+                            continue;
+                        }
+
+                        var p = ctx.ToPixels(f.Parts[0], waterName.Extent)[0];
+                        if (p.X < 0 || p.Y < 0 || p.X >= TileSize || p.Y >= TileSize)
+                            continue;
+
+                        using (var path = new GraphicsPath())
+                        {
+                            path.AddString(name, family, (int)FontStyle.Italic, 11, p, format);
+                            var b = path.GetBounds();
+                            if (!ctx.TryOccupy(b))
+                                continue;
+                            ctx.G.DrawPath(halo, path);
+                            ctx.G.FillPath(brush, path);
+                            done.Add(name);
+                        }
+                    }
+                }
+
+                // folyók, patakok: a vonal mentén
+                if (waterway != null && ctx.Zoom >= 12)
+                {
+                    foreach (var f in waterway.Features)
+                    {
+                        if (f.Type != VectorGeometryType.LineString)
+                            continue;
+                        if (ctx.Zoom < 14 && f.GetString("class") != "river")
+                            continue;
+
+                        string name = GetName(f);
+                        if (name == null || done.Contains(name))
+                            continue;
+
+                        if (DrawLineLabel(ctx, f, waterway.Extent, name, family, FontStyle.Italic, 10, brush, halo))
+                            done.Add(name);
+                    }
+                }
+            }
+        }
+
+        static void DrawHouseNumbers(RenderContext ctx, VectorTileLayer layer)
+        {
+            if (layer == null || ctx.Zoom < 17)
+                return;
+
+            using (var brush = new SolidBrush(Color.FromArgb(110, 100, 95)))
+            using (var font = new Font(FontFamily.GenericSansSerif, 8f, GraphicsUnit.Pixel))
+            using (var format = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            {
+                foreach (var f in layer.Features)
+                {
+                    if (f.Type != VectorGeometryType.Point || f.Parts.Count == 0 || f.Parts[0].Count == 0)
+                        continue;
+
+                    string hn = f.GetString("housenumber");
+                    if (string.IsNullOrEmpty(hn))
+                        continue;
+
+                    var p = ctx.ToPixels(f.Parts[0], layer.Extent)[0];
+                    if (p.X < 0 || p.Y < 0 || p.X >= TileSize || p.Y >= TileSize)
+                        continue;
+
+                    var sz = ctx.G.MeasureString(hn, font);
+                    var r = new RectangleF(p.X - sz.Width / 2, p.Y - sz.Height / 2, sz.Width, sz.Height);
+                    if (!ctx.TryOccupy(r))
+                        continue;
+
+                    ctx.G.DrawString(hn, font, brush, p, format);
                 }
             }
         }

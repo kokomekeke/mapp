@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="MapProvider" Type="System.String" Scope="User">
-      <Value Profile="(Default)">BingMap</Value>
+      <Value Profile="(Default)">HFsystemMap</Value>
     </Setting>
     <Setting Name="Latitude" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">47.4979</Value>
+      <Value Profile="(Default)">47.39835</Value>
     </Setting>
     <Setting Name="Longitude" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">19.0402</Value>
+      <Value Profile="(Default)">19.51172</Value>
     </Setting>
     <Setting Name="Settlement" Type="System.String" Scope="User">
       <Value Profile="(Default)">Budapest</Value>
@@ -21,7 +21,7 @@
       <Value Profile="(Default)">google.com</Value>
     </Setting>
     <Setting Name="Zoom" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">3</Value>
+      <Value Profile="(Default)">10</Value>
     </Setting>
   </Settings>
 </SettingsFile>

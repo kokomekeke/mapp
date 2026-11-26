@@ -650,6 +650,32 @@ namespace GMap.NET.Internals
             }
         }
 
+        /// <summary>
+        ///     A csempék újratöltése (pl. ha a provider ugyanarra a csempére más képet ad, mert
+        ///     megváltoztak a látható rétegek). A ReloadMap-pel ellentétben megtartja a már ismert
+        ///     "működő" zoomszintet (_okZoom), így a hiányzó csempék helyén a szülőcsempe nagyított
+        ///     képe továbbra is megjelenik (FillEmptyTiles).
+        /// </summary>
+        public void ReloadTiles()
+        {
+            if (!IsStarted)
+                return;
+
+            CancelAsyncTasks();
+
+            Matrix.ClearAllLevels();
+
+            lock (FailedLoads)
+            {
+                FailedLoads.Clear();
+                _raiseEmptyTileError = true;
+            }
+
+            Refresh.Set();
+
+            UpdateBounds();
+        }
+
 #if !NETFRAMEWORK
         public Task ReloadMapAsync()
         {

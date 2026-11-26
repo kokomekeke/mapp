@@ -24,7 +24,123 @@ namespace GMap.NET.MapProviders
         {
             // Az INI-t az exe mappájából olvassuk, nem az aktuális munkakönyvtárból
             LoadParameters(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "HFsystemMap.ini"));
+
+            // Vektoros módban a kirajzolt kép a bekapcsolt rétegektől függ, ezért a GMap lemezes
+            // csempe-gyorsítótárát nem használjuk (különben rétegváltás után a régi kép jönne vissza).
+            // A letöltött .pbf adatokat a provider maga tartja a memóriában (lásd _pbfCache).
+            BypassCache = IsVectorTileUrl;
         }
+
+        #region kezdőnézet
+
+        /// <summary>
+        ///     Ha meg van adva (INI: StartLatitude, StartLongitude, StartZoom), az alkalmazás
+        ///     mindig ide indul a HFsystemMap térképpel, a legutóbb elmentett nézet helyett.
+        /// </summary>
+        public double? StartLatitude { get; set; }
+
+        public double? StartLongitude { get; set; }
+
+        public double? StartZoom { get; set; }
+
+        public bool HasStartView
+        {
+            get { return StartLatitude.HasValue && StartLongitude.HasValue && StartZoom.HasValue; }
+        }
+
+        static double? ParseIniDouble(string s)
+        {
+            s = (s ?? string.Empty).Trim().Replace(',', '.');
+            return double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out double d) ? d : (double?)null;
+        }
+
+        #endregion
+
+        #region rétegek
+
+        HFsystemLayers _visibleLayers = HFsystemLayers.All;
+
+        /// <summary>
+        ///     A kirajzolt rétegek. INI kulcsok: Layer.&lt;név&gt;=1/0, pl. Layer.StreetNames=0
+        ///     Változtatás után a térképet újra kell tölteni (lásd LayersChanged).
+        /// </summary>
+        public HFsystemLayers VisibleLayers
+        {
+            get { return _visibleLayers; }
+            set
+            {
+                if (_visibleLayers != value)
+                {
+                    _visibleLayers = value;
+                    LayersChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        public bool IsLayerVisible(HFsystemLayers layer)
+        {
+            return (_visibleLayers & layer) == layer;
+        }
+
+        public void SetLayerVisible(HFsystemLayers layer, bool visible)
+        {
+            VisibleLayers = visible ? _visibleLayers | layer : _visibleLayers & ~layer;
+        }
+
+        /// <summary>
+        ///     a látható rétegek megváltoztak; a térképet újra kell rajzolni
+        /// </summary>
+        public event EventHandler LayersChanged;
+
+        #endregion
+
+        #region .pbf memória-gyorsítótár
+
+        const int PbfCacheMaxTiles = 2000;
+        readonly Dictionary<string, byte[]> _pbfCache = new Dictionary<string, byte[]>();
+        readonly LinkedList<string> _pbfCacheOrder = new LinkedList<string>();
+        readonly object _pbfCacheLock = new object();
+
+        byte[] GetPbfCached(string url)
+        {
+            lock (_pbfCacheLock)
+            {
+                if (_pbfCache.TryGetValue(url, out var cached))
+                    return cached;
+            }
+
+            byte[] data = GetTileDataUsingHttp(url);
+
+            lock (_pbfCacheLock)
+            {
+                if (!_pbfCache.ContainsKey(url))
+                {
+                    _pbfCache[url] = data;
+                    _pbfCacheOrder.AddLast(url);
+                    while (_pbfCacheOrder.Count > PbfCacheMaxTiles)
+                    {
+                        _pbfCache.Remove(_pbfCacheOrder.First.Value);
+                        _pbfCacheOrder.RemoveFirst();
+                    }
+                }
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        ///     a memóriában tartott .pbf csempék törlése (pl. ha a szerveren frissültek az adatok)
+        /// </summary>
+        public void ClearPbfCache()
+        {
+            lock (_pbfCacheLock)
+            {
+                _pbfCache.Clear();
+                _pbfCacheOrder.Clear();
+            }
+        }
+
+        #endregion
 
         static HFsystemMapProvider()
         {
@@ -214,9 +330,9 @@ namespace GMap.NET.MapProviders
             long subY = pos.Y - (src.Y << overzoom);
 
             string url = MakeTileImageUrl(src, zoom - overzoom, string.Empty);
-            byte[] pbf = GetTileDataUsingHttp(url);
+            byte[] pbf = GetPbfCached(url);
 
-            byte[] png = VectorTileRenderer.RenderToPng(pbf, zoom, overzoom, subX, subY);
+            byte[] png = VectorTileRenderer.RenderToPng(pbf, zoom, overzoom, subX, subY, _visibleLayers);
 
             // publiclyVisible: true kell, mert a GMaps a gyorsítótárazáshoz Data.GetBuffer()-t hív,
             // ami a sima new MemoryStream(byte[]) esetén UnauthorizedAccessException-t dob
@@ -292,6 +408,20 @@ namespace GMap.NET.MapProviders
                         continue;
 
                     var ls = line.Split(new char[] {'='},2);
+                    if (ls.Length > 1 && ls[0].Trim().StartsWith("Layer.", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Layer.StreetNames=0 / 1
+                        string layerName = ls[0].Trim().Substring("Layer.".Length);
+                        string v = ls[1].Trim();
+                        if (Enum.TryParse(layerName, true, out HFsystemLayers layer) && layer != HFsystemLayers.None)
+                        {
+                            bool on = v == "1" || v.Equals("true", StringComparison.OrdinalIgnoreCase) ||
+                                      v.Equals("igen", StringComparison.OrdinalIgnoreCase);
+                            _visibleLayers = on ? _visibleLayers | layer : _visibleLayers & ~layer;
+                        }
+                        continue;
+                    }
+
                     if (ls.Length > 1)
                     {
                         switch (ls[0].Trim())
@@ -320,6 +450,15 @@ namespace GMap.NET.MapProviders
                             case "TileFormat":
                                 if (!string.IsNullOrEmpty(ls[1].Trim()))
                                     TileFormat = ls[1].Trim();
+                                break;
+                            case "StartLatitude":
+                                StartLatitude = ParseIniDouble(ls[1]);
+                                break;
+                            case "StartLongitude":
+                                StartLongitude = ParseIniDouble(ls[1]);
+                                break;
+                            case "StartZoom":
+                                StartZoom = ParseIniDouble(ls[1]);
                                 break;
                             case "MaxVectorZoom":
                                 if (int.TryParse(ls[1].Trim(), out int mvz) && mvz >= 0)

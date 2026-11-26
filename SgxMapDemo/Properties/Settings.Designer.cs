@@ -25,7 +25,7 @@ namespace SgxMapDemo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("BingMap")]
+        [global::System.Configuration.DefaultSettingValueAttribute("HFsystemMap")]
         public string MapProvider {
             get {
                 return ((string)(this["MapProvider"]));
@@ -37,7 +37,7 @@ namespace SgxMapDemo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("47.4979")]
+        [global::System.Configuration.DefaultSettingValueAttribute("47.39835")]
         public double Latitude {
             get {
                 return ((double)(this["Latitude"]));
@@ -49,7 +49,7 @@ namespace SgxMapDemo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("19.0402")]
+        [global::System.Configuration.DefaultSettingValueAttribute("19.51172")]
         public double Longitude {
             get {
                 return ((double)(this["Longitude"]));
@@ -97,7 +97,7 @@ namespace SgxMapDemo.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public double Zoom {
             get {
                 return ((double)(this["Zoom"]));

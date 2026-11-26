@@ -683,6 +683,14 @@ namespace SgxMap
             Core.ReloadMap();
         }
 
+        /// <summary>
+        ///     Csempék újratöltése a zoomszint-állapot megtartásával (pl. rétegváltáskor)
+        /// </summary>
+        public void ReloadTiles()
+        {
+            Core.ReloadTiles();
+        }
+
         #region Cash
 
         /// <summary>

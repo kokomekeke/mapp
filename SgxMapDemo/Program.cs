@@ -15,9 +15,9 @@ namespace SgxMapDemo
         public static Properties.Settings settings = new Properties.Settings();
 
         // map
-        public static GMapProvider mapProvider = GMapProviders.BingHybridMap;           // initial map
-        public static double initialLatitude = 47.4979;                                 // initial center position
-        public static double initialLongitude = 19.0402;
+        public static GMapProvider mapProvider = GMapProviders.HFsystemMap;             // initial map
+        public static double initialLatitude = 47.39835;                                // initial center position
+        public static double initialLongitude = 19.51172;
         public static double initialZoom = 10;                                          // initial zoom of map
         public static string settlement = "Hungary, Budapest";                          // initial center settlement
         public static string pingaddress = "google.com";                                // ip address to check conenction
@@ -80,6 +80,17 @@ namespace SgxMapDemo
                 }
             }
 
+
+            // Ha a HFsystemMap.ini-ben meg van adva kezdőnézet (StartLatitude/StartLongitude/StartZoom),
+            // a program mindig ott indul a HFsystemMap térképpel, a legutóbb elmentett nézettől függetlenül.
+            var hf = GMapProviders.HFsystemMap;
+            if (hf.HasStartView)
+            {
+                Program.mapProvider = hf;
+                initialLatitude = hf.StartLatitude!.Value;
+                initialLongitude = hf.StartLongitude!.Value;
+                initialZoom = hf.StartZoom!.Value;
+            }
 
             foreach (AccessMode a in Enum.GetValues(typeof(AccessMode)))
             {

@@ -20,6 +20,7 @@ using System.Windows.Forms;
 using GMap.NET;
 using GMap.NET.Internals;
 using GMap.NET.MapProviders;
+using GMap.NET.MapProviders.HFsystem;
 using SgxMap.Shapes;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static GMap.NET.Entity.OpenStreetMapGraphHopperGeocodeEntity;
@@ -72,6 +73,7 @@ namespace SgxMap
                 {
                     MainMap.MapProvider = value;
                     comboBoxMapType.SelectedItem = value;
+                    UpdateLayerButton();
                     trackBar_Zoom.Minimum = (int)MainMap.MinZoom;
                     trackBar_Zoom.Maximum = (int)MainMap.MaxZoom;
                     if ((MainMap.Zoom >= MainMap.MinZoom) && (MainMap.Zoom <= MainMap.MaxZoom))
@@ -98,6 +100,7 @@ namespace SgxMap
         public SgxMapControl()
         {
             InitializeComponent();
+            CreateLayerMenu();
             LoadControls();
             MainMap.MouseDown += MainMap_MouseDown;
             MainMap.OnShowPlaceInfo += MainMap_ShowPlaceInfo;
@@ -118,9 +121,124 @@ namespace SgxMap
         }
 
 
+        #region HFsystemMap rétegek
+
+        private System.Windows.Forms.Button btn_layers = null!;
+        private ContextMenuStrip menu_layers = null!;
+
+        /// <summary>
+        ///     "Rétegek" gomb a térképtípus-választó mellett; csak HFsystemMap (vektoros) térképnél látszik.
+        ///     A menüben a rétegek pipával be-/kikapcsolhatók, a térkép azonnal újrarajzolódik.
+        /// </summary>
+        private void CreateLayerMenu()
+        {
+            menu_layers = new ContextMenuStrip(components);
+            menu_layers.ShowCheckMargin = true;
+            menu_layers.ShowImageMargin = false;
+            // pipáláskor ne csukódjon be a menü, így több réteg is átállítható egyszerre
+            menu_layers.Closing += (s, e) =>
+            {
+                if (e.CloseReason == ToolStripDropDownCloseReason.ItemClicked)
+                    e.Cancel = true;
+            };
+
+            var provider = HFsystemMapProvider.Instance;
+            string? group = null;
+
+            foreach (var item in HFsystemLayerInfo.Items)
+            {
+                if (item.Group != group)
+                {
+                    if (group != null)
+                        menu_layers.Items.Add(new ToolStripSeparator());
+                    menu_layers.Items.Add(new ToolStripLabel(item.Group) { Font = new Font(menu_layers.Font, FontStyle.Bold), ForeColor = SystemColors.GrayText });
+                    group = item.Group;
+                }
+
+                var mi = new ToolStripMenuItem(item.Title)
+                {
+                    CheckOnClick = true,
+                    Checked = provider.IsLayerVisible(item.Layer),
+                    Tag = item.Layer
+                };
+                mi.CheckedChanged += (s, e) =>
+                {
+                    var m = (ToolStripMenuItem)s!;
+                    HFsystemMapProvider.Instance.SetLayerVisible((HFsystemLayers)m.Tag!, m.Checked);
+                };
+                menu_layers.Items.Add(mi);
+            }
+
+            menu_layers.Items.Add(new ToolStripSeparator());
+            menu_layers.Items.Add(new ToolStripMenuItem("Mind be", null, (s, e) => SetAllLayers(true)));
+            menu_layers.Items.Add(new ToolStripMenuItem("Csak alaptérkép (feliratok nélkül)", null, (s, e) =>
+            {
+                SetAllLayers(true);
+                foreach (var it in menu_layers.Items.OfType<ToolStripMenuItem>())
+                {
+                    if (it.Tag is HFsystemLayers l && HFsystemLayerInfo.Items.Any(x => x.Layer == l && x.Group == "Feliratok"))
+                        it.Checked = false;
+                }
+            }));
+
+            btn_layers = new System.Windows.Forms.Button
+            {
+                Text = "Rétegek ▾",
+                Location = new System.Drawing.Point(comboBoxMapType.Right + 6, comboBoxMapType.Top - 1),
+                Size = new Size(90, 25),
+                UseVisualStyleBackColor = true,
+                Visible = false,
+                TabIndex = 10
+            };
+            toolTip_draw.SetToolTip(btn_layers, "Térképrétegek be-/kikapcsolása (utak, utcanevek, épületek...)");
+            btn_layers.Click += (s, e) => menu_layers.Show(btn_layers, new System.Drawing.Point(0, btn_layers.Height));
+            SearchPanel.Controls.Add(btn_layers);
+
+            provider.LayersChanged += HFsystem_LayersChanged;
+            HandleDestroyed += (s, e) => HFsystemMapProvider.Instance.LayersChanged -= HFsystem_LayersChanged;
+        }
+
+        private void SetAllLayers(bool visible)
+        {
+            foreach (var it in menu_layers.Items.OfType<ToolStripMenuItem>())
+            {
+                if (it.Tag is HFsystemLayers)
+                    it.Checked = visible;
+            }
+        }
+
+        private void HFsystem_LayersChanged(object? sender, EventArgs e)
+        {
+            if (MainMap.MapProvider != HFsystemMapProvider.Instance)
+                return;
+
+            // a már kirajzolt csempék a memóriában vannak; töröljük, hogy az új rétegekkel rajzolódjanak újra
+            GMaps.Instance.MemoryCache.Clear();
+            try
+            {
+                // nem ReloadMap: az nullázná a "működő zoomszintet", és a hiányzó csempék helyén
+                // nem jelenne meg a szülőcsempe nagyított képe (csak üres hibacsempék)
+                MainMap.ReloadTiles();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("HFsystem_LayersChanged: " + ex.Message);
+            }
+        }
+
+        private void UpdateLayerButton()
+        {
+            if (btn_layers != null)
+                btn_layers.Visible = MainMap.MapProvider == HFsystemMapProvider.Instance &&
+                                     HFsystemMapProvider.Instance.IsVectorTileUrl;
+        }
+
+        #endregion
+
         private void comboBoxMapType_SelectedValueChanged(object sender, EventArgs e)
         {
             MainMap.MapProvider = comboBoxMapType.SelectedItem as GMapProvider;
+            UpdateLayerButton();
             trackBar_Zoom.Minimum = (int)MainMap.MinZoom;
             trackBar_Zoom.Maximum = (int)MainMap.MaxZoom;
             if ((MainMap.Zoom >= MainMap.MinZoom) && (MainMap.Zoom <= MainMap.MaxZoom))

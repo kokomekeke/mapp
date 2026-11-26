@@ -6,10 +6,10 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyVersion>1.0.26.831</AssemblyVersion>
-    <FileVersion>1.0.26.831</FileVersion>
+    <AssemblyVersion>1.0.26.1125</AssemblyVersion>
+    <FileVersion>1.0.26.1125</FileVersion>
     <Title>SGXMap - Maps For Windows</Title>
-    <Version>1.0.26.831</Version>
+    <Version>1.0.26.1125</Version>
     <Authors>Endre Kótai</Authors>
     <Company>SAGAX Communications Ltd.</Company>
     <Copyright>Copyright (c) SAGAX 2026</Copyright>
